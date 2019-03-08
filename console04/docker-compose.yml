@@ -1,0 +1,26 @@
+# vi:nu:et:sts=4 ts=4 sw=4
+# Simple docker-compose file to build go program
+# container and link it to a redis container
+version: '3'
+services:
+    web:
+        image:      kranki/console04
+        networks:   ["redis-net"]
+        ports:
+            - "9000:9000"
+        depends_on:
+            - redis
+    redis:
+        image:          redis
+        command: ["redis-server", "--appendonly", "yes"]
+        container_name: redis
+        hostname:       redis
+        networks: ["redis-net"]
+        ports:
+            - "6379:6379"        
+        volumes:
+            - redis_data:/data
+networks:
+    redis-net:
+volumes:
+    redis_data:
