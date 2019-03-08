@@ -1,0 +1,22 @@
+# I am going through courses on Golang and Docker.  The assignment in the Docker
+# course was to tie a Python program to redis using docker-compose in two con-
+# tainers.  
+
+# I don't like blindly accepting something. So, I spent a little time looking 
+# into what redis is (a NoSQL database) and a little about how it is used.  I 
+# also looked into putting a go program into a Docker Container which turned 
+# out to be pretty easy especially the cross compiling for linux. (I think!)
+# So, now the work begins. lol
+
+# First, I needed a program to simulate what the python program did, but
+# running on my computer not in a container.  So, that is what this program
+# does.  You run it with one of the following urls:
+#
+        http://localhost:9000/          <= Prints a you are here type msg
+        http://localhost:9000/hi        <= Prints "Hello" msg
+        http://localhost:9000/hitme     <= Prints "Ouch" msg with increasing count
+        http://localhost:9000/q         <= Quits the program
+
+
+
+

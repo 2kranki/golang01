@@ -1,0 +1,10 @@
+# My objective with this program is reproduce the logic of dotnet01/console04. That
+# program is  a study in how access and build databases using Microsoft SQL Server 
+# running in Docker.
+
+# To do this, I had to add an SQL interface to Golang. So, I did:
+go get github.com/denisenkom/go-mssqldb
+# It installed the package and did not affect the current directory.
+
+
+
