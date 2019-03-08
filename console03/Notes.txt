@@ -1,0 +1,37 @@
+# I am going through courses on Golang and Docker.  The assignment in the Docker
+# course was to tie a Python program to redis using docker-compose in two con-
+# tainers.  
+
+# I don't like blindly accepting something. So, I spent a little time looking 
+# into what redis is (a NoSQL database) and a little about how it is used.  I 
+# also looked into putting a go program into a Docker Container which turned 
+# out to be pretty easy especially the cross compiling for linux. (I think!)
+# So, now the work begins. lol
+
+# Second, I found an example program to create a simple http server using go
+# in "The Go Programming Language" book by Alan Donovan and Brian Kernighan.
+# On page 158, they describe displaying a database using the net/http package.
+# I used it as an example to create a program that handled what I wanted to do.
+# I had the "/hitme" url, incrementing a counter.  It did not work correctly
+# until I changed the functions for httpHandler to be pointers.  With that working,
+# now start creating the redis interface for the count.
+
+# When I first copied this over from console02, I simply put that program in
+# the docker container asis.  It took me a while to figure out why it did not
+# work when console02 worked fine.  It was because I was still directing it
+# to localhost:9000 in the program.  This is to the docker container's
+# local vm host not to the localhost in this computer.  You have to think of
+# the docker container as its own computer which it is and that can be con-
+# fusing at times.
+
+# To run this version, you use the following:
+            ./run.sh
+# Then:
+            http://localhost:9000/          <== General you are here msg
+            http://localhost:9000/hi        <== Hello! msg
+            http://localhost:9000/hitme     <== Ouch! msg incrementing counter
+# To end it:
+            ./kill.sh
+
+
+
