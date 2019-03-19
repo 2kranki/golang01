@@ -1,0 +1,9 @@
+# This was an exercise from a Golang Web Dev course that I am taking.  I wrote
+# all the code and it gives me a reference for future about reading a csv with
+# floats and ints in it.  The template file is pretty primitive at this point.
+
+# To run it, you should use the following:
+go run main.go
+
+
+

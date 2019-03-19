@@ -1,0 +1,39 @@
+# I am going through courses on Golang and Docker.  The assignment in the Docker
+# course was to tie a Python program to redis using docker-compose in two con-
+# tainers.  
+
+# This program is based on console03, but using redis to maintain the counter.
+# It also uses docker-compoase to start up the new container that we build here,
+# but also the redis container and it's associated data volume.
+
+# First, I needed an interface between go and redis. I found this via the Redis 
+# site, redis.io.  They suggested:
+
+go get github.com/gomodule/redigo/redis
+docker image pull redis:latest
+
+# Then:
+        ./buildDocker.sh
+        docker login
+        docker image push kranki/console04:latest
+
+
+# To run this version, I did the following:
+            docker network create redis-net
+            docker-compose -f docker-compose.yml
+# Then in my browser:
+            http://localhost:9000/          <== General you are here msg
+            http://localhost:9000/hi        <== Hello! msg
+            http://localhost:9000/hitme     <== Ouch! msg incrementing counter
+# To end it:
+            ^C (Ctrl-C)
+
+# It took me several iterations to figure out how to push the docker image,
+# remember my signon and find the command to push since I had not done it
+# before.  Finding information about writing the yml file was interesting
+# since it took 3 different websites to figure it out. However, now I know
+# and that is what this exercise is all about.  "docker-compose" does make
+# it easy to bring up multi-container apps.
+
+
+
