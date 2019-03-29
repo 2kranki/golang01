@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></meta>
+    <title>Some Title</title>
+</head>
+<body>
+
+    {{range }}
+        <li>{{.Num}} - {{.Title}}</li>
+    {{end}}
+
+</body>
+</html>
