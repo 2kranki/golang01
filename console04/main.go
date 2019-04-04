@@ -5,13 +5,25 @@ package main
 
 import (
     "fmt"
+    "html/template"
     "log"
     "net/http"
     "strconv"
+    "sync"
     "github.com/gomodule/redigo/redis"
 )
 
 
+var hitmeTpl = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <p>OUCH - You have hit me {{.}} times!</p>
+</body>
+</html>`
 
 
 //***************************************************************
@@ -45,7 +57,7 @@ func getCount() int {
 
 	c := redisConnect()
 	defer c.Close()
-	// get the value from redis for the key viewedcount
+	// get the value from redis for the key viewed count
 	reply, err := c.Do("GET", "count")
 	if err != nil {
 		log.Fatal(err)
@@ -66,7 +78,11 @@ func getCount() int {
 //                  HTTP Request Handlers
 //***************************************************************
 
+// Request Handlers run as independent goroutines so any shared
+// data must be protected.
+
 type httpHandler struct{
+    mu      sync.Mutex
     count   int
 }
 
@@ -82,10 +98,20 @@ func (h *httpHandler) hi(w http.ResponseWriter, r *http.Request) {
 
 
 func (h *httpHandler) hitme(w http.ResponseWriter, r *http.Request) {
-    count := getCount()
-	fmt.Fprintf(w, "Ouch! %d - %s\n", count, r.URL.Path)
-    count++
-    updateCount(count)
+    h.mu.Lock()
+    defer h.mu.Unlock()
+    h.count = getCount()
+    h.count++
+    updateCount(h.count)
+    tpl, err := template.New("HitMe").Parse(hitmeTpl)
+    if err != nil {
+        log.Fatalln("Error while parsing template:", err)
+    }
+    err = tpl.ExecuteTemplate(w, "HitMe", h.count)
+    if err != nil {
+        log.Fatalln("Error while executing template:", err)
+    }
+
 }
 
 
@@ -104,6 +130,6 @@ func main() {
     http.HandleFunc("/hi", h.hi)
     http.HandleFunc("/hitme", h.hitme)
 
-    log.Fatal(http.ListenAndServe(":9000", nil))
+    log.Fatal(http.ListenAndServe(":8080", nil))
 
 }

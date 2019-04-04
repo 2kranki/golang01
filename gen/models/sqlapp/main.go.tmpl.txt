@@ -1,0 +1,60 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+// SQL Application main program
+
+// Generated: {{.Defns.time}}
+
+
+package main
+
+import (
+    "flag"
+    "fmt"
+    "log"
+)
+
+{{- if .Data.Flags -}}
+    {{- range $t := .Data.Flags -}}
+    {{if $t.Internal}}{{$t.Internal}}{{else}}{{$t.Name}}{{end}} {{ $t.Type }}
+    {{- end -}}
+{{- end -}}
+{{ if .Data.Usage }}
+
+func usage() {
+    	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
+    	{{ if .Data.Usage.Line -}}
+	        fmt.Fprintf(flag.CommandLine.Output(), "{{ .Usage.Line }}\n")
+        {{ end }}
+	    fmt.Fprintf(flag.CommandLine.Output(), "\nOptions:\n")
+	    flag.PrintDefaults()
+	    {{ if .Data.Usage.Notes -}}
+	        fmt.Fprintf(flag.CommandLine.Output(), "\nNotes:\n")
+            {{ range $t := .Data.Usage.Notes }}
+                fmt.Fprintf(flag.CommandLine.Output(), "{{ $t }}")
+            {{- end -}}
+        {{ end }}
+}
+{{- end }}
+
+func main() {
+
+    // Set up flag variables
+{{ if .Data.Usage }}
+	flag.Usage = usage
+{{- end -}}
+{{- if .Data.Flags -}}
+    {{- range $t := .Data.Flags }}
+    {{ flagPrs $t }}
+    {{ end -}}
+{{- end -}}
+
+	flag.Parse()
+	if debug {
+		log.Println("\tIn Debug Mode...")
+	}
+
+	exec()
+}
+
+

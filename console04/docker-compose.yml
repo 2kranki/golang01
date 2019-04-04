@@ -7,7 +7,7 @@ services:
         image:      kranki/console04
         networks:   ["redis-net"]
         ports:
-            - "9000:9000"
+            - "8080:8080"
         depends_on:
             - redis
     redis:

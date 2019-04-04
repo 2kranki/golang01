@@ -27,6 +27,7 @@ build/
 *~.nib
 
 # MPLABX files
+*.a
 *.dmp
 *.lst
 *.map

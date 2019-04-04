@@ -1,0 +1,73 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+//
+
+package table
+
+import (
+	"errors"
+	{{ if .Data.SqlType == "mariadb" }}
+		ERROR - NOT IMPLEMENTED
+	{{ else if .Data.SqlType == "mssql" }}
+	_ "github.com/2kranki/go-mssqldb"
+	{{ else if .Data.SqlType == "mysql" }}
+		_ "github.com/go-sql-driver/mysql"
+	{{ else if .Data.SqlType == "postgres" }}
+		_ "github.com/lib/pq"
+	{{ else if .Data.SqlType == "sqlite" }}
+	_ "github.com/2kranki/go-sqlite3"
+	{{ end }}
+	"net/http"
+	"strconv"
+)
+
+
+var TPL *template.Template
+
+func init() {
+	TPL = template.Must(template.ParseGlob("templates/*.gohtml"))
+	{{ if .Data.SqlType == "mariadb" }}
+		ERROR - NOT IMPLEMENTED
+	{{ else if .Data.SqlType == "mssql" }}
+	_ "github.com/2kranki/go-mssqldb"
+	{{ else if .Data.SqlType == "mysql" }}
+		_ "github.com/go-sql-driver/mysql"
+	{{ else if .Data.SqlType == "postgres" }}
+		_ "github.com/lib/pq"
+	{{ else if .Data.SqlType == "sqlite" }}
+	_ "github.com/2kranki/go-sqlite3"
+	{{ end }}
+}
+
+{{- range $t := .Data.Tables -}}
+
+func {{ title $t.Name }}DeleteRow( ) {
+
+}
+
+func {{ title $t.Name }}InsertRow( ) {
+
+}
+
+func {{ title $t.Name }}Select(sel string) []string,error {
+	{{ if .Data.SqlType == "mariadb" }}
+		ERROR - NOT IMPLEMENTED
+	{{ else if .Data.SqlType == "mssql" }}
+	_ "github.com/2kranki/go-mssqldb"
+	{{ else if .Data.SqlType == "mysql" }}
+		_ "github.com/go-sql-driver/mysql"
+	{{ else if .Data.SqlType == "postgres" }}
+		_ "github.com/lib/pq"
+	{{ else if .Data.SqlType == "sqlite" }}
+	_ "github.com/2kranki/go-sqlite3"
+	{{ end }}
+
+}
+
+func {{ title $t.Name }}UpdateRow( ) {
+
+}
+
+
+{{ end -}}

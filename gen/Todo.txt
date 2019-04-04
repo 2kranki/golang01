@@ -1,0 +1,21 @@
+* Clean up when done:
+    * unneeded files
+    * write any extra needed documentation
+
+* GenSqlApp:
+    * Generate setup.sh  which takes care of the application requirements such as:
+        * go get <package>
+        * compile and install program
+        * set up database and create tables
+    * main.go
+    * table display/maintenance
+        * tableio.go
+        * tablehndlr.go
+        * toubleform.html per table
+            * Try to do all the single record stuff in one form
+            * Add ability to switch back to list form from this record
+        * tablelist.html per table
+            * Consider doing paging
+            * Allow some selection criteria
+            * generate switch to single record mode and back
+

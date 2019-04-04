@@ -1,0 +1,8 @@
+# This program listens on localhost:8080 and handles some simple http type
+# requests. It does some very simple parsing of the HTTP header from a
+# browser such as Safari. It was an exercise to understand what net/http
+# is doing for us. I wrote this from examples of various pieces on the
+# net and the golang package documentation.
+
+go run main.go
+

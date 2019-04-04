@@ -1,0 +1,31 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+//
+
+package table
+
+import (
+	"errors"
+	{{ if .JsonData.Sqlapp.SqlType == "mariadb" }}
+		ERROR - NOT IMPLEMENTED
+	{{ else if .JsonData.Sqlapp.SqlType == "mssql" }}
+	_ "github.com/2kranki/go-mssqldb"
+	{{ else if .JsonData.Sqlapp.SqlType == "mysql" }}
+		_ "github.com/go-sql-driver/mysql"
+	{{ else if .JsonData.Sqlapp.SqlType == "postgres" }}
+		_ "github.com/lib/pq"
+	{{ else if .JsonData.Sqlapp.SqlType == "sqlite" }}
+	_ "github.com/2kranki/go-sqlite3"
+	{{ end }}
+	"net/http"
+	"strconv"
+)
+
+
+var TPL *template.Template
+
+func init() {
+	TPL = template.Must(template.ParseGlob("templates/*.gohtml"))
+}
+
