@@ -24,6 +24,8 @@ func GenHtmlFile(mdl string, fn string, pt bool, data interface{}) error {
 	var tmpl *template.Template
 
 	log.Printf("\tGenHtmlFile mdl:%s fn:%s ...", mdl, fn)
+
+	// The function map is different between the text and html template packages
 	funcs = template.FuncMap{"dblClose": dblClose, "dblOpen": dblOpen, "nameUC": nameUC}
 
 	outData := strings.Builder{}

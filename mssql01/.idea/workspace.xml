@@ -2,20 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a8d13f04-2a66-4998-bb27-d565aae260ac" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/mssql01.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../console01/Notes.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../console01/main.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../console04/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../console04/buildDocker.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../console04/buildDocker.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../console04/console04_linux" beforeDir="false" afterPath="$PROJECT_DIR$/../console04/console04_linux" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../console04/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../console04/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../console04/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/../console04/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../templates/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../templates/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gen/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../gen/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gen/models/sqlapp/main.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../gen/models/sqlapp/main.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gen/models/sqlapp/mainExec.go.tmpl.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../gen/models/sqlapp/mainExec.go.tmpl.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gen/models/sqlapp/tableHndlr.go.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../gen/models/sqlapp/tableHndlr.go.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gen/models/sqlapp/tableio.go.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../gen/models/sqlapp/tableio.go.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -24,12 +15,12 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="376">
-              <caret line="125" column="40" selection-start-line="125" selection-start-column="40" selection-end-line="125" selection-end-column="40" />
+            <state relative-caret-position="248">
+              <caret line="43" lean-forward="true" selection-start-line="42" selection-end-line="43" />
             </state>
           </provider>
         </entry>
@@ -53,8 +44,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="185" />
-    <option name="y" value="50" />
+    <option name="x" value="77" />
+    <option name="y" value="53" />
     <option name="width" value="1429" />
     <option name="height" value="987" />
   </component>
@@ -64,6 +55,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -75,7 +67,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -127,17 +118,12 @@
     </recent_temporary>
   </component>
   <component name="ToolWindowManager">
-    <frame x="185" y="50" width="1429" height="987" extended-state="0" />
+    <frame x="77" y="53" width="1429" height="987" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Favorites" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24945927" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25306416" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Terminal" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32912844" />
@@ -145,27 +131,32 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Database" />
-      <window_info anchor="right" id="make" />
-      <window_info anchor="right" id="Json Parser" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Database Changes" order="8" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info anchor="bottom" id="Terminal" order="10" />
+      <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="make" order="3" />
+      <window_info anchor="right" id="Database" order="4" />
+      <window_info anchor="right" id="Json Parser" order="5" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Notes.txt">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="376">
-          <caret line="125" column="40" selection-start-line="125" selection-start-column="40" selection-end-line="125" selection-end-column="40" />
+        <state relative-caret-position="248">
+          <caret line="43" lean-forward="true" selection-start-line="42" selection-end-line="43" />
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Notes.txt">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
   </component>
 </project>

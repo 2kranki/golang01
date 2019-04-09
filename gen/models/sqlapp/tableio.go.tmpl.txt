@@ -1,0 +1,108 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+//
+
+package main
+
+import (
+    "database/sql"
+	"errors"
+	{{ if .Data.SqlType == "mariadb" }}
+		ERROR - NOT IMPLEMENTED
+	{{ else if .Data.SqlType == "mssql" }}
+	_ "github.com/2kranki/go-mssqldb"
+	{{ else if .Data.SqlType == "mysql" }}
+		_ "github.com/go-sql-driver/mysql"
+	{{ else if .Data.SqlType == "postgres" }}
+		_ "github.com/lib/pq"
+	{{ else if .Data.SqlType == "sqlite" }}
+	    _ "github.com/2kranki/go-sqlite3"
+	{{ end }}
+	"net/http"
+	"strconv"
+)
+
+
+var db *sql.DB
+
+// ioClose cleans up anything that needs to be
+// accomplished before the database is closed
+// and then closes the database connection.
+func ioClose() {
+    db.Close()
+}
+
+func ioConnect() {
+	{{ if .Data.SqlType == "mariadb" }}
+		ERROR - NOT IMPLEMENTED
+	{{ else if .Data.SqlType == "mssql" }}
+	    connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s&connection+timeout=30",
+	                            user,pw,server,port,db)
+	    db, err := sql.Open("mssql", connStr)
+	{{ else if .Data.SqlType == "mysql" }}
+		ERROR - NOT IMPLEMENTED
+	{{ else if .Data.SqlType == "postgres" }}
+	    connStr := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
+	                            user,pw,server,port,db)
+        db, err = sql.Open("postgres", connStr)
+	{{ else if .Data.SqlType == "sqlite" }}
+	    db, err = sql.Open("sqlite3", host)
+	{{ end }}
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+    err = db.Ping()
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+}
+
+{{- range $t := .Data.Tables -}}
+    func {{title $t.Name }}DeleteRow( ) {
+
+    }
+
+    func {{title $t.Name }}InsertRow( ) {
+
+    }
+
+    func {{title $t.Name }}Select(sel string) []string,error {
+        {{ if .Data.SqlType == "mariadb" }}
+            ERROR - NOT IMPLEMENTED
+        {{ else if .Data.SqlType == "mssql" }}
+        _ "github.com/2kranki/go-mssqldb"
+        {{ else if .Data.SqlType == "mysql" }}
+            _ "github.com/go-sql-driver/mysql"
+        {{ else if .Data.SqlType == "postgres" }}
+            _ "github.com/lib/pq"
+        {{ else if .Data.SqlType == "sqlite" }}
+        _ "github.com/2kranki/go-sqlite3"
+        {{ end }}
+
+    }
+
+    func {{ title $t.Name }}SetupRow(r *http.Request) {
+        data := interface{}
+        key := r.FormValue("{{$t.PrimaryKey}}")
+	    if key == "" {
+		    return data, errors.New("400. Bad Request.")
+	    }
+        row := config.DB.QueryRow("SELECT * FROM {{$t.Name}} WHERE {{$t.PrimaryKey}} = $1", key)
+        err := row.Scan(
+                    &data.Isbn,
+                    &data.Title,
+                    &data.Author,
+                    &data.Price)
+        if err != nil {
+        	return data, err
+        }
+        	return data, nil
+    }
+
+    func {{ title $t.Name }}UpdateRow( ) {
+
+    }
+
+
+{{ end -}}

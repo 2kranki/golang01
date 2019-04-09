@@ -16,10 +16,12 @@ import (
 )
 
 func GenTextFile(mdl string, outPath string, pt bool, data interface{}) error {
-	var err error
-	var tmpl *template.Template
+	var err 	error
+	var tmpl 	*template.Template
 
 	log.Printf("\tGenTextFile mdl:%s fn:%s ...", mdl, outPath)
+
+	// The function map is different between the text and html template packages
 	funcs := template.FuncMap{"dblClose": dblClose, "dblOpen": dblOpen, "flagPrs":flagPrs, "nameUC": nameUC}
 
 	outData := strings.Builder{}

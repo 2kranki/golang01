@@ -14,12 +14,20 @@ import (
     "log"
 )
 
-{{- if .Data.Flags -}}
-    {{- range $t := .Data.Flags -}}
-    {{if $t.Internal}}{{$t.Internal}}{{else}}{{$t.Name}}{{end}} {{ $t.Type }}
-    {{- end -}}
+var (
+{{ if .Data.Flags -}}
+    {{- range $t := .Data.Flags }}
+        {{if $t.Internal}}{{$t.Internal}}{{else}}{{$t.Name}}{{end}} {{$t.Type}}
+    {{ end -}}
 {{- end -}}
 {{ if .Data.Usage }}
+	pw     string
+	port   string
+	server string
+	user   string
+	db     string
+)
+
 
 func usage() {
     	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
@@ -48,12 +56,19 @@ func main() {
     {{ flagPrs $t }}
     {{ end -}}
 {{- end -}}
+	flag.StringVar(&pw, "pw", "Passw0rd!", "the database password")
+	flag.StringVar(&port, "port", "1401", "the database port")
+	flag.StringVar(&server, "server", "localhost", "the database server")
+	flag.StringVar(&user, "user", "sa", "the database user")
+	flag.StringVar(&db, "db", "TeachDB", "the database name")
 
+    // Parse the flags and check them
 	flag.Parse()
 	if debug {
 		log.Println("\tIn Debug Mode...")
 	}
 
+    // Execute the main process.
 	exec()
 }
 

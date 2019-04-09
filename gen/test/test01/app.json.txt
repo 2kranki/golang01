@@ -2,10 +2,11 @@
 
 {
     "Database":"Finances",
-    "SqlType":"postgres",                   # mariadb | mssql | mysql | postgres | sqlite
+    "SqlType":"postgres",                   # mariadb | mssql | mysql | postgres | sqlite (required)
     "Tables":[
         {
             "Name":"Customer",
+            "PrimaryKey":"CustNo",
             "Fields":[
                 {
                     "Name":"CustNo",
@@ -16,7 +17,8 @@
                 {
                     "Name":"CustName",
                     "Type":"NVARCHAR",
-                    "Len":30
+                    "Len":30,
+                    "List":true
                 },
                 {
                     "Name":"CustAddr1",
@@ -58,12 +60,14 @@
                 {
                     "Name":"VendNo",
                     "Type":"int",
-                    "PrimaryKey":true
+                    "PrimaryKey":true,
+                    "List":true
                 },
                 {
                     "Name":"VendName",
                     "Type":"string",
-                    "Len":30
+                    "Len":30,
+                    "List":true
                 },
                 {
                     "Name":"VendAddr1",

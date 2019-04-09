@@ -3,19 +3,19 @@
 
 //
 
-package table
+package main
 
 import (
 	"errors"
-	{{ if .JsonData.Sqlapp.SqlType == "mariadb" }}
+	{{ if .Data.SqlType == "mariadb" }}
 		ERROR - NOT IMPLEMENTED
-	{{ else if .JsonData.Sqlapp.SqlType == "mssql" }}
+	{{ else if .Data.SqlType == "mssql" }}
 	_ "github.com/2kranki/go-mssqldb"
-	{{ else if .JsonData.Sqlapp.SqlType == "mysql" }}
+	{{ else if .Data.SqlType == "mysql" }}
 		_ "github.com/go-sql-driver/mysql"
-	{{ else if .JsonData.Sqlapp.SqlType == "postgres" }}
+	{{ else if .Data.SqlType == "postgres" }}
 		_ "github.com/lib/pq"
-	{{ else if .JsonData.Sqlapp.SqlType == "sqlite" }}
+	{{ else if .Data.SqlType == "sqlite" }}
 	_ "github.com/2kranki/go-sqlite3"
 	{{ end }}
 	"net/http"
