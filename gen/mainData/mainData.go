@@ -1,14 +1,20 @@
 // See License.txt in main repository directory
 
-// Template Functions used in generation
+// mainData is responsible for reading and processing the
+// Main JSON file.  It reads it in and supplies the necessary
+// functions used in the templating.
 
-package genSqlApp
+package mainData
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"path/filepath"
 	"reflect"
 	"strings"
+	"../shared"
+	"../util"
 )
 
 type MainFlag struct {
@@ -28,6 +34,9 @@ type MainData struct {
 	Flags		[]MainFlag
 	Usage 		MainUsage
 }
+
+var	mainStruct	MainData
+var	mainJson	interface{}
 
 func decodeMainFlag(i interface{}) *MainFlag {
 	var f		MainFlag
@@ -53,6 +62,44 @@ func decodeMainFlag(i interface{}) *MainFlag {
 		return nil
 	}
 	return &f
+}
+
+func decodeMainUsage(i interface{}) *MainUsage {
+	var t		MainUsage
+	var m		map[string]interface{}
+	var notes	[]string
+	var ok		bool
+
+	if m, ok = i.(map[string]interface{}); !ok {
+		return nil
+	}
+	if t.Line, ok = m["Line"].(string); !ok {
+		return nil
+	}
+	if notes, ok = m["Notes"].([]string); !ok {
+		return nil
+	}
+	for _, v := range notes {
+		t.Notes = append(t.Notes, v)
+	}
+	return &t
+}
+
+func decodeMainData(i interface{}) *MainData {
+	var t		MainData
+	var m		map[string]interface{}
+	var ok		bool
+
+	if m, ok = i.(map[string]interface{}); !ok {
+		return nil
+	}
+	if t.Usage, ok = m["Usage"].(MainUsage); !ok {
+		return nil
+	}
+	if t.Flags, ok = m["Flags"].([]MainFlag); !ok {
+		return nil
+	}
+	return &t
 }
 
 func flagPrs(mp map[string]interface{}) string {
@@ -120,8 +167,42 @@ func flagPrs(mp map[string]interface{}) string {
 	return str.String()
 }
 
-func nameUC() string {
-	return strings.ToUpper(defns[nameId].(string))
+func MainJson() *interface{} {
+	return &mainJson
+}
+
+func MainStruct() *MainData {
+	return &mainStruct
+}
+
+// ReadJsonFileMain reads the input JSON file for main
+// and stores the generic JSON Table as well as the
+// decoded structs.
+func ReadJsonFileMain(fn string) error {
+	var err 		error
+	var jsonPath 	string
+
+	jsonPath,_ = filepath.Abs(fn)
+	if sharedData.Debug() {
+		log.Println("json path:", jsonPath)
+	}
+
+	// Read in the json file generically
+	if mainJson, err = util.ReadJsonFile(jsonPath); err != nil {
+		return errors.New(fmt.Sprintln("Error: unmarshalling", jsonPath, ", JSON input file:", err))
+	}
+
+	// Read in the json file structurally
+	if err = util.ReadJsonFileToData(jsonPath, &mainStruct); err != nil {
+		return errors.New(fmt.Sprintln("Error: unmarshalling", jsonPath, ", JSON input file:", err))
+	}
+
+	if sharedData.Debug() {
+		log.Println("\tJson Data:", mainJson)
+		log.Println("\tJson Struct:", mainStruct)
+	}
+
+	return nil
 }
 
 func rowScan(mp map[string]interface{}, ) string {
@@ -136,7 +217,7 @@ func rowScan(mp map[string]interface{}, ) string {
 
 	// Get the field names
 	for _, field := range mp {
-		if debug {
+		if sharedData.Debug() {
 			v := reflect.ValueOf(field)
 			log.Println("FIELD type:", v.Kind())
 		}
@@ -151,5 +232,9 @@ func rowScan(mp map[string]interface{}, ) string {
 	str.WriteString(")")
 
 	return str.String()
+}
+
+func Setup(inDefns map[string]interface{}) {
+
 }
 

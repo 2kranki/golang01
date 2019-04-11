@@ -12,11 +12,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 	"strings"
-	"time"
 	// genGo packages
 	"./cobj"
 	"./genSqlApp"
+	"./shared"
+	"./mainData"
 	"./util"
 	// External Imports
 )
@@ -26,7 +28,6 @@ const (
 	debugId    = "debug"
 	defineId   = "defines"
 	forceId    = "force"
-	jsonDirId  = "jsondir"
 	mdldirId   = "mdldir"
 	nameId     = "name"
 	noopId     = "noop"
@@ -35,6 +36,20 @@ const (
 	timeId     = "time"
 )
 
+// TmplData is used to centralize all the inputs
+// to the generators.  We maintain generic JSON
+// structures for the templating system which does
+// not support structs.  (Not certain why yet.)
+// We also maintain the data in structs for easier
+// access by the generation functions.
+type TmplData struct {
+	DataJson	*map[string] interface{}
+	Data		*interface{}
+	MainJson	*map[string] interface{}
+	Main		*mainData.MainData
+}
+
+var	tmplData	TmplData
 var (
 	debug    bool
 	execPath string
@@ -46,6 +61,7 @@ var (
 	outdir   string
 	quiet    bool
 )
+
 
 var defns map[string]interface{}
 
@@ -71,36 +87,30 @@ func SetupDefns(execPath string, cmd string) error {
 
 	// Set up default definitions
 	defns = map[string]interface{}{}
-	defns[debugId] = debug
-	defns[forceId] = force
-	if len(jsonPath) > 0 {
-		defns[jsonDirId] = jsonPath
-	}
+	sharedData.SetDebug(debug)
+	sharedData.SetForce(force)
 	if len(mdldir) > 0 {
-		defns[mdldirId] = mdldir
+		sharedData.SetMdlDir(mdldir)
 	} else {
 		dir := os.ExpandEnv("${GENGOMDL}")
 		if len(dir) > 0 {
-			defns[mdldirId] = dir
-		} else {
-			defns[mdldirId] = "./models"
+			sharedData.SetMdlDir(dir)
 		}
 	}
-	defns[noopId] = noop
+	sharedData.SetNoop(noop)
 	if len(outdir) > 0 {
-		defns[outdirId] = outdir
+		sharedData.SetOutDir(outdir)
 	}
-	defns[quietId] = quiet
-	defns[timeId] = time.Now().Format("Mon Jan _2, 2006 15:04")
+	sharedData.SetQuiet(quiet)
 
 	// Now merge in cli defines.
 	for _, v := range defnFlags {
 		s := strings.Split(v, "=")
 		if len(s) > 1 {
-			defns[s[0]] = s[1]
+			sharedData.SetDefn(s[0], s[1])
 		}
 	}
-	defns[cmdId] = cmd
+	sharedData.SetCmd(cmd)
 
 	if len(execPath) > 0 {
 		jsonOut, err = util.ReadJsonFile(execPath)
@@ -114,29 +124,26 @@ func SetupDefns(execPath string, cmd string) error {
 		if m == nil {
 			return errors.New("Error: Exec JSON file did not unmarshal properly!")
 		}
-		if wrk, ok = m[debugId]; ok {
-			defns[debugId] = wrk.(bool)
+		if wrk, ok = m["debug"]; ok {
+			sharedData.SetDebug(wrk.(bool))
 		}
-		if wrk, ok = m[forceId]; ok {
-			defns[forceId] = wrk.(bool)
+		if wrk, ok = m["force"]; ok {
+			sharedData.SetForce(wrk.(bool))
 		}
-		if wrk, ok = m[quietId]; ok {
-			defns[quietId] = wrk.(bool)
+		if wrk, ok = m["quiet"]; ok {
+			sharedData.SetQuiet(wrk.(bool))
 		}
-		if wrk, ok = m[defineId]; ok {
+		if wrk, ok = m["define"]; ok {
 			s := strings.Split(wrk.(string), ",")
 			for _, v := range s {
 				ss := strings.Split(v, "=")
 				if len(ss) > 1 {
-					defns[ss[0]] = ss[1]
+					sharedData.SetDefn(ss[0], ss[1])
 				}
 			}
 		}
-		if wrk, ok = m[cmdId]; ok {
-			defns[cmdId] = wrk.(string)
-		}
-		if wrk, ok = m[jsonDirId]; ok {
-			defns[jsonDirId] = wrk.(string)
+		if wrk, ok = m["cmd"]; ok {
+			sharedData.SetCmd(wrk.(string))
 		}
 	}
 
@@ -144,7 +151,9 @@ func SetupDefns(execPath string, cmd string) error {
 }
 
 func main() {
-	var err error
+	var err 		error
+	var tmplJson	interface{}
+	var tmplData	interface{}
 
 	flag.Usage = usage
 	flag.BoolVar(&debug, "debug", true, "enable debugging")
@@ -169,6 +178,11 @@ func main() {
 	err = SetupDefns(execPath, flag.Arg(0))
 	if err != nil {
 		log.Fatalln("Error: failed to set up main definitions:", err)
+	}
+
+	// Read JSON definition files
+	if err = mainData.ReadJsonFileMain(sharedData.MainPath()); err != nil {
+		log.Fatalln("Error: Reading Main Json Input:", mainPath, err)
 	}
 
 	// Execute the command

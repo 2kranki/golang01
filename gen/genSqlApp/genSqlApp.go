@@ -1,11 +1,22 @@
 // vi:nu:et:sts=4 ts=4 sw=4
 // See License.txt in main repository directory
 
-// Generate SQL Application programs for GO
+// Generate SQL Application programs in go
+
+// Notes:
+//	1.	The html and text templating systems require that
+//		their data be separated since it is not identical.
+//		So, we put them in separate files.
+//	2.	The html and text templating systems access generic
+//		structures with range, with, if.  They do not handle
+//		structures well especially arrays of structures within
+//		structures.
 
 package genSqlApp
 
 import (
+	"../mainData"
+	"../shared"
 	"../util"
 	"errors"
 	"flag"
@@ -17,18 +28,10 @@ import (
 
 const (
 	jsonDirCon = "./"
-	mdldirCon   = "./models/sqlapp/"
-	outdirCon   = "./test/"
 	// Merged from main.go
 	cmdId       = "cmd"
-	debugId     = "debug"
-	forceId     = "force"
 	jsonDirId   = "jsondir"
-	mdldirId    = "mdldir"
 	nameId      = "name"
-	noopId      = "noop"
-	outdirId    = "outdir"
-	quietId     = "quiet"
 	timeId      = "time"
 )
 
@@ -38,60 +41,27 @@ type FileDefn struct {
 	ModelName 		string 		`json:"ModelName,omitempty"`
 	FileName 		string 		`json:"FileName,omitempty"`
 	FileType		string 		`json:"Type,omitempty"`			// text, sql, html
-	JsonDataPath	string    	`json:"JsonDataPath,omitempty"`
-	JsonMainPath	string		`json:"JsonMainPath,omitempty"`
 	Class  			string    	`json:"Class,omitempty"`		// single, table
 	PrefixTable		bool 		`json:"PrefixTable,omitempty"`	// Prefix output file name with table name
 }
-
-// TmplData is used to centralize all the inputs
-// to the generators.  We maintain generic JSON
-// structures for the templating system which does
-// not support structs.  (Not certain why yet.)
-// We also maintain the data in structs for easier
-// access by the generation functions.
-type TmplData struct {
-	DataJson	*map[string] interface{}
-	Data		*Database
-	MainJson	*map[string] interface{}
-	Main		*MainData
-	Defns    	*map[string] interface{}
-}
-
-// defns is the accumulation of default flags,
-// flags entered via the JSON exec file and
-// flags entered on the command line.
-var defns 		map[string] interface{}
-// We pull the following variables from defns
-// for ease of access by the other routines
-var debug 		bool
-var force 		bool
-var noop 		bool
-var quiet 		bool
 
 // FileDefns controls what files are generated.
 var FileDefns	[]FileDefn = []FileDefn {
 	{"main.go.tmpl.txt",
 		"main.go",
 		"text",
-		"main.json.txt",
-		"data.json.txt",
 		"one",
 		false,
 	},
 	{"mainExec.go.tmpl.txt",
 		"mainExec.go",
 		"text",
-		"app.json.txt",
-		"data.json.txt",
 		"single",
 		false,
 	},
 	{"tableio.go.tmpl.txt",
-		"mainExec.go",
+		"tableio.go",
 		"text",
-		"app.json.txt",
-		"data.json.txt",
 		"single",
 		false,
 	},
@@ -112,12 +82,8 @@ func createModelPath(fn string) (string, error) {
 	}
 
 	// Calculate the model path.
-	modelPath, ok = defns[mdldirId].(string)
-	if ok {
-		modelPath += "/sqlapp"
-	} else {
-		modelPath = mdldirCon
-	}
+	modelPath = sharedData.MdlDir()
+	modelPath += "/sqlapp"
 	modelPath += "/"
 	modelPath += fn
 	//modelPath = filepath.Clean(modelPath)				// Clean() is part of Abs()
@@ -127,21 +93,16 @@ func createModelPath(fn string) (string, error) {
 }
 
 func createOutputPath(fn string) (string, error) {
-	var outPath string
-	var ok bool
-	var err error
+	var outPath 	string
+	var ok 			bool
+	var err 		error
 
-	outPath, ok = defns[outdirId].(string)
-	if !ok {
-		outPath = "./test"
-	}
+	outPath = sharedData.MdlDir()
 	outPath += "/"
 	outPath += fn
-	outPath = filepath.Clean(outPath)
-
 	outPath, err = util.IsPathRegularFile(outPath)
 	if err == nil {
-		if !force {
+		if !sharedData.Force() {
 			return outPath, errors.New(fmt.Sprint("Over-write error of:", outPath))
 		}
 	}
@@ -149,87 +110,23 @@ func createOutputPath(fn string) (string, error) {
 	return outPath, nil
 }
 
-func ReadJsonFile(fn string, ot string) (interface{}, error) {
-	var err 		error
-	var ok 			bool
-	var jsonPath 	string
-	var data  		interface{}
-	var appData		DatabaseData
-	var mainData  	MainData
-
-	jsonPath,ok = defns[jsonDirId].(string)
-	if !ok {
-		jsonPath = jsonDirCon
-	}
-	jsonPath += "/"
-	jsonPath += fn
-	jsonPath,_ = filepath.Abs(jsonPath)
-	if debug {
-		log.Println("json path:", jsonPath)
-	}
-
-	// Read in the json file
-	switch ot {
-	case "databasexx":
-		err = util.ReadJsonFileToData(jsonPath, &appData)
-		if err != nil {
-			log.Fatalln("Error: unmarshalling", jsonPath, ", JSON input file:", err)
-		}
-		data = appData
-	case "mainxx":
-		err = util.ReadJsonFileToData(jsonPath, &mainData)
-		if err != nil {
-			log.Fatalln("Error: unmarshalling", jsonPath, ", JSON input file:", err)
-		}
-		data = mainData
-	default:
-		jd, err := util.ReadJsonFile(jsonPath)
-		if err != nil {
-			log.Fatalln("Error: unmarshalling", jsonPath, ", JSON input file:", err)
-		}
-		data = &jd
-	}
-
-	if debug {
-		log.Println("\tJson Data:", data)
-	}
-
-	return data,nil
-}
-
 func GenSqlApp(inDefns map[string]interface{}) error {
+	var err			error
 
-	defns = inDefns
-	debug = inDefns[debugId].(bool)
-	force = inDefns[forceId].(bool)
-	noop  = inDefns[noopId].(bool)
-	quiet = inDefns[quietId].(bool)
-
-	if debug {
+	if sharedData.Debug() {
 		log.Println("\tsql_app: In Debug Mode")
-		log.Printf("\t  Defns: %q\n", inDefns)
 		log.Printf("\t  args: %q\n", flag.Args())
 	}
 
+	// Read in the primary json files.
+
 	// Now handle each FileDefn creating a file for it.
 	for _, def := range(FileDefns) {
+		var modelPath	string
+		var outPath		string
 
-		if !quiet {
+		if !sharedData.Quiet() {
 			log.Println("Process file:",def.ModelName,"generating:",def.FileName,"from:",def.JsonPath,"...")
-		}
-		// Set up the Template Data
-		if json, err :=	ReadJsonFile(def.JsonPath, def.JsonType); err != nil {
-			return errors.New(fmt.Sprint("Error: Reading Json Input:", def.JsonPath, err))
-		}
-		if debug {
-			log.Println("JSON TypeOf:",reflect.TypeOf(json))
-			v := reflect.ValueOf(json)
-			log.Println("JSON Value Type:", v.Kind())
-		}
-		data := TmplData{Data:&json, Defns:&defns}
-		if debug {
-			log.Println("data.Data TypeOf:",reflect.TypeOf(data.Data))
-			log.Println("*data.Data TypeOf:",reflect.TypeOf(*data.Data))
 		}
 
 		//if def.PreprocSql {
@@ -238,9 +135,9 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 
 		// Create the input model file path.
 		if modelPath, err := createModelPath(def.ModelName); err !=  nil {
-			return errors.New(fmt.Sprint("Error:", modelPath, err))
+			return errors.New(fmt.Sprintln("Error:", modelPath, err))
 		}
-		if debug {
+		if sharedData.Debug() {
 			log.Println("\t\tmodelPath=", modelPath)
 		}
 
@@ -248,7 +145,7 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 		if outPath, err := createOutputPath(def.FileName); err != nil {
 			log.Fatalln(err)
 		}
-		if debug {
+		if sharedData.Debug() {
 			log.Println("\t\t outPath=", outPath)
 		}
 

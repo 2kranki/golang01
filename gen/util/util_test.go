@@ -44,8 +44,7 @@ func TestReadJson(t *testing.T) {
 	var wrk interface{}
 	var err error
 
-	jsonOut, err = ReadJsonFile("./test.exec.json.txt")
-	if err != nil {
+	if jsonOut, err = ReadJsonFile("./test/test.exec.json.txt"); err != nil {
 		t.Errorf("ReadJson(test.exec.json.txt) failed: %s\n", err)
 	}
 	m := jsonOut.(map[string]interface{})
@@ -69,7 +68,7 @@ func TestReadJsonFileToData(t *testing.T) {
 
 	jsonOut = jsonData{}
 	t.Log("&jsonOut:", &jsonOut)
-	err = ReadJsonFileToData("test.exec.json.txt", &jsonOut)
+	err = ReadJsonFileToData("./test/test.exec.json.txt", &jsonOut)
 	if err != nil {
 		t.Errorf("ReadJsonToData(test.exec.json.txt) failed: %s\n", err)
 	}
