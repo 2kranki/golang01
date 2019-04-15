@@ -5,19 +5,26 @@
 
 package main
 
-import "testing"
+import (
+	sharedData "github.com/2kranki/golang01/gen/shared"
+	"testing"
+)
 
 func TestSetupDefns(t *testing.T) {
 	var err error
 
-	err = SetupDefns("", "cmd")
-	if err != nil {
+	if err = SetupDefns("", "cmd"); err != nil {
 		t.Errorf("SetupDefns() failed: %s\n", err)
 	}
+	if "cmd" != sharedData.Cmd() {
+		t.Errorf("SetupDefns() cmd should be 'cmd', but is %s\n", sharedData.Cmd())
+	}
 
-	err = SetupDefns("test.exec.json.txt", "cmd")
-	if err != nil {
+	if err = SetupDefns("test/test01.exec.json.txt", "cmd"); err != nil {
 		t.Errorf("SetupDefns() failed: %s\n", err)
+	}
+	if "cmd" != sharedData.Cmd() {
+		t.Errorf("SetupDefns() cmd should be 'cmd', but is %s\n", sharedData.Cmd())
 	}
 
 }

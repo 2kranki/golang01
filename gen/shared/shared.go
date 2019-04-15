@@ -6,6 +6,7 @@
 package sharedData
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -14,6 +15,7 @@ var dataPath	string
 var defns		map[string]interface{}
 var	debug		bool
 var force		bool
+var funcs		map[string]interface{}
 var mainPath	string
 var	mdlDir		string
 var	noop		bool
@@ -22,9 +24,12 @@ var quiet		bool
 var timeNow		string
 
 func init() {
+	defns  = map[string]interface{}{}
+	funcs  = map[string]interface{}{}
 	mdlDir = "./models"
 	outDir = "./test"
 	timeNow = time.Now().Format("Mon Jan _2, 2006 15:04")
+	//sharedData.SetFunc("time", Time)	<== Causes import cycle, added to main
 }
 
 func Cmd() string {
@@ -138,6 +143,24 @@ func SetForce(f bool) {
 	force = f
 }
 
+func Funcs() map[string]interface{} {
+	return funcs
+}
+
+func FuncsSlice() []interface{} {
+	var f = []interface{}{}
+
+	for _, v := range funcs {
+		f = append(f, v)
+	}
+
+	return f
+}
+
+func SetFunc(nm string, d interface{}) {
+	funcs[nm] = d
+}
+
 // MainPath is the path to the main json file.
 func MainPath() string {
 	return mainPath
@@ -177,6 +200,22 @@ func Quiet() bool {
 
 func SetQuiet(f bool) {
 	quiet = f
+}
+
+// String returns a stringified version of the shared data
+func String() string {
+	s := "{"
+	s += fmt.Sprintf("cmd:%q,",cmd)
+	s += fmt.Sprintf("dataPath:%q,",dataPath)
+	s += fmt.Sprintf("debug:%q,",debug)
+	s += fmt.Sprintf("force:%q,",force)
+	s += fmt.Sprintf("mainPath:%q,",mainPath)
+	s += fmt.Sprintf("mdlDir:%q,",mdlDir)
+	s += fmt.Sprintf("noop:%q,",noop)
+	s += fmt.Sprintf("outDir:%q,",outDir)
+	s += fmt.Sprintf("time:%q,",timeNow)
+	s += "}"
+	return s
 }
 
 // MainPath is the path to the main json file.

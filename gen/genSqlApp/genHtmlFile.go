@@ -18,25 +18,21 @@ import (
 
 var htmlTmpls template.Template
 
-func GenHtmlFile(mdl string, fn string, pt bool, data interface{}) error {
+func GenHtmlFile(mdl string, fn string, data interface{}) error {
 	var outPath string
 	var err error
-	var funcs template.FuncMap
 	var tmpl *template.Template
 
 	log.Printf("\tGenHtmlFile mdl:%s fn:%s ...", mdl, fn)
 
-	// The function map is different between the text and html template packages
-	funcs = template.FuncMap{"dblClose": dblClose, "dblOpen": dblOpen}
-
 	outData := strings.Builder{}
 	if sharedData.Debug() {
 		log.Println("\t\texecuting template...")
-		log.Println("\t\tdata:", data)
+		log.Println("\t\tdata:", nil)
 	}
 
 	name := filepath.Base(mdl)
-	tmpl, err = template.New(name).Funcs(funcs).ParseFiles(mdl)
+	tmpl, err = template.New(name).Funcs(sharedData.Funcs()).ParseFiles(mdl)
 	if err != nil {
 		return err
 	}

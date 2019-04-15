@@ -7,15 +7,15 @@ package main
 
 import (
 	"errors"
-	{{ if .Data.SqlType == "mariadb" }}
+	{{ if eq .Data.SqlType "mariadb" }}
 		ERROR - NOT IMPLEMENTED
-	{{ else if .Data.SqlType == "mssql" }}
+	{{ else if eq .Data.SqlType "mssql" }}
 	_ "github.com/2kranki/go-mssqldb"
-	{{ else if .Data.SqlType == "mysql" }}
+	{{ else if eq .Data.SqlType "mysql" }}
 		_ "github.com/go-sql-driver/mysql"
-	{{ else if .Data.SqlType == "postgres" }}
+	{{ else if eq .Data.SqlType "postgres" }}
 		_ "github.com/lib/pq"
-	{{ else if .Data.SqlType == "sqlite" }}
+	{{ else if eq .Data.SqlType "sqlite" }}
 	_ "github.com/2kranki/go-sqlite3"
 	{{ end }}
 	"net/http"

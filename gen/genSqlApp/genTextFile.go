@@ -6,6 +6,7 @@
 package genSqlApp
 
 import (
+	"../shared"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -15,24 +16,21 @@ import (
 	"text/template"
 )
 
-func GenTextFile(mdl string, outPath string, pt bool, data interface{}) error {
+func GenTextFile(mdl string, outPath string, data interface{}) error {
 	var err 	error
 	var tmpl 	*template.Template
 
 	log.Printf("\tGenTextFile mdl:%s fn:%s ...", mdl, outPath)
 
-	// The function map is different between the text and html template packages
-	funcs := template.FuncMap{"dblClose": dblClose, "dblOpen": dblOpen,}
-
 	outData := strings.Builder{}
 
 	// Parse and execute the template.
 	name := filepath.Base(mdl)
-	tmpl, err = template.New(name).Funcs(funcs).ParseFiles(mdl)
+	tmpl, err = template.New(name).Funcs(sharedData.Funcs()).ParseFiles(mdl)
 	if err != nil {
 		return err
 	}
-	if debug {
+	if sharedData.Debug() {
 		log.Println("\t\t\t input data to template:", data)
 		log.Println("\t\texecuting template...")
 	}
@@ -42,7 +40,7 @@ func GenTextFile(mdl string, outPath string, pt bool, data interface{}) error {
 	}
 
 	// Save the generated file to the output file path.
-	if !noop {
+	if !sharedData.Noop() {
 		// Write the file to disk
 		err := ioutil.WriteFile(outPath, []byte(outData.String()), 0664)
 		if err != nil {

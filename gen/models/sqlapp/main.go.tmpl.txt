@@ -3,7 +3,7 @@
 
 // SQL Application main program
 
-// Generated: {{.Defns.time}}
+// Generated: {{Time}}
 
 
 package main
@@ -15,30 +15,30 @@ import (
 )
 
 var (
-{{ if .Data.Flags -}}
-    {{- range $t := .Data.Flags }}
-        {{if $t.Internal}}{{$t.Internal}}{{else}}{{$t.Name}}{{end}} {{$t.Type}}
-    {{ end -}}
+{{ if .Main.Flags -}}
+    {{GenVarDefns}}
 {{- end -}}
-{{ if .Data.Usage }}
-	pw     string
-	port   string
-	server string
-	user   string
-	db     string
+{{ if .Main.Usage }}
+	db_pw       string
+	db_port     string
+	db_srvr     string
+	db_user     string
+	db_name     string
+	http_srvr   string
+	http_port   string
 )
 
 
 func usage() {
     	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
-    	{{ if .Data.Usage.Line -}}
+    	{{ if .Main.Usage.Line -}}
 	        fmt.Fprintf(flag.CommandLine.Output(), "{{ .Usage.Line }}\n")
         {{ end }}
 	    fmt.Fprintf(flag.CommandLine.Output(), "\nOptions:\n")
 	    flag.PrintDefaults()
-	    {{ if .Data.Usage.Notes -}}
+	    {{ if .Main.Usage.Notes -}}
 	        fmt.Fprintf(flag.CommandLine.Output(), "\nNotes:\n")
-            {{ range $t := .Data.Usage.Notes }}
+            {{ range $t := .Main.Usage.Notes }}
                 fmt.Fprintf(flag.CommandLine.Output(), "{{ $t }}")
             {{- end -}}
         {{ end }}
@@ -48,13 +48,11 @@ func usage() {
 func main() {
 
     // Set up flag variables
-{{ if .Data.Usage }}
+{{ if .Main.Usage }}
 	flag.Usage = usage
 {{- end -}}
-{{- if .Data.Flags -}}
-    {{- range $t := .Data.Flags }}
-    {{ flagPrs $t }}
-    {{ end -}}
+{{- if .Main.Flags -}}
+    {{ GenFlagSetup }}
 {{- end -}}
 	flag.StringVar(&pw, "pw", "Passw0rd!", "the database password")
 	flag.StringVar(&port, "port", "1401", "the database port")

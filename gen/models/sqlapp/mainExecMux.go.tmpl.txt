@@ -17,7 +17,6 @@ func FavIconHndlr(w http.ResponseWriter, req *http.Request) {
 
 func exec() {
 
-    router := mux.NewRouter()
     router.HandleFunc("/favicon.ico", FavIconHndlr).Methods("GET")
 	http.HandleFunc("/", mainIndex)
 	http.HandleFunc("/favicon.ico", noFile)
@@ -31,7 +30,7 @@ func exec() {
 	    http.HandleFunc("/{{$t.Name}}/delete/process",    {{$t.Name}}.DeleteProcess)
 	{{ end -}}
 	srvrStr := fmt.Sprintf("%s:%s", http_srvr, http_port)
-	http.ListenAndServe(srvrStr, nil)
+	log.Fatal(http.ListenAndServe(srvrStr, nil))
 
 }
 

@@ -15,70 +15,126 @@
 package genSqlApp
 
 import (
+	"../appData"
 	"../mainData"
 	"../shared"
 	"../util"
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
+	"os"
+	"path"
 	"path/filepath"
-	"reflect"
 )
 
 const (
 	jsonDirCon = "./"
 	// Merged from main.go
-	cmdId       = "cmd"
-	jsonDirId   = "jsondir"
-	nameId      = "name"
-	timeId      = "time"
+	cmdId     = "cmd"
+	jsonDirId = "jsondir"
+	nameId    = "name"
+	timeId    = "time"
 )
 
 // FileDefn gives the parameters needed to generate a file.  The fields of
 // the struct have been simplified to allow for easy json encoding/decoding.
 type FileDefn struct {
-	ModelName 		string 		`json:"ModelName,omitempty"`
-	FileName 		string 		`json:"FileName,omitempty"`
-	FileType		string 		`json:"Type,omitempty"`			// text, sql, html
-	Class  			string    	`json:"Class,omitempty"`		// single, table
-	PrefixTable		bool 		`json:"PrefixTable,omitempty"`	// Prefix output file name with table name
+	ModelName string `json:"ModelName,omitempty"`
+	FileName  string `json:"FileName,omitempty"`
+	FileType  string `json:"Type,omitempty"`  // text, sql, html
+	Class     string `json:"Class,omitempty"` // single, table
 }
 
 // FileDefns controls what files are generated.
-var FileDefns	[]FileDefn = []FileDefn {
+var FileDefns []FileDefn = []FileDefn{
+	{"base.html.tmpl.txt",
+		"/tmpl/base.html.tmpl",
+		"copy",
+		"one",
+	},
 	{"main.go.tmpl.txt",
 		"main.go",
 		"text",
 		"one",
-		false,
 	},
 	{"mainExec.go.tmpl.txt",
 		"mainExec.go",
 		"text",
 		"single",
-		false,
 	},
-	{"tableio.go.tmpl.txt",
-		"tableio.go",
+	{"handlers.go.tmpl.txt",
+		"/handlers/handlers.go",
 		"text",
 		"single",
-		false,
+	},
+	{"tableio.go.tmpl.txt",
+		"/tableio/tableio.go",
+		"text",
+		"single",
 	},
 }
+
+// TmplData is used to centralize all the inputs
+// to the generators.  We maintain generic JSON
+// structures for the templating system which does
+// not support structs.  (Not certain why yet.)
+// We also maintain the data in structs for easier
+// access by the generation functions.
+type TmplData struct {
+	DataJson map[string]interface{}
+	Data     *appData.Database
+	MainJson map[string]interface{}
+	Main     *mainData.MainData
+}
+
+var tmplData TmplData
 
 func init() {
 
 }
 
-func createModelPath(fn string) (string, error) {
-	var modelPath 	string
-	var ok 			bool
-	var err			error
+func copyFile(modelPath, outPath string) (int64, error) {
+	var dst *os.File
+	var err error
+	var src *os.File
 
-	modelPath,err = util.IsPathRegularFile(fn)
+	if _, err = util.IsPathRegularFile(modelPath); err != nil {
+		return 0, errors.New(fmt.Sprint("Error - model file does not exist:", modelPath, err))
+	}
+
+	if outPath, err = util.IsPathRegularFile(outPath); err == nil {
+		if sharedData.Force() {
+			if err = os.Remove(outPath); err != nil {
+				return 0, errors.New(fmt.Sprint("Error - could not delete:", outPath, err))
+			}
+		} else {
+			return 0, errors.New(fmt.Sprint("Error - overwrite error of:", outPath))
+		}
+	}
+	if dst, err = os.Create(outPath); err != nil {
+		return 0, errors.New(fmt.Sprint("Error - could not create:", outPath, err))
+	}
+	defer dst.Close()
+
+	if src, err = os.Open(modelPath); err != nil {
+		return 0, errors.New(fmt.Sprint("Error - could not open model file:", modelPath, err))
+	}
+	defer src.Close()
+
+	amt, err := io.Copy(dst, src)
+
+	return amt, err
+}
+
+func createModelPath(fn string) (string, error) {
+	var modelPath string
+	var err error
+
+	modelPath, err = util.IsPathRegularFile(fn)
 	if err == nil {
-		return modelPath,err
+		return modelPath, err
 	}
 
 	// Calculate the model path.
@@ -87,17 +143,16 @@ func createModelPath(fn string) (string, error) {
 	modelPath += "/"
 	modelPath += fn
 	//modelPath = filepath.Clean(modelPath)				// Clean() is part of Abs()
-	modelPath,err = filepath.Abs(modelPath)
+	modelPath, err = filepath.Abs(modelPath)
 
-	return modelPath,err
+	return modelPath, err
 }
 
 func createOutputPath(fn string) (string, error) {
-	var outPath 	string
-	var ok 			bool
-	var err 		error
+	var outPath string
+	var err error
 
-	outPath = sharedData.MdlDir()
+	outPath = sharedData.OutDir()
 	outPath += "/"
 	outPath += fn
 	outPath, err = util.IsPathRegularFile(outPath)
@@ -111,30 +166,65 @@ func createOutputPath(fn string) (string, error) {
 }
 
 func GenSqlApp(inDefns map[string]interface{}) error {
-	var err			error
+	var err error
+	var ok bool
 
 	if sharedData.Debug() {
 		log.Println("\tsql_app: In Debug Mode")
 		log.Printf("\t  args: %q\n", flag.Args())
 	}
 
-	// Read in the primary json files.
+	// Read JSON definition files
+	if err = mainData.ReadJsonFileMain(sharedData.MainPath()); err != nil {
+		log.Fatalln("Error: Reading Main Json Input:", sharedData.MainPath(), err)
+	}
+	if err = appData.ReadJsonFileApp(sharedData.DataPath()); err != nil {
+		log.Fatalln("Error: Reading Main Json Input:", sharedData.DataPath(), err)
+	}
+
+	// Set up template data
+	if tmplData.MainJson, ok = mainData.MainJson().(map[string]interface{}); !ok {
+		log.Fatalln("Error - Could not type assert mainData.MainJson()")
+	}
+	tmplData.Main = mainData.MainStruct()
+	if tmplData.DataJson, ok = appData.AppJson().(map[string]interface{}); !ok {
+		log.Fatalln("Error - Could not type assert appData.AppJson()")
+	}
+	tmplData.Data = appData.AppStruct()
+
+	// Set up the output directory structure
+	tmpName := path.Clean(sharedData.OutDir())
+	if err = os.RemoveAll(tmpName); err != nil {
+		log.Fatalln("Error: Could not remove output directory:", tmpName, err)
+	}
+	tmpName = path.Clean(sharedData.OutDir() + "/tmpl")
+	if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+		log.Fatalln("Error: Could not create output directory:", tmpName, err)
+	}
+	tmpName = path.Clean(sharedData.OutDir() + "/handlers")
+	if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+		log.Fatalln("Error: Could not create output directory:", tmpName, err)
+	}
+	tmpName = path.Clean(sharedData.OutDir() + "/tableio")
+	if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+		log.Fatalln("Error: Could not create output directory:", tmpName, err)
+	}
 
 	// Now handle each FileDefn creating a file for it.
-	for _, def := range(FileDefns) {
-		var modelPath	string
-		var outPath		string
+	for _, def := range (FileDefns) {
+		var modelPath string
+		var outPath string
 
 		if !sharedData.Quiet() {
-			log.Println("Process file:",def.ModelName,"generating:",def.FileName,"from:",def.JsonPath,"...")
+			log.Println("Process file:", def.ModelName, "generating:", def.FileName, "...")
 		}
 
 		//if def.PreprocSql {
-			//PreprocessSql(json.(DatabaseData))
+		//PreprocessSql(json.(DatabaseData))
 		//}
 
 		// Create the input model file path.
-		if modelPath, err := createModelPath(def.ModelName); err !=  nil {
+		if modelPath, err = createModelPath(def.ModelName); err != nil {
 			return errors.New(fmt.Sprintln("Error:", modelPath, err))
 		}
 		if sharedData.Debug() {
@@ -142,7 +232,7 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 		}
 
 		// Create the output path
-		if outPath, err := createOutputPath(def.FileName); err != nil {
+		if outPath, err = createOutputPath(def.FileName); err != nil {
 			log.Fatalln(err)
 		}
 		if sharedData.Debug() {
@@ -151,19 +241,44 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 
 		// Now generate the file.
 		switch def.FileType {
-			case "html":
-				err = GenHtmlFile(modelPath, def.FileName, def.PrefixTable, data)
-			case "text":
-				err = GenTextFile(modelPath, def.FileName, def.PrefixTable, data)
-			default:
-				return errors.New(fmt.Sprint("Error: Invalid file type:", def.FileType,
-					"for",def.JsonPath, err))
-		}
-		if err != nil {
-			return errors.New(fmt.Sprint("Error: Processing file:", def.JsonPath, err))
+		case "copy":
+			if sharedData.Noop() {
+				if !sharedData.Quiet() {
+					log.Printf("\tShould have copied from %s to %s\n", modelPath, outPath)
+				}
+			} else {
+				if amt, err := copyFile(modelPath, outPath); err == nil {
+					if !sharedData.Quiet() {
+						log.Printf("\tCopied %d bytes from %s to %s\n", amt, modelPath, outPath)
+					}
+				} else {
+					log.Fatalf("Error - Copied %d bytes from %s to %s with error %s\n",
+						amt, modelPath, outPath, err)
+				}
+			}
+		case "html":
+			if err = GenHtmlFile(modelPath, outPath, tmplData); err == nil {
+				if !sharedData.Quiet() {
+					log.Printf("\tGenerated HTML from %s to %s\n", modelPath, outPath)
+				}
+			} else {
+				log.Fatalf("Error - Generated HTML from %s to %s with error %s\n",
+					modelPath, outPath, err)
+			}
+		case "text":
+			if err = GenTextFile(modelPath, outPath, tmplData); err == nil {
+				if !sharedData.Quiet() {
+					log.Printf("\tGenerated HTML from %s to %s\n", modelPath, outPath)
+				}
+			} else {
+				log.Fatalf("Error - Generated HTML from %s to %s with error %s\n",
+					modelPath, outPath, err)
+			}
+		default:
+			return errors.New(fmt.Sprint("Error: Invalid file type:", def.FileType,
+				"for", def.ModelName, err))
 		}
 	}
 
 	return nil
 }
-

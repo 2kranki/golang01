@@ -4,7 +4,7 @@
 // See the specific template files for how the functions
 // and data are used.
 
-package mainData
+package appData
 
 import (
 	"../shared"
@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-func TestReadJsonFileMain(t *testing.T) {
+func TestReadJsonFileApp(t *testing.T) {
 	var err			error
 	var json		map[string]interface{}
 	var ok			bool
@@ -20,39 +20,39 @@ func TestReadJsonFileMain(t *testing.T) {
 	var wi  		interface{}
 	var map1  		map[string]interface{}
 
-	sharedData.SetMainPath("./test/main.json.txt")
-	if err = ReadJsonFileMain(sharedData.MainPath()); err != nil {
-		t.Errorf("ReadJsonFile() Reading Main JSON failed: %s'\n", sharedData.MainPath())
+	sharedData.SetMainPath("./test/app.json.txt")
+	if err = ReadJsonFileApp(sharedData.MainPath()); err != nil {
+		t.Errorf("ReadJsonFileApp() Reading Main JSON failed: %s'\n", sharedData.MainPath())
 	}
 
 
-	wi = *MainJson()
-	t.Log(fmt.Sprintf("MainJson() Type: %T",MainJson()))
+	wi = *AppJson()
+	t.Log(fmt.Sprintf("MainJson() Type: %T",AppJson()))
 	t.Log(fmt.Sprintf("*MainJson() Type: %T", wi))
 	if json, ok = wi.(map[string]interface{}); !ok {
-		t.Errorf("ReadJsonFile() Main JSON type assertion failed: %s'\n", sharedData.MainPath())
+		t.Errorf("ReadJsonFileApp() Main JSON type assertion failed: %s'\n", sharedData.MainPath())
 	}
 
-	if wi, ok = json["Flags"]; !ok {
-		t.Errorf("ReadJsonFile() failed: Could not find Flags\n")
+	if wi, ok = json["Tables"]; !ok {
+		t.Errorf("ReadJsonFileApp() failed: Could not find Tables\n")
 	}
-	t.Log(fmt.Sprintf("Flags Type: %T", wi))
+	t.Log(fmt.Sprintf("Tables Type: %T", wi))
 	if wa, ok = wi.([]interface{}); !ok {
-		t.Errorf("ReadJsonFile() failed: Flags type assertion failed\n")
+		t.Errorf("ReadJsonFileApp() failed: Tables type assertion failed\n")
 	}
 	wi = wa[0]
 	if map1, ok = wi.(map[string]interface{}); !ok {
-		t.Errorf("ReadJsonFile() Flags[0] type assertion failed: %q\n", wi)
+		t.Errorf("ReadJsonFileApp() Tables[0] type assertion failed: %q\n", wi)
 	}
 	if _, ok = map1["Name"]; !ok {
-		t.Errorf("ReadJsonFile() Flags[0].Name not found: %q\n", map1)
+		t.Errorf("ReadJsonFileApp() Tables[0].Name not found: %q\n", map1)
 	}
 
-	if len(mainStruct.Usage.Notes) != 3 {
-		t.Errorf("ReadJsonFile() failed: len(Notes) should be 3 but is '%d'\n", len(mainStruct.Usage.Notes))
+	if len(appStruct.Tables) != 2 {
+		t.Errorf("ReadJsonFileApp() failed: len(Tables) should be 2 but is '%d'\n", len(appStruct.Name))
 	}
-	if len(mainStruct.Flags) != 7 {
-		t.Errorf("ReadJsonFile() failed: should be 7 flags but is %d\n", len(mainStruct.Flags))
+	if len(appStruct.Tables[0].Fields) != 8 {
+		t.Errorf("ReadJsonFileApp() failed: should be 8 Tables but is %d\n", len(appStruct.Tables[0].Fields))
 	}
 
 	//t.Log(logData.String())

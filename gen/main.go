@@ -12,28 +12,14 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"reflect"
 	"strings"
 	// genGo packages
 	"./cobj"
 	"./genSqlApp"
-	"./shared"
 	"./mainData"
+	"./shared"
 	"./util"
 	// External Imports
-)
-
-const (
-	cmdId      = "cmd"
-	debugId    = "debug"
-	defineId   = "defines"
-	forceId    = "force"
-	mdldirId   = "mdldir"
-	nameId     = "name"
-	noopId     = "noop"
-	outdirId   = "outdir"
-	quietId    = "quiet"
-	timeId     = "time"
 )
 
 // TmplData is used to centralize all the inputs
@@ -115,7 +101,7 @@ func SetupDefns(execPath string, cmd string) error {
 	if len(execPath) > 0 {
 		jsonOut, err = util.ReadJsonFile(execPath)
 		if err != nil {
-			return err
+			return errors.New(fmt.Sprintln("Error: Exec JSON,",execPath,", file did not unmarshal properly:", err))
 		}
 		if debug {
 			fmt.Println("\tData:", jsonOut)
@@ -124,11 +110,17 @@ func SetupDefns(execPath string, cmd string) error {
 		if m == nil {
 			return errors.New("Error: Exec JSON file did not unmarshal properly!")
 		}
+		if wrk, ok = m["data"]; ok {
+			sharedData.SetDataPath(wrk.(string))
+		}
 		if wrk, ok = m["debug"]; ok {
 			sharedData.SetDebug(wrk.(bool))
 		}
 		if wrk, ok = m["force"]; ok {
 			sharedData.SetForce(wrk.(bool))
+		}
+		if wrk, ok = m["main"]; ok {
+			sharedData.SetMainPath(wrk.(string))
 		}
 		if wrk, ok = m["quiet"]; ok {
 			sharedData.SetQuiet(wrk.(bool))
@@ -152,8 +144,6 @@ func SetupDefns(execPath string, cmd string) error {
 
 func main() {
 	var err 		error
-	var tmplJson	interface{}
-	var tmplData	interface{}
 
 	flag.Usage = usage
 	flag.BoolVar(&debug, "debug", true, "enable debugging")
@@ -187,12 +177,9 @@ func main() {
 
 	// Execute the command
 	if debug {
-		log.Println("\tcmd: '",defns[cmdId],"'")
+		log.Println("\tcmd: '",sharedData.Cmd(),"'")
 	}
-	if debug {
-		log.Println("\tjsonPath: '",defns[jsonDirId],"'")
-	}
-	switch defns[cmdId] {
+	switch sharedData.Cmd() {
 	case "cobj":
 		err = cobj.GenCObj(defns)
 	case "sqlapp":

@@ -102,33 +102,13 @@ func decodeMainData(i interface{}) *MainData {
 	return &t
 }
 
-func flagPrs(mp map[string]interface{}) string {
+// genFlagVar generates the flag.~Var definition for given
+// CLI variable definition
+func genFlagVar(flg MainFlag) string {
 	var str			strings.Builder
-	var desc		string
-	var flagType	string
-	var init		string
-	var internal	string
-	var name		string
-
-	// unmap the values
-	if mp["Desc"] != nil {
-		desc = mp["Desc"].(string)
-	}
-	if mp["Type"] != nil {
-		flagType = mp["Type"].(string)
-	}
-	if mp["Init"] != nil {
-		init = mp["Init"].(string)
-	}
-	if mp["Internal"] != nil {
-		internal = mp["Internal"].(string)
-	}
-	if mp["Name"] != nil {
-		name = mp["Name"].(string)
-	}
 
 	// Now create the string from the names
-	switch flagType {
+	switch flg.FlagType {
 	case "bool":
 		str.WriteString("flag.BoolVar(&")
 	case "int":
@@ -139,36 +119,67 @@ func flagPrs(mp map[string]interface{}) string {
 		str.WriteString("flag.Var(&")
 	default:
 		str.WriteString("flag type ERROR:")
-		if flagType == "" {
+		if flg.FlagType == "" {
 			str.WriteString("flagType: EMPTY ")
 		} else {
 			str.WriteString("flagType:")
-			str.WriteString(flagType)
+			str.WriteString(flg.FlagType)
 		}
 	}
-	if len(internal) > 0 {
-		str.WriteString(internal)
+	if len(flg.Internal) > 0 {
+		str.WriteString(flg.Internal)
 	} else {
-		str.WriteString(name)
+		str.WriteString(flg.Name)
 	}
 	str.WriteString(",")
-	if len(init) > 0 {
-		if flagType == "string" {
-			str.WriteString(fmt.Sprintf("\"%s\"",init))
+	if len(flg.Init) > 0 {
+		if flg.FlagType == "string" {
+			str.WriteString(fmt.Sprintf("\"%s\"",flg.Init))
 		} else {
-			str.WriteString(init)
+			str.WriteString(flg.Init)
 		}
 	}
-	if len(desc) > 0 {
-		str.WriteString(fmt.Sprintf(",\"%s\"",desc))
+	if len(flg.Desc) > 0 {
+		str.WriteString(fmt.Sprintf(",\"%s\"",flg.Desc))
 	}
-	str.WriteString(")")
+	str.WriteString(")\n")
 
 	return str.String()
 }
 
-func MainJson() *interface{} {
-	return &mainJson
+// GenFlagSetup generates the flag.~Var definitions for the
+// CLI variables
+func GenFlagSetup() string {
+	s := ""
+	for _, v := range mainStruct.Flags {
+		s += genFlagVar(v)
+	}
+	return s
+}
+
+// GenVarDefns generate the CLI variable definitions
+func GenVarDefns() string {
+	s := "\t"
+	for _, v := range mainStruct.Flags {
+		if len(v.Internal) > 0 {
+			s += fmt.Sprintf("%s\t", v.Internal)
+		} else {
+			s += fmt.Sprintf("%s\t", v.Name)
+		}
+		s += fmt.Sprintf("%s\n", v.FlagType)
+	}
+	return s
+}
+
+// init() adds the functions needed for templating to
+// shared data.
+func init() {
+	sharedData.SetFunc("GenFlagSetup", GenFlagSetup)
+	sharedData.SetFunc("GenVarDefns", GenVarDefns)
+}
+
+func MainJson() interface{} {
+	return mainJson
 }
 
 func MainStruct() *MainData {
