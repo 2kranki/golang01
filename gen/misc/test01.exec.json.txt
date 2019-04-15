@@ -1,0 +1,10 @@
+{
+    "debug":true,
+    "force":false,
+    "quiet":false,
+    "noop":true,
+    "jsondir":"./test/test01",
+    "mdldir":"./models/sqlapp",
+    "outdir":"./x",
+    "cmd":"sqlapp"
+}
