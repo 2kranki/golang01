@@ -145,7 +145,7 @@ func SetupDefns(execPath string, cmd string) error {
 		}
 	}
 
-	sharedData.SetFunc("time", sharedData.Time)
+	sharedData.SetFunc("Time", sharedData.Time)
 
 
 	return nil

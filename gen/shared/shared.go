@@ -29,7 +29,7 @@ func init() {
 	mdlDir = "./models"
 	outDir = "./test"
 	timeNow = time.Now().Format("Mon Jan _2, 2006 15:04")
-	//sharedData.SetFunc("time", Time)	<== Causes import cycle, added to main
+	//sharedData.SetFunc("Time", Time)	<== Causes import cycle, added to main
 }
 
 func Cmd() string {
