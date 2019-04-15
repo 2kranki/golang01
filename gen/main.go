@@ -122,6 +122,12 @@ func SetupDefns(execPath string, cmd string) error {
 		if wrk, ok = m["main"]; ok {
 			sharedData.SetMainPath(wrk.(string))
 		}
+		if wrk, ok = m["mdldir"]; ok {
+			sharedData.SetMdlDir(wrk.(string))
+		}
+		if wrk, ok = m["outdir"]; ok {
+			sharedData.SetOutDir(wrk.(string))
+		}
 		if wrk, ok = m["quiet"]; ok {
 			sharedData.SetQuiet(wrk.(bool))
 		}
@@ -138,6 +144,9 @@ func SetupDefns(execPath string, cmd string) error {
 			sharedData.SetCmd(wrk.(string))
 		}
 	}
+
+	sharedData.SetFunc("time", sharedData.Time)
+
 
 	return nil
 }

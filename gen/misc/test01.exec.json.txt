@@ -1,10 +1,10 @@
 {
+    "cmd":"sqlapp",
+    "data":"./misc/app.json.txt",
     "debug":true,
     "force":false,
-    "quiet":false,
+    "main":"./misc/main.json.txt",
     "noop":true,
-    "jsondir":"./test/test01",
-    "mdldir":"./models/sqlapp",
-    "outdir":"./x",
-    "cmd":"sqlapp"
+    "outdir":"/tmp/gen",
+    "quiet":false
 }
