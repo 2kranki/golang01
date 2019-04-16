@@ -118,16 +118,16 @@ var typeConvSqlite = []DbTypeConv{
 }
 
 type DbField struct {
-	Name 		string 		`json:"Name,omitempty"`
-	Type		string 		`json:"Type,omitempty"`
-	Len  		int    		`json:"Len,omitempty"`
-	PrimaryKey  bool    	`json:"PrimaryKey,omitempty"`
-	List  		bool    	`json:"List,omitempty"`			// Include in List Report
+	Name		string		`json:"Name,omitempty"`
+	Type		string		`json:"Type,omitempty"`
+	Len		    int		    `json:"Len,omitempty"`
+	PrimaryKey  bool	    `json:"PrimaryKey,omitempty"`
+	List		bool	    `json:"List,omitempty"`			// Include in List Report
 }
 
 type DbTable struct {
-	Name   		string 		`json:"Name,omitempty"`
-	Fields 		[]DbField
+	Name		string		`json:"Name,omitempty"`
+	Fields		[]DbField
 }
 
 func (t *DbTable) CreateInsertStr() string {
@@ -143,8 +143,8 @@ func (t *DbTable) CreateInsertStr() string {
 }
 
 type Database struct {
-	Name 	string 			`json:"Name,omitempty"`
-	SqlType	string 			`json:"SqlType,omitempty"`
+	Name	string			`json:"Name,omitempty"`
+	SqlType	string			`json:"SqlType,omitempty"`
 	Tables  []DbTable
 }
 
@@ -337,8 +337,8 @@ func init() {
 // and stores the generic JSON Table as well as the
 // decoded structs.
 func ReadJsonFileApp(fn string) error {
-	var err 		error
-	var jsonPath 	string
+	var err		    error
+	var jsonPath	string
 
 	jsonPath,_ = filepath.Abs(fn)
 	if sharedData.Debug() {

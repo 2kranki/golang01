@@ -7,16 +7,16 @@
 package genSqlApp
 
 type DbField struct {
-	Name 		string 		`json:"Name,omitempty"`
-	Type		string 		`json:"Type,omitempty"`
-	Len  		int    		`json:"Len,omitempty"`
-	PrimaryKey  bool    	`json:"PrimaryKey,omitempty"`
-	List  		bool    	`json:"List,omitempty"`			// Include in List Report
+	Name		string		`json:"Name,omitempty"`
+	Type		string		`json:"Type,omitempty"`
+	Len		    int		    `json:"Len,omitempty"`
+	PrimaryKey  bool	    `json:"PrimaryKey,omitempty"`
+	List		bool	    `json:"List,omitempty"`			// Include in List Report
 }
 
 type DbTable struct {
-	Name   		string 		`json:"Name,omitempty"`
-	Fields 		[]DbField
+	Name		string		`json:"Name,omitempty"`
+	Fields		[]DbField
 }
 
 func (t *DbTable) CreateInsertStr() string {
@@ -32,8 +32,8 @@ func (t *DbTable) CreateInsertStr() string {
 }
 
 type Database struct {
-	Name 	string 			`json:"Name,omitempty"`
-	SqlType	string 			`json:"SqlType,omitempty"`
+	Name	string			`json:"Name,omitempty"`
+	SqlType	string			`json:"SqlType,omitempty"`
 	Tables  []DbTable
 }
 

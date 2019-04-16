@@ -207,12 +207,13 @@ func String() string {
 	s := "{"
 	s += fmt.Sprintf("cmd:%q,",cmd)
 	s += fmt.Sprintf("dataPath:%q,",dataPath)
-	s += fmt.Sprintf("debug:%q,",debug)
-	s += fmt.Sprintf("force:%q,",force)
+	s += fmt.Sprintf("debug:%v,",debug)
+	s += fmt.Sprintf("force:%v,",force)
 	s += fmt.Sprintf("mainPath:%q,",mainPath)
 	s += fmt.Sprintf("mdlDir:%q,",mdlDir)
-	s += fmt.Sprintf("noop:%q,",noop)
+	s += fmt.Sprintf("noop:%v,",noop)
 	s += fmt.Sprintf("outDir:%q,",outDir)
+	s += fmt.Sprintf("quiet:%v,",quiet)
 	s += fmt.Sprintf("time:%q,",timeNow)
 	s += "}"
 	return s

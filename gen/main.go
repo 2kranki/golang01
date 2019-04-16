@@ -13,6 +13,8 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
+
 	// genGo packages
 	"./cobj"
 	"./genSqlApp"
@@ -64,15 +66,18 @@ func (t *defineFlags) Set(value string) error {
 
 var defnFlags defineFlags
 
-func SetupDefns(execPath string, cmd string) error {
+// SetupShared combines several sources of program options into
+// one shared package used throughout the program.
+func SetupShared(execPath string, cmd string) error {
 	var jsonOut interface{}
 	var wrk interface{}
 	var err error
 	//var flag		bool
 	var ok bool
 
-	// Set up default definitions
+	// Copy the default CLI flags to the shared data.
 	defns = map[string]interface{}{}
+	sharedData.SetCmd(cmd)
 	sharedData.SetDebug(debug)
 	sharedData.SetForce(force)
 	if len(mdldir) > 0 {
@@ -89,19 +94,24 @@ func SetupDefns(execPath string, cmd string) error {
 	}
 	sharedData.SetQuiet(quiet)
 
-	// Now merge in cli defines.
+	// Now merge in CLI defines. Defines are the <name>=<value>
+	// pairs found on the command line.  Note it is fine to
+	// specify CLI flags in the defines as long as the type
+	// of the value is correct.
 	for _, v := range defnFlags {
 		s := strings.Split(v, "=")
 		if len(s) > 1 {
 			sharedData.SetDefn(s[0], s[1])
 		}
 	}
-	sharedData.SetCmd(cmd)
 
+	// Now merge in the Exec JSON File if there is one.  It
+	// uses the same names as the CLI flags.
 	if len(execPath) > 0 {
 		jsonOut, err = util.ReadJsonFile(execPath)
 		if err != nil {
-			return errors.New(fmt.Sprintln("Error: Exec JSON,",execPath,", file did not unmarshal properly:", err))
+			return errors.New(fmt.Sprintln("Error: Exec JSON,",execPath,", " +
+												"file did not unmarshal properly:", err))
 		}
 		if debug {
 			fmt.Println("\tData:", jsonOut)
@@ -145,6 +155,7 @@ func SetupDefns(execPath string, cmd string) error {
 		}
 	}
 
+	sharedData.SetTime(time.Now().String())
 	sharedData.SetFunc("Time", sharedData.Time)
 
 
@@ -174,7 +185,7 @@ func main() {
 		log.Println("\tIn Debug Mode...")
 	}
 
-	err = SetupDefns(execPath, flag.Arg(0))
+	err = SetupShared(execPath, flag.Arg(0))
 	if err != nil {
 		log.Fatalln("Error: failed to set up main definitions:", err)
 	}

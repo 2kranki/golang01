@@ -16,17 +16,16 @@ func TestReadJsonFileApp(t *testing.T) {
 	var err			error
 	var json		map[string]interface{}
 	var ok			bool
-	var wa  		[]interface{}
-	var wi  		interface{}
-	var map1  		map[string]interface{}
+	var wa		    []interface{}
+	var wi		    interface{}
+	var map1		map[string]interface{}
 
 	sharedData.SetMainPath("./test/app.json.txt")
 	if err = ReadJsonFileApp(sharedData.MainPath()); err != nil {
 		t.Errorf("ReadJsonFileApp() Reading Main JSON failed: %s'\n", sharedData.MainPath())
 	}
 
-
-	wi = *AppJson()
+	wi = AppJson()
 	t.Log(fmt.Sprintf("MainJson() Type: %T",AppJson()))
 	t.Log(fmt.Sprintf("*MainJson() Type: %T", wi))
 	if json, ok = wi.(map[string]interface{}); !ok {

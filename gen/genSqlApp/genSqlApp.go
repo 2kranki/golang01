@@ -129,11 +129,10 @@ func copyFile(modelPath, outPath string) (int64, error) {
 }
 
 func createModelPath(fn string) (string, error) {
-	var modelPath string
-	var err error
+	var modelPath   string
+	var err         error
 
-	modelPath, err = util.IsPathRegularFile(fn)
-	if err == nil {
+	if modelPath, err = util.IsPathRegularFile(fn); err == nil {
 		return modelPath, err
 	}
 
@@ -165,6 +164,22 @@ func createOutputPath(fn string) (string, error) {
 	return outPath, nil
 }
 
+// readJsonFiles reads in the two JSON files that define the
+// application to be generated.
+func readJsonFiles() error {
+	var err error
+
+	if err = mainData.ReadJsonFileMain(sharedData.MainPath()); err != nil {
+		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.MainPath(), err))
+	}
+
+	if err = appData.ReadJsonFileApp(sharedData.DataPath()); err != nil {
+		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.DataPath(), err))
+	}
+
+    return nil
+}
+
 func GenSqlApp(inDefns map[string]interface{}) error {
 	var err error
 	var ok bool
@@ -174,13 +189,10 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 		log.Printf("\t  args: %q\n", flag.Args())
 	}
 
-	// Read JSON definition files
-	if err = mainData.ReadJsonFileMain(sharedData.MainPath()); err != nil {
-		log.Fatalln("Error: Reading Main Json Input:", sharedData.MainPath(), err)
-	}
-	if err = appData.ReadJsonFileApp(sharedData.DataPath()); err != nil {
-		log.Fatalln("Error: Reading Main Json Input:", sharedData.DataPath(), err)
-	}
+    // Read the JSON files.
+    if err = readJsonFiles(); err != nil {
+		log.Fatalln(err)
+    }
 
 	// Set up template data
 	if tmplData.MainJson, ok = mainData.MainJson().(map[string]interface{}); !ok {
@@ -193,22 +205,24 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 	tmplData.Data = appData.AppStruct()
 
 	// Set up the output directory structure
-	tmpName := path.Clean(sharedData.OutDir())
-	if err = os.RemoveAll(tmpName); err != nil {
-		log.Fatalln("Error: Could not remove output directory:", tmpName, err)
-	}
-	tmpName = path.Clean(sharedData.OutDir() + "/tmpl")
-	if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-		log.Fatalln("Error: Could not create output directory:", tmpName, err)
-	}
-	tmpName = path.Clean(sharedData.OutDir() + "/handlers")
-	if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-		log.Fatalln("Error: Could not create output directory:", tmpName, err)
-	}
-	tmpName = path.Clean(sharedData.OutDir() + "/tableio")
-	if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
-		log.Fatalln("Error: Could not create output directory:", tmpName, err)
-	}
+    if !sharedData.Noop() {
+        tmpName := path.Clean(sharedData.OutDir())
+        if err = os.RemoveAll(tmpName); err != nil {
+            log.Fatalln("Error: Could not remove output directory:", tmpName, err)
+        }
+        tmpName = path.Clean(sharedData.OutDir() + "/tmpl")
+        if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+            log.Fatalln("Error: Could not create output directory:", tmpName, err)
+        }
+        tmpName = path.Clean(sharedData.OutDir() + "/handlers")
+        if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+            log.Fatalln("Error: Could not create output directory:", tmpName, err)
+        }
+        tmpName = path.Clean(sharedData.OutDir() + "/tableio")
+        if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
+            log.Fatalln("Error: Could not create output directory:", tmpName, err)
+        }
+    }
 
 	// Now handle each FileDefn creating a file for it.
 	for _, def := range (FileDefns) {

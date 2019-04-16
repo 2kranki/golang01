@@ -12,8 +12,17 @@ import (
 	"net/http"
 )
 
-func FavIconHndlr(w http.ResponseWriter, req *http.Request) {
-	http.
+func HndlrFavIcon(w http.ResponseWriter, req *http.Request) {
+	http.NotFound(w, r)
+}
+
+func HndlrHome(w http.ResponseWriter, req *http.Request) {
+    if r.URL.Path != "/" {
+        http.NotFound(w, r)
+        return
+    }
+
+    w.Write([]byte("Set up main menu here..."))
 }
 
 func exec() {
