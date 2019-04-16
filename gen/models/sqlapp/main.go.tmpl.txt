@@ -3,7 +3,7 @@
 
 // SQL Application main program
 
-// Generated: {{Time}}
+// Generated: [[Time]]
 
 
 package main
@@ -15,10 +15,10 @@ import (
 )
 
 var (
-{{ if .Main.Flags -}}
-    {{GenVarDefns}}
-{{- end -}}
-{{ if .Main.Usage }}
+[[ if .Main.Flags -]]
+    [[GenVarDefns]]
+[[- end -]]
+[[ if .Main.Usage ]]
 	db_pw       string
 	db_port     string
 	db_srvr     string
@@ -31,29 +31,29 @@ var (
 
 func usage() {
     	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
-    	{{ if .Main.Usage.Line -}}
-	        fmt.Fprintf(flag.CommandLine.Output(), "{{ .Usage.Line }}\n")
-        {{ end }}
+    	[[ if .Main.Usage.Line -]]
+	        fmt.Fprintf(flag.CommandLine.Output(), "[[ .Usage.Line ]]\n")
+        [[ end ]]
 	    fmt.Fprintf(flag.CommandLine.Output(), "\nOptions:\n")
 	    flag.PrintDefaults()
-	    {{ if .Main.Usage.Notes -}}
+	    [[ if .Main.Usage.Notes -]]
 	        fmt.Fprintf(flag.CommandLine.Output(), "\nNotes:\n")
-            {{ range $t := .Main.Usage.Notes }}
-                fmt.Fprintf(flag.CommandLine.Output(), "{{ $t }}")
-            {{- end -}}
-        {{ end }}
+            [[ range $t := .Main.Usage.Notes ]]
+                fmt.Fprintf(flag.CommandLine.Output(), "[[ $t ]]")
+            [[- end -]]
+        [[ end ]]
 }
-{{- end }}
+[[- end ]]
 
 func main() {
 
     // Set up flag variables
-{{ if .Main.Usage }}
+[[ if .Main.Usage ]]
 	flag.Usage = usage
-{{- end -}}
-{{- if .Main.Flags -}}
-    {{ GenFlagSetup }}
-{{- end -}}
+[[- end -]]
+[[- if .Main.Flags -]]
+    [[ GenFlagSetup ]]
+[[- end -]]
 	flag.StringVar(&pw, "pw", "Passw0rd!", "the database password")
 	flag.StringVar(&port, "port", "1401", "the database port")
 	flag.StringVar(&server, "server", "localhost", "the database server")

@@ -1,7 +1,7 @@
 // vi:nu:et:sts=4 ts=4 sw=4
 /* 
- * File:   $P_internal.h
- *	Generated $C/$D/$Y $H:$M:$S
+ * File:   [[.Defns.Name]]_internal.h
+ *	Generated [[Time]]
  *
  * Notes:
  *  --	N/A
@@ -39,12 +39,12 @@
 
 
 
-#include        <$P.h>
+#include        <[[.Defns.Name]].h>
 #include        <jsonIn.h>
 
 
-#ifndef $Q_INTERNAL_H
-#define	$Q_INTERNAL_H
+#ifndef [[.Defns.NameUC]]_INTERNAL_H
+#define	[[.Defns.NameUC]]_INTERNAL_H
 
 
 
@@ -64,7 +64,7 @@ extern "C" {
     //---------------------------------------------------------------
 
 #pragma pack(push, 1)
-struct $P_data_s	{
+struct [[.Defns.Name]]_data_s	{
     /* Warning - OBJ_DATA must be first in this object!
      */
     OBJ_DATA        super;
@@ -79,11 +79,11 @@ struct $P_data_s	{
 #pragma pack(pop)
 
     extern
-    struct $P_class_data_s  $P_ClassObj;
+    struct [[.Defns.Name]]_class_data_s  [[.Defns.Name]]_ClassObj;
 
     extern
     const
-    $Q_VTBL         $P_Vtbl;
+    [[.Defns.NameUC]]_VTBL         [[.Defns.Name]]_Vtbl;
 
 
 
@@ -91,13 +91,13 @@ struct $P_data_s	{
     //              Class Object Method Forward Definitions
     //---------------------------------------------------------------
 
-#ifdef  $Q_SINGLETON
-    $Q_DATA *     $P_getSingleton (
+#ifdef  [[.Defns.NameUC]]_SINGLETON
+    [[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_getSingleton (
         void
     );
 
-    bool            $P_setSingleton (
-     $Q_DATA       *pValue
+    bool            [[.Defns.Name]]_setSingleton (
+     [[.Defns.NameUC]]_DATA       *pValue
 );
 #endif
 
@@ -107,30 +107,30 @@ struct $P_data_s	{
     //              Internal Method Forward Definitions
     //---------------------------------------------------------------
 
-    OBJ_IUNKNOWN *  $P_getSuperVtbl (
-        $Q_DATA     *this
+    OBJ_IUNKNOWN *  [[.Defns.Name]]_getSuperVtbl (
+        [[.Defns.NameUC]]_DATA     *this
     );
 
 
-    void            $P_Dealloc (
+    void            [[.Defns.Name]]_Dealloc (
         OBJ_ID          objId
     );
 
 
-    $Q_DATA *       $P_ParseObject (
+    [[.Defns.NameUC]]_DATA *       [[.Defns.Name]]_ParseObject (
         JSONIN_DATA     *pParser
     );
 
 
-    void *          $P_QueryInfo (
+    void *          [[.Defns.Name]]_QueryInfo (
         OBJ_ID          objId,
         uint32_t        type,
         void            *pData
     );
 
 
-    ASTR_DATA *     $P_ToJSON (
-        $Q_DATA      *this
+    ASTR_DATA *     [[.Defns.Name]]_ToJSON (
+        [[.Defns.NameUC]]_DATA      *this
     );
 
 
@@ -138,8 +138,8 @@ struct $P_data_s	{
 
 #ifdef NDEBUG
 #else
-    bool			$P_Validate (
-        $Q_DATA       *this
+    bool			[[.Defns.Name]]_Validate (
+        [[.Defns.NameUC]]_DATA       *this
     );
 #endif
 
@@ -149,5 +149,5 @@ struct $P_data_s	{
 }
 #endif
 
-#endif	/* $Q_INTERNAL_H */
+#endif	/* [[.Defns.NameUC]]_INTERNAL_H */
 

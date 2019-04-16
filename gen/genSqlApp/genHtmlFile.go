@@ -32,7 +32,7 @@ func GenHtmlFile(mdl string, fn string, data interface{}) error {
 	}
 
 	name := filepath.Base(mdl)
-	tmpl, err = template.New(name).Funcs(sharedData.Funcs()).ParseFiles(mdl)
+	tmpl, err = template.New(name).Delims("[[", "]]").Funcs(sharedData.Funcs()).ParseFiles(mdl)
 	if err != nil {
 		return err
 	}

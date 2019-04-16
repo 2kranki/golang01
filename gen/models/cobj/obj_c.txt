@@ -1,7 +1,7 @@
 // vi:nu:et:sts=4 ts=4 sw=4
 /*
- * File:   $P.c
- *	Generated $C/$D/$Y $H:$M:$S
+ * File:   [[.Defns.Name]].c
+ *	Generated [[Time]]
  *
  */
 
@@ -41,7 +41,7 @@
 //*****************************************************************
 
 /* Header File Inclusion */
-#include        <$P_internal.h>
+#include        <[[.Defns.Name]]_internal.h>
 #include        <trace.h>
 
 
@@ -64,11 +64,11 @@ extern "C" {
 
 #ifdef XYZZY
     static
-    void            $P_task_body (
+    void            [[.Defns.Name]]_task_body (
         void            *pData
     )
     {
-        //$Q_DATA  *this = pData;
+        //[[.Defns.NameUC]]_DATA  *this = pData;
         
     }
 #endif
@@ -84,12 +84,12 @@ extern "C" {
     //                      *** Class Methods ***
     //===============================================================
 
-    $Q_DATA *     $P_Alloc (
+    [[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_Alloc (
         void
     )
     {
-        $Q_DATA       *this;
-        uint32_t        cbSize = sizeof($Q_DATA);
+        [[.Defns.NameUC]]_DATA       *this;
+        uint32_t        cbSize = sizeof([[.Defns.NameUC]]_DATA);
         
         // Do initialization.
         
@@ -101,15 +101,15 @@ extern "C" {
 
 
 
-    $Q_DATA *     $P_New (
+    [[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_New (
         void
     )
     {
-        $Q_DATA       *this;
+        [[.Defns.NameUC]]_DATA       *this;
         
-        this = $P_Alloc( );
+        this = [[.Defns.Name]]_Alloc( );
         if (this) {
-            this = $P_Init(this);
+            this = [[.Defns.Name]]_Init(this);
         } 
         return this;
     }
@@ -126,15 +126,15 @@ extern "C" {
     //                          P r i o r i t y
     //---------------------------------------------------------------
     
-    uint16_t        $P_getPriority (
-        $Q_DATA     *this
+    uint16_t        [[.Defns.Name]]_getPriority (
+        [[.Defns.NameUC]]_DATA     *this
     )
     {
 
         // Validate the input parameters.
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return 0;
         }
@@ -145,14 +145,14 @@ extern "C" {
     }
 
 
-    bool            $P_setPriority (
-        $Q_DATA     *this,
+    bool            [[.Defns.Name]]_setPriority (
+        [[.Defns.NameUC]]_DATA     *this,
         uint16_t        value
     )
     {
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return false;
         }
@@ -169,13 +169,13 @@ extern "C" {
     //                              S i z e
     //---------------------------------------------------------------
     
-    uint32_t        $P_getSize (
-        $Q_DATA       *this
+    uint32_t        [[.Defns.Name]]_getSize (
+        [[.Defns.NameUC]]_DATA       *this
     )
     {
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return 0;
         }
@@ -190,15 +190,15 @@ extern "C" {
     //                              S t r
     //---------------------------------------------------------------
     
-    ASTR_DATA * $P_getStr (
-        $Q_DATA     *this
+    ASTR_DATA * [[.Defns.Name]]_getStr (
+        [[.Defns.NameUC]]_DATA     *this
     )
     {
         
         // Validate the input parameters.
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return OBJ_NIL;
         }
@@ -208,14 +208,14 @@ extern "C" {
     }
     
     
-    bool        $P_setStr (
-        $Q_DATA     *this,
+    bool        [[.Defns.Name]]_setStr (
+        [[.Defns.NameUC]]_DATA     *this,
         ASTR_DATA   *pValue
     )
     {
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return false;
         }
@@ -238,15 +238,15 @@ extern "C" {
     //                          S u p e r
     //---------------------------------------------------------------
     
-    OBJ_IUNKNOWN *  $P_getSuperVtbl (
-        $Q_DATA     *this
+    OBJ_IUNKNOWN *  [[.Defns.Name]]_getSuperVtbl (
+        [[.Defns.NameUC]]_DATA     *this
     )
     {
 
         // Validate the input parameters.
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return 0;
         }
@@ -275,16 +275,16 @@ extern "C" {
      a copy of the object is performed.
      Example:
      @code 
-        ERESULT eRc = $P_Assign(this,pOther);
+        ERESULT eRc = [[.Defns.Name]]_Assign(this,pOther);
      @endcode 
-     @param     this    $Q object pointer
-     @param     pOther  a pointer to another $Q object
+     @param     this    object pointer
+     @param     pOther  a pointer to another [[.Defns.NameUC]] object
      @return    If successful, ERESULT_SUCCESS otherwise an 
                 ERESULT_* error 
      */
-    ERESULT         $P_Assign (
-        $Q_DATA		*this,
-        $Q_DATA     *pOther
+    ERESULT         [[.Defns.Name]]_Assign (
+        [[.Defns.NameUC]]_DATA		*this,
+        [[.Defns.NameUC]]_DATA     *pOther
     )
     {
         ERESULT     eRc;
@@ -292,11 +292,11 @@ extern "C" {
         // Do initialization.
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_OBJECT;
         }
-        if (!$P_Validate(pOther)) {
+        if (![[.Defns.Name]]_Validate(pOther)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_OBJECT;
         }
@@ -348,9 +348,9 @@ extern "C" {
                 ERESULT_SUCCESS_LESS_THAN if this < other
                 ERESULT_SUCCESS_GREATER_THAN if this > other
      */
-    ERESULT         $P_Compare (
-        $Q_DATA     *this,
-        $Q_DATA     *pOther
+    ERESULT         [[.Defns.Name]]_Compare (
+        [[.Defns.NameUC]]_DATA     *this,
+        [[.Defns.NameUC]]_DATA     *pOther
     )
     {
         int             i = 0;
@@ -364,11 +364,11 @@ extern "C" {
         
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_OBJECT;
         }
-        if (!$P_Validate(pOther)) {
+        if (![[.Defns.Name]]_Validate(pOther)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_PARAMETER;
         }
@@ -406,32 +406,32 @@ extern "C" {
      Copy the current object creating a new object.
      Example:
      @code 
-        $P      *pCopy = $P_Copy(this);
+        [[.Defns.Name]]      *pCopy = [[.Defns.Name]]_Copy(this);
      @endcode 
-     @param     this    $Q object pointer
-     @return    If successful, a $Q object which must be 
+     @param     this    object pointer
+     @return    If successful, a [[.Defns.NameUC]] object which must be 
                 released, otherwise OBJ_NIL.
      @warning   Remember to release the returned object.
      */
-    $Q_DATA *     $P_Copy (
-        $Q_DATA       *this
+    [[.Defns.NameUC]]_DATA *     [[.Defns.Name]]_Copy (
+        [[.Defns.NameUC]]_DATA       *this
     )
     {
-        $Q_DATA       *pOther = OBJ_NIL;
+        [[.Defns.NameUC]]_DATA       *pOther = OBJ_NIL;
         ERESULT         eRc;
         
         // Do initialization.
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return OBJ_NIL;
         }
 #endif
         
-        pOther = $P_New( );
+        pOther = [[.Defns.Name]]_New( );
         if (pOther) {
-            eRc = $P_Assign(this, pOther);
+            eRc = [[.Defns.Name]]_Assign(this, pOther);
             if (ERESULT_HAS_FAILED(eRc)) {
                 obj_Release(pOther);
                 pOther = OBJ_NIL;
@@ -449,11 +449,11 @@ extern "C" {
     //                        D e a l l o c
     //---------------------------------------------------------------
 
-    void            $P_Dealloc (
+    void            [[.Defns.Name]]_Dealloc (
         OBJ_ID          objId
     )
     {
-        $Q_DATA   *this = objId;
+        [[.Defns.NameUC]]_DATA   *this = objId;
 
         // Do initialization.
         if (NULL == this) {
@@ -461,7 +461,7 @@ extern "C" {
         }        
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return;
         }
@@ -469,11 +469,11 @@ extern "C" {
 
 #ifdef XYZZY
         if (obj_IsEnabled(this)) {
-            (($Q_VTBL *)obj_getVtbl(this))->devVtbl.pStop((OBJ_DATA *)this,NULL);
+            (([[.Defns.NameUC]]_VTBL *)obj_getVtbl(this))->devVtbl.pStop((OBJ_DATA *)this,NULL);
         }
 #endif
 
-        $P_setStr(this, OBJ_NIL);
+        [[.Defns.Name]]_setStr(this, OBJ_NIL);
 
         obj_setVtbl(this, this->pSuperVtbl);
         // pSuperVtbl is saved immediately after the super
@@ -496,8 +496,8 @@ extern "C" {
      @return    if successful, ERESULT_SUCCESS.  Otherwise, an ERESULT_*
                 error code.
      */
-    ERESULT         $P_Disable (
-        $Q_DATA		*this
+    ERESULT         [[.Defns.Name]]_Disable (
+        [[.Defns.NameUC]]_DATA		*this
     )
     {
         //ERESULT         eRc;
@@ -505,7 +505,7 @@ extern "C" {
         // Do initialization.
     #ifdef NDEBUG
     #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_OBJECT;
         }
@@ -531,8 +531,8 @@ extern "C" {
      @return    if successful, ERESULT_SUCCESS.  Otherwise, an ERESULT_*
                 error code.
      */
-    ERESULT         $P_Enable (
-        $Q_DATA		*this
+    ERESULT         [[.Defns.Name]]_Enable (
+        [[.Defns.NameUC]]_DATA		*this
     )
     {
         //ERESULT         eRc;
@@ -540,7 +540,7 @@ extern "C" {
         // Do initialization.
     #ifdef NDEBUG
     #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_OBJECT;
         }
@@ -560,11 +560,11 @@ extern "C" {
     //                          I n i t
     //---------------------------------------------------------------
 
-    $Q_DATA *   $P_Init (
-        $Q_DATA       *this
+    [[.Defns.NameUC]]_DATA *   [[.Defns.Name]]_Init (
+        [[.Defns.NameUC]]_DATA       *this
     )
     {
-        uint32_t        cbSize = sizeof($Q_DATA);
+        uint32_t        cbSize = sizeof([[.Defns.NameUC]]_DATA);
         //ERESULT         eRc;
         
         if (OBJ_NIL == this) {
@@ -582,7 +582,7 @@ extern "C" {
         }
 
         //this = (OBJ_ID)other_Init((OTHER_DATA *)this);    // Needed for Inheritance
-        this = (OBJ_ID)obj_Init(this, cbSize, OBJ_IDENT_$Q);
+        this = (OBJ_ID)obj_Init(this, cbSize, OBJ_IDENT_[[.Defns.NameUC]]);
         if (OBJ_NIL == this) {
             DEBUG_BREAK();
             obj_Release(this);
@@ -590,22 +590,22 @@ extern "C" {
         }
         //obj_setSize(this, cbSize);                        // Needed for Inheritance
         this->pSuperVtbl = obj_getVtbl(this);
-        obj_setVtbl(this, (OBJ_IUNKNOWN *)&$P_Vtbl);
+        obj_setVtbl(this, (OBJ_IUNKNOWN *)&[[.Defns.Name]]_Vtbl);
         
         //this->stackSize = obj_getMisc1(this);
         //this->pArray = objArray_New( );
 
     #ifdef NDEBUG
     #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             obj_Release(this);
             return OBJ_NIL;
         }
 #ifdef __APPLE__
-        fprintf(stderr, "$P::sizeof($Q_DATA) = %lu\n", sizeof($Q_DATA));
+        fprintf(stderr, "[[.Defns.Name]]::sizeof([[.Defns.NameUC]]_DATA) = %lu\n", sizeof([[.Defns.NameUC]]_DATA));
 #endif
-        BREAK_NOT_BOUNDARY4(sizeof($Q_DATA));
+        BREAK_NOT_BOUNDARY4(sizeof([[.Defns.NameUC]]_DATA));
     #endif
 
         return this;
@@ -617,8 +617,8 @@ extern "C" {
     //                       I s E n a b l e d
     //---------------------------------------------------------------
     
-    ERESULT         $P_IsEnabled (
-        $Q_DATA		*this
+    ERESULT         [[.Defns.Name]]_IsEnabled (
+        [[.Defns.NameUC]]_DATA		*this
     )
     {
         //ERESULT         eRc;
@@ -626,7 +626,7 @@ extern "C" {
         // Do initialization.
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return ERESULT_INVALID_OBJECT;
         }
@@ -653,14 +653,14 @@ extern "C" {
      Example:
      @code
         // Return a method pointer for a string or NULL if not found. 
-        void        *pMethod = $P_QueryInfo(this, OBJ_QUERYINFO_TYPE_METHOD, "xyz");
+        void        *pMethod = [[.Defns.Name]]_QueryInfo(this, OBJ_QUERYINFO_TYPE_METHOD, "xyz");
      @endcode 
      @param     objId   object pointer
      @param     type    one of OBJ_QUERYINFO_TYPE members (see obj.h)
      @param     pData   for OBJ_QUERYINFO_TYPE_INFO, this field is not used,
                         for OBJ_QUERYINFO_TYPE_METHOD, this field points to a 
                         character string which represents the method name without
-                        the object name, "$P", prefix,
+                        the object name, "[[.Defns.Name]]", prefix,
                         for OBJ_QUERYINFO_TYPE_PTR, this field contains the
                         address of the method to be found.
      @return    If unsuccessful, NULL. Otherwise, for:
@@ -668,13 +668,13 @@ extern "C" {
                 OBJ_QUERYINFO_TYPE_METHOD: method pointer,
                 OBJ_QUERYINFO_TYPE_PTR: constant UTF-8 method name pointer
      */
-    void *          $P_QueryInfo (
+    void *          [[.Defns.Name]]_QueryInfo (
         OBJ_ID          objId,
         uint32_t        type,
         void            *pData
     )
     {
-        $Q_DATA     *this = objId;
+        [[.Defns.NameUC]]_DATA     *this = objId;
         const
         char            *pStr = pData;
         
@@ -683,7 +683,7 @@ extern "C" {
         }
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return NULL;
         }
@@ -692,11 +692,11 @@ extern "C" {
         switch (type) {
                 
         case OBJ_QUERYINFO_TYPE_OBJECT_SIZE:
-            return (void *)sizeof($Q_DATA);
+            return (void *)sizeof([[.Defns.NameUC]]_DATA);
             break;
             
             case OBJ_QUERYINFO_TYPE_CLASS_OBJECT:
-                return (void *)$P_Class();
+                return (void *)[[.Defns.Name]]_Class();
                 break;
                 
 #ifdef XYZZY  
@@ -726,22 +726,22 @@ extern "C" {
                         
                     case 'D':
                         if (str_Compare("Disable", (char *)pStr) == 0) {
-                            return $P_Disable;
+                            return [[.Defns.Name]]_Disable;
                         }
                         break;
 
                     case 'E':
                         if (str_Compare("Enable", (char *)pStr) == 0) {
-                            return $P_Enable;
+                            return [[.Defns.Name]]_Enable;
                         }
                         break;
 
                     case 'T':
                         if (str_Compare("ToDebugString", (char *)pStr) == 0) {
-                            return $P_ToDebugString;
+                            return [[.Defns.Name]]_ToDebugString;
                         }
                         if (str_Compare("ToJSON", (char *)pStr) == 0) {
-                            return $P_ToJSON;
+                            return [[.Defns.Name]]_ToJSON;
                         }
                         break;
                         
@@ -751,9 +751,9 @@ extern "C" {
                 break;
                 
             case OBJ_QUERYINFO_TYPE_PTR:
-                if (pData == $P_ToDebugString)
+                if (pData == [[.Defns.Name]]_ToDebugString)
                     return "ToDebugString";
-                if (pData == $P_ToJSON)
+                if (pData == [[.Defns.Name]]_ToJSON)
                     return "ToJSON";
                 break;
                 
@@ -770,8 +770,8 @@ extern "C" {
     //                       T o  J S O N
     //---------------------------------------------------------------
     
-     ASTR_DATA *     $P_ToJSON (
-        $Q_DATA      *this
+     ASTR_DATA *     [[.Defns.Name]]_ToJSON (
+        [[.Defns.NameUC]]_DATA      *this
     )
     {
         ERESULT         eRc;
@@ -782,7 +782,7 @@ extern "C" {
         
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return OBJ_NIL;
         }
@@ -813,16 +813,16 @@ extern "C" {
      Create a string that describes this object and the objects within it.
      Example:
      @code 
-        ASTR_DATA      *pDesc = $P_ToDebugString(this,4);
+        ASTR_DATA      *pDesc = [[.Defns.Name]]_ToDebugString(this,4);
      @endcode 
-     @param     this    $Q object pointer
+     @param     this    [[.Defns.NameUC]] object pointer
      @param     indent  number of characters to indent every line of output, can be 0
      @return    If successful, an AStr object which must be released containing the
                 description, otherwise OBJ_NIL.
      @warning  Remember to release the returned AStr object.
      */
-    ASTR_DATA *     $P_ToDebugString (
-        $Q_DATA      *this,
+    ASTR_DATA *     [[.Defns.Name]]_ToDebugString (
+        [[.Defns.NameUC]]_DATA      *this,
         int             indent
     )
     {
@@ -838,7 +838,7 @@ extern "C" {
         // Do initialization.
 #ifdef NDEBUG
 #else
-        if (!$P_Validate(this)) {
+        if (![[.Defns.Name]]_Validate(this)) {
             DEBUG_BREAK();
             return OBJ_NIL;
         }
@@ -859,7 +859,7 @@ extern "C" {
                     "{%p(%s) size=%d\n",
                     this,
                     pInfo->pClassName,
-                    $P_getSize(this)
+                    [[.Defns.Name]]_getSize(this)
             );
 
 #ifdef  XYZZY        
@@ -896,15 +896,15 @@ extern "C" {
 
     #ifdef NDEBUG
     #else
-    bool            $P_Validate (
-        $Q_DATA      *this
+    bool            [[.Defns.Name]]_Validate (
+        [[.Defns.NameUC]]_DATA      *this
     )
     {
  
         // WARNING: We have established that we have a valid pointer
         //          in 'this' yet.
        if (this) {
-            if (obj_IsKindOf(this, OBJ_IDENT_$Q))
+            if (obj_IsKindOf(this, OBJ_IDENT_[[.Defns.NameUC]]))
                 ;
             else {
                 // 'this' is not our kind of data. We really don't
@@ -920,7 +920,7 @@ extern "C" {
         // 'this'.
 
 
-        if (!(obj_getSize(this) >= sizeof($Q_DATA))) {
+        if (!(obj_getSize(this) >= sizeof([[.Defns.NameUC]]_DATA))) {
             return false;
         }
 

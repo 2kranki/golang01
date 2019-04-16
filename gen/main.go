@@ -216,4 +216,7 @@ func usage() {
 	fmt.Fprintf(flag.CommandLine.Output(), "option.\n\n")
 	fmt.Fprintf(flag.CommandLine.Output(), "'json path' is the json file that defines the data passed to the\n")
 	fmt.Fprintf(flag.CommandLine.Output(), "template engine which controls data within the generated files.\n")
+	fmt.Fprintf(flag.CommandLine.Output(), "'{{' and '}}' are not used in the basic templates.  Instead, '[['\n")
+	fmt.Fprintf(flag.CommandLine.Output(), "and ']]' are used. This way, we can pass the generated text back\n")
+	fmt.Fprintf(flag.CommandLine.Output(), "through the templating system at execution time.\n")
 }

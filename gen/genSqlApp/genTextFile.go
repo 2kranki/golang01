@@ -26,7 +26,7 @@ func GenTextFile(mdl string, outPath string, data interface{}) error {
 
 	// Parse and execute the template.
 	name := filepath.Base(mdl)
-	tmpl, err = template.New(name).Funcs(sharedData.Funcs()).ParseFiles(mdl)
+	tmpl, err = template.New(name).Delims("[[", "]]").Funcs(sharedData.Funcs()).ParseFiles(mdl)
 	if err != nil {
 		return err
 	}

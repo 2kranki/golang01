@@ -1,5 +1,5 @@
 /*
- *	Generated $C/$D/$Y $H:$M:$S
+ *	Generated [[Time]]
  */
 
 
@@ -26,17 +26,17 @@
 //      XCTAssertNoThrowSpecificNamed(expression, exception_class, exception_name, failure_description, ...)
 
 
-#include    <$P_internal.h>
+#include    <[[.Defns.Name]]_internal.h>
 #include    <trace.h>
 
 
 
 
-@interface $PTests : XCTestCase
+@interface [[.Defns.Name]]Tests : XCTestCase
 
 @end
 
-@implementation $PTests
+@implementation [[.Defns.Name]]Tests
 
 
 - (void)setUp
@@ -68,11 +68,11 @@
 - (void)testOpenClose
 {
     ERESULT         eRc = ERESULT_SUCCESS;
-    $Q_DATA	*pObj = OBJ_NIL;
+    [[.Defns.NameUC]]_DATA	*pObj = OBJ_NIL;
    
-    pObj = $P_Alloc( );
+    pObj = [[.Defns.Name]]_Alloc( );
     XCTAssertFalse( (OBJ_NIL == pObj) );
-    pObj = $P_Init( pObj );
+    pObj = [[.Defns.Name]]_Init( pObj );
     XCTAssertFalse( (OBJ_NIL == pObj) );
     if (pObj) {
         

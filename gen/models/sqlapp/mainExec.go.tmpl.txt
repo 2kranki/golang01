@@ -3,6 +3,7 @@
 
 // SQL Application main program
 
+// Generated: [[Time]]
 
 package main
 
@@ -21,15 +22,15 @@ func exec() {
     router.HandleFunc("/favicon.ico", FavIconHndlr).Methods("GET")
 	http.HandleFunc("/", mainIndex)
 	http.HandleFunc("/favicon.ico", noFile)
-	{{- range $t := .Data.Tables -}}
-	    http.HandleFunc("/{{$t.Name}}",                   {{$t.Name}}.Index)
-	    http.HandleFunc("/{{$t.Name}}/show",              {{$t.Name}}.Show)
-	    http.HandleFunc("/{{$t.Name}}/create",            {{$t.Name}}.Create)
-	    http.HandleFunc("/{{$t.Name}}/create/process",    {{$t.Name}}.CreateProcess)
-	    http.HandleFunc("/{{$t.Name}}/update",            {{$t.Name}}.Update)
-	    http.HandleFunc("/{{$t.Name}}/update/process",    {{$t.Name}}.UpdateProcess)
-	    http.HandleFunc("/{{$t.Name}}/delete/process",    {{$t.Name}}.DeleteProcess)
-	{{ end -}}
+	[[- range $t := .Data.Tables -]]
+	    http.HandleFunc("/[[$t.Name]]",                   [[$t.Name]]HndlrIndex)
+	    http.HandleFunc("/[[$t.Name]]/show",              [[$t.Name]]HndlrShow)
+	    http.HandleFunc("/[[$t.Name]]/create",            [[$t.Name]]HndlrCreate)
+	    http.HandleFunc("/[[$t.Name]]/create/process",    [[$t.Name]]HndlrCreateProcess)
+	    http.HandleFunc("/[[$t.Name]]/update",            [[$t.Name]]HndlrUpdate)
+	    http.HandleFunc("/[[$t.Name]]/update/process",    [[$t.Name]]HndlrUpdateProcess)
+	    http.HandleFunc("/[[$t.Name]]/delete/process",    [[$t.Name]]HndlrDeleteProcess)
+	[[ end -]]
 	srvrStr := fmt.Sprintf("%s:%s", http_srvr, http_port)
 	http.ListenAndServe(srvrStr, nil)
 
