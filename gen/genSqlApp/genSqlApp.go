@@ -29,22 +29,14 @@ import (
 	"path/filepath"
 )
 
-const (
-	jsonDirCon = "./"
-	// Merged from main.go
-	cmdId     = "cmd"
-	jsonDirId = "jsondir"
-	nameId    = "name"
-	timeId    = "time"
-)
 
 // FileDefn gives the parameters needed to generate a file.  The fields of
 // the struct have been simplified to allow for easy json encoding/decoding.
 type FileDefn struct {
-	ModelName string `json:"ModelName,omitempty"`
-	FileName  string `json:"FileName,omitempty"`
-	FileType  string `json:"Type,omitempty"`  // text, sql, html
-	Class     string `json:"Class,omitempty"` // single, table
+	ModelName string 		`json:"ModelName,omitempty"`
+	FileName  string 		`json:"FileName,omitempty"`
+	FileType  string 		`json:"Type,omitempty"`  // text, sql, html
+	Class     string 		`json:"Class,omitempty"` // single, table
 }
 
 // FileDefns controls what files are generated.

@@ -38,70 +38,6 @@ type MainData struct {
 var	mainStruct	MainData
 var	mainJson	interface{}
 
-func decodeMainFlag(i interface{}) *MainFlag {
-	var f		MainFlag
-	var m		map[string]interface{}
-	var ok		bool
-
-	if m, ok = i.(map[string]interface{}); !ok {
-		return nil
-	}
-	if f.Name, ok = m["Name"].(string); !ok {
-		return nil
-	}
-	if f.Internal, ok = m["Internal"].(string); !ok {
-		return nil
-	}
-	if f.Desc, ok = m["Desc"].(string); !ok {
-		return nil
-	}
-	if f.FlagType, ok = m["FlagType"].(string); !ok {
-		return nil
-	}
-	if f.Init, ok = m["Init"].(string); !ok {
-		return nil
-	}
-	return &f
-}
-
-func decodeMainUsage(i interface{}) *MainUsage {
-	var t		MainUsage
-	var m		map[string]interface{}
-	var notes	[]string
-	var ok		bool
-
-	if m, ok = i.(map[string]interface{}); !ok {
-		return nil
-	}
-	if t.Line, ok = m["Line"].(string); !ok {
-		return nil
-	}
-	if notes, ok = m["Notes"].([]string); !ok {
-		return nil
-	}
-	for _, v := range notes {
-		t.Notes = append(t.Notes, v)
-	}
-	return &t
-}
-
-func decodeMainData(i interface{}) *MainData {
-	var t		MainData
-	var m		map[string]interface{}
-	var ok		bool
-
-	if m, ok = i.(map[string]interface{}); !ok {
-		return nil
-	}
-	if t.Usage, ok = m["Usage"].(MainUsage); !ok {
-		return nil
-	}
-	if t.Flags, ok = m["Flags"].([]MainFlag); !ok {
-		return nil
-	}
-	return &t
-}
-
 // genFlagVar generates the flag.~Var definition for given
 // CLI variable definition
 func genFlagVar(flg MainFlag) string {
@@ -138,6 +74,12 @@ func genFlagVar(flg MainFlag) string {
 		} else {
 			str.WriteString(flg.Init)
 		}
+	} else {
+		if flg.FlagType == "string" {
+			str.WriteString(fmt.Sprintf("\"\""))
+		} else {
+			str.WriteString("0")
+		}
 	}
 	if len(flg.Desc) > 0 {
 		str.WriteString(fmt.Sprintf(",\"%s\"",flg.Desc))
@@ -159,14 +101,19 @@ func GenFlagSetup() string {
 
 // GenVarDefns generate the CLI variable definitions
 func GenVarDefns() string {
-	s := "\t"
+	s := ""
 	for _, v := range mainStruct.Flags {
+		s += "\t"
 		if len(v.Internal) > 0 {
 			s += fmt.Sprintf("%s\t", v.Internal)
 		} else {
 			s += fmt.Sprintf("%s\t", v.Name)
 		}
-		s += fmt.Sprintf("%s\n", v.FlagType)
+		s += fmt.Sprintf("%s\t", v.FlagType)
+		if len(v.Desc) > 0 {
+			s += fmt.Sprintf("// %s", v.Desc)
+		}
+		s += "\n"
 	}
 	return s
 }

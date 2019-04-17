@@ -2,7 +2,7 @@
 
 {
     "Name":"Finances",
-    "SqlType":"postgres",                   # mariadb | mssql | mysql | postgres | sqlite (required)
+    "SqlType":"sqlite",                 # mariadb | mssql | mysql | postgres | sqlite (required)
     "Tables":[
         {
             "Name":"Customer",

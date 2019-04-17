@@ -39,15 +39,15 @@ type TmplData struct {
 
 var	tmplData	TmplData
 var (
-	debug    bool
-	execPath string
-	force    bool
-	jsonPath string
-	mainPath string
-	mdldir   string
-	noop     bool
-	outdir   string
-	quiet    bool
+	debug    	bool
+	execPath 	string
+	force    	bool
+	jsonPath 	string
+	mainPath 	string
+	mdldir   	string
+	noop     	bool
+	outdir   	string
+	quiet    	bool
 )
 
 
@@ -134,6 +134,9 @@ func SetupShared(execPath string, cmd string) error {
 		}
 		if wrk, ok = m["mdldir"]; ok {
 			sharedData.SetMdlDir(wrk.(string))
+		}
+		if wrk, ok = m["noop"]; ok {
+			sharedData.SetNoop(wrk.(bool))
 		}
 		if wrk, ok = m["outdir"]; ok {
 			sharedData.SetOutDir(wrk.(string))

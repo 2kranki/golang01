@@ -29,11 +29,11 @@ import (
 var TPL *template.Template
 
 func init() {
-	TPL = template.Must(template.ParseGlob("templates/*.gohtml"))
+	TPL = template.Must(template.ParseGlob("tmpl/*.tmpl"))
 }
 
-[[- range $t := .Data.Tables ]]
-    func [[$t.Name]]HndlrIndex)(w http.ResponseWriter, r *http.Request) {
+[[ range $t := .Data.Tables -]]
+    func [[$t.Name]]HndlrIndex(w http.ResponseWriter, r *http.Request) {
         if r.Method != "GET" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return
@@ -42,7 +42,7 @@ func init() {
         w.Write([]byte("Show table index here..."))
     }
 
-    func [[$t.Name]]HndlrShow)(w http.ResponseWriter, r *http.Request) {
+    func [[$t.Name]]HndlrShow(w http.ResponseWriter, r *http.Request) {
         if r.Method != "GET" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return
@@ -51,11 +51,11 @@ func init() {
         w.Write([]byte("Show a particular record..."))
     }
 
-    func [[$t.Name]]HndlrCreate)(w http.ResponseWriter, r *http.Request) {
+    func [[$t.Name]]HndlrCreate(w http.ResponseWriter, r *http.Request) {
         w.Write([]byte("Show the form for creating a new row..."))
     }
 
-    func [[$t.Name]]HndlrCreateProcess)(w http.ResponseWriter, r *http.Request) {
+    func [[$t.Name]]HndlrCreateProcess(w http.ResponseWriter, r *http.Request) {
         if r.Method != "POST" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return
@@ -64,7 +64,7 @@ func init() {
         w.Write([]byte("Process the form data from the row creation form..."))
     }
 
-    func [[$t.Name]]HndlrUpdate)(w http.ResponseWriter, r *http.Request) {
+    func [[$t.Name]]HndlrUpdate(w http.ResponseWriter, r *http.Request) {
         if r.Method != "GET" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return
@@ -73,7 +73,7 @@ func init() {
         w.Write([]byte("Show the form for updating a row..."))
     }
 
-    func [[$t.Name]]HndlrUpdateProcess)(w http.ResponseWriter, r *http.Request) {
+    func [[$t.Name]]HndlrUpdateProcess(w http.ResponseWriter, r *http.Request) {
         if r.Method != "POST" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return
@@ -82,7 +82,7 @@ func init() {
         w.Write([]byte("Process the form data from the row update form..."))
     }
 
-    func [[$t.Name]]HndlrDeleteProcess)(w http.ResponseWriter, r *http.Request) {
+    func [[$t.Name]]HndlrDeleteProcess(w http.ResponseWriter, r *http.Request) {
         if r.Method != "GET" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return
@@ -91,4 +91,4 @@ func init() {
         w.Write([]byte("Process the form data from the row deletion form..."))
     }
 
-[[ end -]]
+[[ end ]]

@@ -118,16 +118,21 @@ var typeConvSqlite = []DbTypeConv{
 }
 
 type DbField struct {
-	Name		string		`json:"Name,omitempty"`
-	Type		string		`json:"Type,omitempty"`
-	Len		    int		    `json:"Len,omitempty"`
+	Name		string		`json:"Name,omitempty"`			// Field Name
+	Type		string		`json:"Type,omitempty"`			// SQL Type
+	Len		    int		    `json:"Len,omitempty"`			// Data Maximum Length
+	Dec		    int		    `json:"Dec,omitempty"`			// Decimal Positions
 	PrimaryKey  bool	    `json:"PrimaryKey,omitempty"`
 	List		bool	    `json:"List,omitempty"`			// Include in List Report
 }
 
+// DbTable stands for Database Table and defines
+// the make up of the SQL Table.
+// Fields should be in the order in which they are to
+// be displayed in the list form and the main form.
 type DbTable struct {
 	Name		string		`json:"Name,omitempty"`
-	Fields		[]DbField
+	Fields		[]DbField	`json:"Fields,omitempty"`
 }
 
 func (t *DbTable) CreateInsertStr() string {
@@ -145,7 +150,7 @@ func (t *DbTable) CreateInsertStr() string {
 type Database struct {
 	Name	string			`json:"Name,omitempty"`
 	SqlType	string			`json:"SqlType,omitempty"`
-	Tables  []DbTable
+	Tables  []DbTable		`json:"Tables,omitempty"`
 }
 
 var	appStruct	Database

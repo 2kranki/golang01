@@ -4,7 +4,7 @@
     "debug":true,
     "force":false,
     "main":"./misc/test01/main.json.txt",
-    "noop":true,
+    "noop":false,
     "outdir":"/tmp/gen",
     "quiet":false
 }

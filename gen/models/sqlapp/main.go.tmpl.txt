@@ -15,10 +15,10 @@ import (
 )
 
 var (
-[[ if .Main.Flags -]]
-    [[GenVarDefns]]
-[[- end -]]
-[[ if .Main.Usage ]]
+	debug    	bool
+	force    	bool
+	noop     	bool
+	quiet    	bool
 	db_pw       string
 	db_port     string
 	db_srvr     string
@@ -26,9 +26,13 @@ var (
 	db_name     string
 	http_srvr   string
 	http_port   string
+[[ if .Main.Flags -]]
+    [[GenVarDefns]]
+[[- end -]]
 )
 
 
+[[ if .Main.Usage ]]
 func usage() {
     	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
     	[[ if .Main.Usage.Line -]]
@@ -50,10 +54,16 @@ func main() {
     // Set up flag variables
 [[ if .Main.Usage ]]
 	flag.Usage = usage
-[[- end -]]
-[[- if .Main.Flags -]]
+[[ end -]]
+	flag.BoolVar(&debug, "debug", true, "enable debugging")
+	flag.BoolVar(&force, "force", true, "enable over-writes and deletions")
+	flag.BoolVar(&force, "f", true, "enable over-writes and deletions")
+	flag.BoolVar(&noop, "noop", true, "execute program, but do not make real changes")
+	flag.BoolVar(&quiet, "quiet", true, "enable quiet mode")
+	flag.BoolVar(&quiet, "q", true, "enable quiet mode")
+[[ if .Main.Flags -]]
     [[ GenFlagSetup ]]
-[[- end -]]
+[[ end -]]
 	flag.StringVar(&pw, "pw", "Passw0rd!", "the database password")
 	flag.StringVar(&port, "port", "1401", "the database port")
 	flag.StringVar(&server, "server", "localhost", "the database server")

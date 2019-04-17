@@ -31,7 +31,7 @@ func exec() {
     router.HandleFunc("/favicon.ico", FavIconHndlr).Methods("GET")
 	http.HandleFunc("/", mainIndex)
 	http.HandleFunc("/favicon.ico", noFile)
-	[[- range $t := .Data.Tables -]]
+	[[ range $t := .Data.Tables -]]
 	    http.HandleFunc("/[[$t.Name]]",                   [[$t.Name]]HndlrIndex)
 	    http.HandleFunc("/[[$t.Name]]/show",              [[$t.Name]]HndlrShow)
 	    http.HandleFunc("/[[$t.Name]]/create",            [[$t.Name]]HndlrCreate)
