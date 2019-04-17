@@ -1,9 +1,9 @@
 {
     "cmd":"sqlapp",
-    "data":"./misc/app.json.txt",
+    "data":"./misc/test01/app.json.txt",
     "debug":true,
     "force":false,
-    "main":"./misc/main.json.txt",
+    "main":"./misc/test01/main.json.txt",
     "noop":true,
     "outdir":"/tmp/gen",
     "quiet":false

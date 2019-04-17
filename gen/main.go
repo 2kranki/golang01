@@ -16,7 +16,7 @@ import (
 	"time"
 
 	// genGo packages
-	"./cobj"
+	"./genCObj"
 	"./genSqlApp"
 	"./mainData"
 	"./shared"
@@ -201,7 +201,7 @@ func main() {
 	}
 	switch sharedData.Cmd() {
 	case "cobj":
-		err = cobj.GenCObj(defns)
+		err = genCObj.GenCObj(defns)
 	case "sqlapp":
 		err = genSqlApp.GenSqlApp(defns)
 	default:
