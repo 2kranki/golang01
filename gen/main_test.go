@@ -6,7 +6,7 @@
 package main
 
 import (
-	sharedData "github.com/2kranki/golang01/gen/shared"
+    "./shared"
 	"testing"
 )
 
@@ -30,10 +30,10 @@ func TestSetupShared(t *testing.T) {
 	}
 
 	t.Logf("Test SetupDefns w/exec json file\n")
-	if err = SetupShared("misc/test01.exec.json.txt", "cmd"); err != nil {
+	if err = SetupShared("misc/test01.exec.json.txt", "cmdx"); err != nil {
 		t.Errorf("SetupDefns() failed: %s\n", err)
 	}
-	if "cmd" != sharedData.Cmd() {
+	if "sqlapp" != sharedData.Cmd() {
 		t.Errorf("ERROR - cmd should be 'cmd', but is %s\n", sharedData.Cmd())
 	}
 
