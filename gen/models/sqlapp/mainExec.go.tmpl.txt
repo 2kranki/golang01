@@ -9,16 +9,21 @@ package main
 
 import (
     "fmt"
+    "log"
 	"net/http"
+	"./handlers"
 )
 
 func HndlrFavIcon(w http.ResponseWriter, req *http.Request) {
-	http.NotFound(w, r)
+    if req.Method != "GET" {
+	    http.NotFound(w, req)
+	}
+    http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
 }
 
 func HndlrHome(w http.ResponseWriter, req *http.Request) {
-    if r.URL.Path != "/" {
-        http.NotFound(w, r)
+    if req.URL.Path != "/" {
+        http.NotFound(w, req)
         return
     }
 
@@ -27,30 +32,28 @@ func HndlrHome(w http.ResponseWriter, req *http.Request) {
 
 func exec() {
 
-    router := mux.NewRouter()
-    router.HandleFunc("/favicon.ico", FavIconHndlr).Methods("GET")
 	http.HandleFunc("/", mainIndex)
-	http.HandleFunc("/favicon.ico", noFile)
+	http.HandleFunc("/favicon.ico", HndlrFavIcon)
 	[[ range $t := .Data.Tables -]]
-	    http.HandleFunc("/[[$t.Name]]",                   [[$t.Name]]HndlrIndex)
-	    http.HandleFunc("/[[$t.Name]]/show",              [[$t.Name]]HndlrShow)
-	    http.HandleFunc("/[[$t.Name]]/create",            [[$t.Name]]HndlrCreate)
-	    http.HandleFunc("/[[$t.Name]]/create/process",    [[$t.Name]]HndlrCreateProcess)
-	    http.HandleFunc("/[[$t.Name]]/update",            [[$t.Name]]HndlrUpdate)
-	    http.HandleFunc("/[[$t.Name]]/update/process",    [[$t.Name]]HndlrUpdateProcess)
-	    http.HandleFunc("/[[$t.Name]]/delete/process",    [[$t.Name]]HndlrDeleteProcess)
+	    http.HandleFunc("/[[$t.Name]]",                   handlers.[[$t.Name]]HndlrIndex)
+	    http.HandleFunc("/[[$t.Name]]/show",              handlers.[[$t.Name]]HndlrShow)
+	    http.HandleFunc("/[[$t.Name]]/create",            handlers.[[$t.Name]]HndlrCreate)
+	    http.HandleFunc("/[[$t.Name]]/create/process",    handlers.[[$t.Name]]HndlrCreateProcess)
+	    http.HandleFunc("/[[$t.Name]]/update",            handlers.[[$t.Name]]HndlrUpdate)
+	    http.HandleFunc("/[[$t.Name]]/update/process",    handlers.[[$t.Name]]HndlrUpdateProcess)
+	    http.HandleFunc("/[[$t.Name]]/delete/process",    handlers.[[$t.Name]]HndlrDeleteProcess)
 	[[ end -]]
 	srvrStr := fmt.Sprintf("%s:%s", http_srvr, http_port)
-	http.ListenAndServe(srvrStr, nil)
+	log.Fatal(http.ListenAndServe(srvrStr, nil))
 
 }
 
 
-func mainIndex(w http.ResponseWriter, r *http.Request) {
-	//http.Redirect(w, r, "/$v.Name", http.StatusSeeOther)
+func mainIndex(w http.ResponseWriter, req *http.Request) {
+	//http.Redirect(w, req, "/$v.Name", http.StatusSeeOther)
 }
 
 // Tell Client that we don't have the requested file
-func noFile(w http.ResponseWriter, r *http.Request) {
+func noFile(w http.ResponseWriter, req *http.Request) {
 	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 }

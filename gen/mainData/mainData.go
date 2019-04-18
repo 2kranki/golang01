@@ -68,6 +68,7 @@ func genFlagVar(flg MainFlag) string {
 		str.WriteString(flg.Name)
 	}
 	str.WriteString(",")
+	str.WriteString(fmt.Sprintf("\"%s\",",flg.Name))
 	if len(flg.Init) > 0 {
 		if flg.FlagType == "string" {
 			str.WriteString(fmt.Sprintf("\"%s\"",flg.Init))
@@ -76,7 +77,7 @@ func genFlagVar(flg MainFlag) string {
 		}
 	} else {
 		if flg.FlagType == "string" {
-			str.WriteString(fmt.Sprintf("\"\""))
+			str.WriteString("\"\"")
 		} else {
 			str.WriteString("0")
 		}

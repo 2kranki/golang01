@@ -6,10 +6,9 @@
 // Generated: [[Time]]
 
 
-package main
+package handlers
 
 import (
-	"errors"
 	[[ if eq .Data.SqlType "mariadb" ]]
 		ERROR - NOT IMPLEMENTED
 	[[ else if eq .Data.SqlType "mssql" ]]
@@ -21,8 +20,8 @@ import (
 	[[ else if eq .Data.SqlType "sqlite" ]]
 	_ "github.com/2kranki/go-sqlite3"
 	[[ end ]]
+    "html/template"
 	"net/http"
-	"strconv"
 )
 
 
@@ -33,8 +32,8 @@ func init() {
 }
 
 [[ range $t := .Data.Tables -]]
-    func [[$t.Name]]HndlrIndex(w http.ResponseWriter, r *http.Request) {
-        if r.Method != "GET" {
+    func [[$t.Name]]HndlrIndex(w http.ResponseWriter, req *http.Request) {
+        if req.Method != "GET" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return
         }
@@ -42,8 +41,8 @@ func init() {
         w.Write([]byte("Show table index here..."))
     }
 
-    func [[$t.Name]]HndlrShow(w http.ResponseWriter, r *http.Request) {
-        if r.Method != "GET" {
+    func [[$t.Name]]HndlrShow(w http.ResponseWriter, req *http.Request) {
+        if req.Method != "GET" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return
         }

@@ -12,6 +12,7 @@ import (
     "flag"
     "fmt"
     "log"
+    "os"
 )
 
 var (
@@ -64,11 +65,13 @@ func main() {
 [[ if .Main.Flags -]]
     [[ GenFlagSetup ]]
 [[ end -]]
-	flag.StringVar(&pw, "pw", "Passw0rd!", "the database password")
-	flag.StringVar(&port, "port", "1401", "the database port")
-	flag.StringVar(&server, "server", "localhost", "the database server")
-	flag.StringVar(&user, "user", "sa", "the database user")
-	flag.StringVar(&db, "db", "TeachDB", "the database name")
+	flag.StringVar(&db_pw, "dbpw", "Passw0rd!", "the database password")
+	flag.StringVar(&db_port, "dbport", "1401", "the database port")
+	flag.StringVar(&db_srvr, "dbserver", "localhost", "the database server")
+	flag.StringVar(&db_user, "dbuser", "sa", "the database user")
+	flag.StringVar(&db_name, "dbname", "", "the database name")
+	flag.StringVar(&http_port, "port", "8080", "server port")
+	flag.StringVar(&http_srvr, "server", "localhost", "server site")
 
     // Parse the flags and check them
 	flag.Parse()
