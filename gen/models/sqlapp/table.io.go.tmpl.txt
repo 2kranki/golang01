@@ -1,0 +1,45 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+//
+
+package tableio
+
+import (
+    "database/sql"
+	"errors"
+	[[ if eq .TD.Data.SqlType "mariadb" ]]
+		ERROR - NOT IMPLEMENTED
+	[[ else if eq .TD.Data.SqlType  "mssql" ]]
+	_ "github.com/2kranki/go-mssqldb"
+	[[ else if eq .TD.Data.SqlType "mysql" ]]
+		_ "github.com/go-sql-driver/mysql"
+	[[ else if eq .TD.Data.SqlType "postgres" ]]
+		_ "github.com/lib/pq"
+	[[ else if eq .TD.Data.SqlType "sqlite" ]]
+	    _ "github.com/2kranki/go-sqlite3"
+	[[ end ]]
+	"net/http"
+	"strconv"
+)
+
+func [[.Table.Name]]RowDelete() {
+
+}
+
+func [[.Table.Name]]RowGet(r *http.Request) (interface{}, error) {
+    key := r.FormValue("{{$t.PrimaryKey}}")
+    if key == "" {
+	    return data, errors.New("400. Bad Request.")
+    }
+
+}
+
+func [[.Table.Name]]RowInsert() {
+
+}
+
+func [[.Table.Name]]RowUpdate() {
+
+}
+

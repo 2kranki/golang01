@@ -3,7 +3,7 @@
 
 // SQL Application main program
 
-// Generated: [[Time]]
+// Generated: 2019-04-24 11:09:33.44631 -0400 EDT m=+0.001906926
 
 
 package main
@@ -27,45 +27,37 @@ var (
 	db_name     string
 	http_srvr   string
 	http_port   string
-[[ if .TD.Main.Flags -]]
-    [[GenVarDefns]]
-[[- end -]]
+	execPath	string	// exec json path (optional)
 )
 
 
-[[ if .TD.Main.Usage ]]
+
 func usage() {
     	fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
-    	[[ if .TD.Main.Usage.Line -]]
-	        fmt.Fprintf(flag.CommandLine.Output(), "[[ .Usage.Line ]]\n")
-        [[ end ]]
+    	
 	    fmt.Fprintf(flag.CommandLine.Output(), "\nOptions:\n")
 	    flag.PrintDefaults()
-	    [[ if .TD.Main.Usage.Notes -]]
-	        fmt.Fprintf(flag.CommandLine.Output(), "\nNotes:\n")
-            [[ range $t := .TD.Main.Usage.Notes ]]
-                fmt.Fprintf(flag.CommandLine.Output(), "[[ $t ]]")
-            [[- end -]]
-        [[ end ]]
+	    fmt.Fprintf(flag.CommandLine.Output(), "\nNotes:\n")
+            
+                fmt.Fprintf(flag.CommandLine.Output(), "'exec json' is a file that defines the command line parameters \n")
+                fmt.Fprintf(flag.CommandLine.Output(), "so that you can set them and then execute gen with -x or -exec\n")
+                fmt.Fprintf(flag.CommandLine.Output(), "option.\n\n")
 }
-[[- end ]]
 
 func main() {
 
     // Set up flag variables
-[[ if .TD.Main.Usage ]]
+
 	flag.Usage = usage
-[[ end -]]
-	flag.BoolVar(&debug, "debug", true, "enable debugging")
+flag.BoolVar(&debug, "debug", true, "enable debugging")
 	flag.BoolVar(&force, "force", true, "enable over-writes and deletions")
 	flag.BoolVar(&force, "f", true, "enable over-writes and deletions")
 	flag.BoolVar(&noop, "noop", true, "execute program, but do not make real changes")
 	flag.BoolVar(&quiet, "quiet", true, "enable quiet mode")
 	flag.BoolVar(&quiet, "q", true, "enable quiet mode")
-[[ if .TD.Main.Flags -]]
-    [[ GenFlagSetup ]]
-[[ end -]]
-	flag.StringVar(&db_pw, "dbpw", "Passw0rd!", "the database password")
+flag.StringVar(&execPath,"exec","","exec json path (optional)")
+
+flag.StringVar(&db_pw, "dbpw", "Passw0rd!", "the database password")
 	flag.StringVar(&db_port, "dbport", "1401", "the database port")
 	flag.StringVar(&db_srvr, "dbserver", "localhost", "the database server")
 	flag.StringVar(&db_user, "dbuser", "sa", "the database user")

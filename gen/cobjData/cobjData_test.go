@@ -4,7 +4,7 @@
 // See the specific template files for how the functions
 // and data are used.
 
-package appData
+package cobjData
 
 import (
 	"../shared"

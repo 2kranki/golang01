@@ -3,11 +3,28 @@
     * write any extra needed documentation
 
 * GenSqlApp:
+    * Session variables ??
+    * Form Generation:
+        * Common buttons
+        * Common form stuff
+        * Field order and display grouping
+        * Field Alignment - if it can not be done easily, add comment for it
+            to be done by hand
+    * List Report form
+        *
+    * Handlers
+        * Translate SQL type to internal type and look at the relationship to
+            that and form type
+        * Translation of special types unique to a particular sql such as bitset in
+            mssql and maybe others
     * Generate setup.sh  which takes care of the application requirements such as:
         * go get <package>
         * compile and install program
         * set up database and create tables
-    * main.go
+    * genSql
+        * Push the FileDefn entries on a chan and have a go function pull them off
+            and execute them.  That way, we can have files generated on partial
+            data such as a table.
     * table display/maintenance
         * tableio.go
         * tablehndlr.go

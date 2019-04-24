@@ -256,6 +256,12 @@ func decodeDatabase(i interface{}) *Database {
 	return &t
 }
 
+func ForTables(f func(DbTable)) {
+	for _, v := range appStruct.Tables {
+		f(v)
+	}
+}
+
 func GenAccessFunc(t DbTable) string {
 	var str			strings.Builder
 	str.WriteString(fmt.Sprintf("\tfunc %sDeleteRow( ) {\n", t.Name))
@@ -315,6 +321,44 @@ func GenAccessFuncs() string {
 	return str.String()
 }
 
+func GenForm(t DbTable) string {
+	var str			strings.Builder
+	str.WriteString(fmt.Sprintf("<form id=\"%s\" method=\"post\">\n", t.Name))
+	for _, v := range t.Fields {
+		str.WriteString(fmt.Sprintf("<p>%s</p>\n",v.Name))
+	}
+	str.WriteString("<p/>\n<p/>\n<p/>\n")
+	str.WriteString("\t<input type=submit onclick='onPrev()' value=\"Prev\">\n")
+	str.WriteString("\t<input type=submit onclick='onAdd()' value=\"Add\">\n")
+	str.WriteString("\t<input type=submit onclick='onDelete()' value=\"Delete\">\n")
+	str.WriteString("\t<input type=submit onclick='onUpdate()' value=\"Update\">\n")
+	str.WriteString("\t<input type=submit onclick='onNext()' value=\"Next\">\n")
+	str.WriteString("\t<input type=reset onclick='onReset()' value=\"Reset\">\n")
+	str.WriteString("</form>\n\n")
+	str.WriteString("<script>\n")
+	str.WriteString("\tfunction onAdd() {\n")
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Create/Process\";\n", t.Name))
+	str.WriteString("\t}\n")
+	str.WriteString("\tfunction onDelete() {\n")
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Delete/Process\";\n",t.Name))
+	str.WriteString("\t}\n")
+	str.WriteString("\tfunction onNext() {\n")
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Next\";\n",t.Name))
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").method = \"get\";\n",t.Name))
+	str.WriteString("\t}\n")
+	str.WriteString("\tfunction onPrev() {\n")
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Prev\";\n",t.Name))
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").method = \"get\";\n",t.Name))
+	str.WriteString("\t}\n")
+	str.WriteString("\tfunction onReset() {\n")
+	str.WriteString("\t}\n")
+	str.WriteString("\tfunction onUpdate() {\n")
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Update/Process\";\n",t.Name))
+	str.WriteString("\t}\n")
+	str.WriteString("</script>\n")
+	return str.String()
+}
+
 func getTypeConv(db string) []DbTypeConv {
 	switch db {
 	case "mariadb":
@@ -368,4 +412,12 @@ func ReadJsonFileApp(fn string) error {
 	return nil
 }
 
+func TableNames() []string {
+	var list	[]string
 
+	for _, v := range appStruct.Tables {
+		list = append(list, v.Name)
+	}
+
+	return list
+}

@@ -3,7 +3,7 @@
 
 // SQL Application main program
 
-// Generated: [[Time]]
+// Generated: 2019-04-24 11:09:33.44631 -0400 EDT m=+0.001906926
 
 package main
 
@@ -88,16 +88,20 @@ func exec() {
 	    r.HandleFunc("/debugPrev", HndlrDebugPrev)
 	    r.HandleFunc("/debugReset", HndlrDebugReset)
 	    r.HandleFunc("/debugUpdate", HndlrDebugUpdate)
-	[[ range $t := .TD.Data.Tables -]]
-	    r.HandleFunc("/[[$t.Name]]",                    handlers.[[$t.Name]]HndlrIndex)
-	    r.HandleFunc("/[[$t.Name]]/show",               handlers.[[$t.Name]]HndlrShow)
-	    r.HandleFunc("/[[$t.Name]]/created",            handlers.[[$t.Name]]HndlrCreated)
-	    r.HandleFunc("/[[$t.Name]]/deleted",            handlers.[[$t.Name]]HndlrDeleted)
-	    r.HandleFunc("/[[$t.Name]]/next",               handlers.[[$t.Name]]HndlrNext)
-	    r.HandleFunc("/[[$t.Name]]/prev",               handlers.[[$t.Name]]HndlrPrev)
-	    r.HandleFunc("/[[$t.Name]]/updated",            handlers.[[$t.Name]]HndlrUpdated)
-	[[ end -]]
-
+	r.HandleFunc("/Customer",                    handlers.CustomerHndlrIndex)
+	    r.HandleFunc("/Customer/show",               handlers.CustomerHndlrShow)
+	    r.HandleFunc("/Customer/created",            handlers.CustomerHndlrCreated)
+	    r.HandleFunc("/Customer/deleted",            handlers.CustomerHndlrDeleted)
+	    r.HandleFunc("/Customer/next",               handlers.CustomerHndlrNext)
+	    r.HandleFunc("/Customer/prev",               handlers.CustomerHndlrPrev)
+	    r.HandleFunc("/Customer/updated",            handlers.CustomerHndlrUpdated)
+	r.HandleFunc("/Vendor",                    handlers.VendorHndlrIndex)
+	    r.HandleFunc("/Vendor/show",               handlers.VendorHndlrShow)
+	    r.HandleFunc("/Vendor/created",            handlers.VendorHndlrCreated)
+	    r.HandleFunc("/Vendor/deleted",            handlers.VendorHndlrDeleted)
+	    r.HandleFunc("/Vendor/next",               handlers.VendorHndlrNext)
+	    r.HandleFunc("/Vendor/prev",               handlers.VendorHndlrPrev)
+	    r.HandleFunc("/Vendor/updated",            handlers.VendorHndlrUpdated)
 	srvUrl := fmt.Sprintf("%s:%s", http_srvr, http_port)
 	srv := &http.Server{
 		Handler:      r,

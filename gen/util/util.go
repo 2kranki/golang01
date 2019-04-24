@@ -88,3 +88,37 @@ func ReadJsonFileToData(jsonPath string, jsonOut interface{}) error {
 
 	return err
 }
+
+// Workers allows us to perform r number of task(s) at a time until
+// all tasks are completed.  The input channel to run the task is
+// returned by this function. The caller of this function simply
+// puts to the returned input channel until all tasks have been inputted.
+// It then closes the channel indicating that there is no more data.
+// The function, completed, will be called when all of the input
+// has been processed.
+// Thanks to Vignesh Sk for his blog post on this.
+func Workers(task func(interface{}), completed func(), r int) chan interface{} {
+	input := make(chan interface{})
+	ack := make(chan bool)
+	for i := 0; i < r; i++ {
+		go func() {
+			for {
+				v, ok := <-input
+				if ok {
+					task(v)
+				} else {
+					ack <- true
+					return
+				}
+			}
+		}()
+	}
+	go func() {
+		for i := 0; i < r; i++ {
+			<-ack
+		}
+		completed()
+	}()
+	return input
+}
+

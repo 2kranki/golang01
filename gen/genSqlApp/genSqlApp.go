@@ -33,38 +33,71 @@ import (
 // FileDefn gives the parameters needed to generate a file.  The fields of
 // the struct have been simplified to allow for easy json encoding/decoding.
 type FileDefn struct {
-	ModelName string 		`json:"ModelName,omitempty"`
-	FileName  string 		`json:"FileName,omitempty"`
-	FileType  string 		`json:"Type,omitempty"`  // text, sql, html
-	Class     string 		`json:"Class,omitempty"` // single, table
+	ModelName	string 		`json:"ModelName,omitempty"`
+	FileDir		string		`json:"FileDir,omitempty"`
+	FileName  	string 		`json:"FileName,omitempty"`
+	FileType  	string 		`json:"Type,omitempty"`  		// text, sql, html
+	Class     	string 		`json:"Class,omitempty"` 		// single, table
+	PerTable  	bool		`json:"PerTable,omitempty"` 	// true == generate one file per table
 }
 
 // FileDefns controls what files are generated.
 var FileDefns []FileDefn = []FileDefn{
 	{"base.html.tmpl.txt",
-		"/tmpl/base.html.tmpl",
+		"/tmpl",
+		"base.html.tmpl",
 		"copy",
 		"one",
+		false,
+	},
+	{"form.html",
+		"/tmpl",
+		"form.html",
+		"copy",
+		"one",
+		false,
 	},
 	{"main.go.tmpl.txt",
+		"",
 		"main.go",
 		"text",
 		"one",
+		false,
 	},
 	{"mainExec.go.tmpl.txt",
+		"",
 		"mainExec.go",
 		"text",
 		"single",
+		false,
 	},
 	{"handlers.go.tmpl.txt",
-		"/handlers/handlers.go",
+		"/handlers",
+		"handlers.go",
 		"text",
 		"single",
+		false,
+	},
+	{"table.handlers.go.tmpl.txt",
+		"/handlers",
+		".go",
+		"text",
+		"single",
+		true,
 	},
 	{"tableio.go.tmpl.txt",
-		"/tableio/tableio.go",
+		"/tableio",
+		"tableio.go",
 		"text",
 		"single",
+		false,
+	},
+	{"table.io.go.tmpl.txt",
+		"/tableio",
+		".go",
+		"text",
+		"single",
+		true,
 	},
 }
 
@@ -75,15 +108,21 @@ var FileDefns []FileDefn = []FileDefn{
 // We also maintain the data in structs for easier
 // access by the generation functions.
 type TmplData struct {
-	DataJson map[string]interface{}
-	Data     *appData.Database
-	MainJson map[string]interface{}
-	Main     *mainData.MainData
+	//DataJson 	map[string]interface{}
+	Data     	*appData.Database
+	//MainJson 	map[string]interface{}
+	Main     	*mainData.MainData
+	Name		string						// Table Name (if present)
 }
 
 var tmplData TmplData
 
-func init() {
+type TaskData struct {
+	FD			FileDefn
+	TD			*TmplData
+	Table		appData.DbTable
+	PathIn	  	string						// Input File Path
+	PathOut	  	string						// Output File Path
 
 }
 
@@ -139,12 +178,19 @@ func createModelPath(fn string) (string, error) {
 	return modelPath, err
 }
 
-func createOutputPath(fn string) (string, error) {
+func createOutputPath(dir string, fn string, tn string) (string, error) {
 	var outPath string
 	var err error
 
 	outPath = sharedData.OutDir()
 	outPath += "/"
+	if len(dir) > 0 {
+		outPath += dir
+		outPath += "/"
+	}
+	if len(tn) > 0 {
+		outPath += tn
+	}
 	outPath += fn
 	outPath, err = util.IsPathRegularFile(outPath)
 	if err == nil {
@@ -154,6 +200,51 @@ func createOutputPath(fn string) (string, error) {
 	}
 
 	return outPath, nil
+}
+
+func genFile(task TaskData) {
+	var err         error
+
+	// Now generate the file.
+	switch task.FD.FileType {
+	case "copy":
+		if sharedData.Noop() {
+			if !sharedData.Quiet() {
+				log.Printf("\tShould have copied from %s to %s\n", task.PathIn, task.PathOut)
+			}
+		} else {
+			if amt, err := copyFile(task.PathIn, task.PathOut); err == nil {
+				if !sharedData.Quiet() {
+					log.Printf("\tCopied %d bytes from %s to %s\n", amt, task.PathIn, task.PathOut)
+				}
+			} else {
+				log.Fatalf("Error - Copied %d bytes from %s to %s with error %s\n",
+					amt, task.PathIn, task.PathOut, err)
+			}
+		}
+	case "html":
+		if err = GenHtmlFile(task.PathIn, task.PathOut, task); err == nil {
+			if !sharedData.Quiet() {
+				log.Printf("\tGenerated HTML from %s to %s\n", task.PathIn, task.PathOut)
+			}
+		} else {
+			log.Fatalf("Error - Generated HTML from %s to %s with error %s\n",
+				task.PathIn, task.PathOut, err)
+		}
+	case "text":
+		if err = GenTextFile(task.PathIn, task.PathOut, task); err == nil {
+			if !sharedData.Quiet() {
+				log.Printf("\tGenerated HTML from %s to %s\n", task.PathIn, task.PathOut)
+			}
+		} else {
+			log.Fatalf("Error - Generated HTML from %s to %s with error %s\n",
+				task.PathIn, task.PathOut, err)
+		}
+	default:
+		log.Fatalln("Error: Invalid file type:", task.FD.FileType, "for", task.FD.ModelName, err)
+	}
+
+
 }
 
 // readJsonFiles reads in the two JSON files that define the
@@ -173,8 +264,9 @@ func readJsonFiles() error {
 }
 
 func GenSqlApp(inDefns map[string]interface{}) error {
-	var err error
-	var ok bool
+	var err 	error
+	var pathIn	string
+	//var ok 		bool
 
 	if sharedData.Debug() {
 		log.Println("\tsql_app: In Debug Mode")
@@ -187,13 +279,13 @@ func GenSqlApp(inDefns map[string]interface{}) error {
     }
 
 	// Set up template data
-	if tmplData.MainJson, ok = mainData.MainJson().(map[string]interface{}); !ok {
-		log.Fatalln("Error - Could not type assert mainData.MainJson()")
-	}
+	//if tmplData.MainJson, ok = mainData.MainJson().(map[string]interface{}); !ok {
+		//log.Fatalln("Error - Could not type assert mainData.MainJson()")
+	//}
 	tmplData.Main = mainData.MainStruct()
-	if tmplData.DataJson, ok = appData.AppJson().(map[string]interface{}); !ok {
-		log.Fatalln("Error - Could not type assert appData.AppJson()")
-	}
+	//if tmplData.DataJson, ok = appData.AppJson().(map[string]interface{}); !ok {
+	//	log.Fatalln("Error - Could not type assert appData.AppJson()")
+	//}
 	tmplData.Data = appData.AppStruct()
 
 	// Set up the output directory structure
@@ -216,75 +308,61 @@ func GenSqlApp(inDefns map[string]interface{}) error {
         }
     }
 
-	// Now handle each FileDefn creating a file for it.
-	for _, def := range (FileDefns) {
-		var modelPath string
-		var outPath string
+	// Setup the worker queue.
+	done := make(chan bool)
+	inputQueue := util.Workers(
+					func(a interface{}) {
+						genFile(a.(TaskData))
+					},
+					func() {
+						done <- true
+					},
+					5)
+
+	for _, def := range FileDefns {
 
 		if !sharedData.Quiet() {
 			log.Println("Process file:", def.ModelName, "generating:", def.FileName, "...")
 		}
 
-		//if def.PreprocSql {
-		//PreprocessSql(json.(DatabaseData))
-		//}
-
 		// Create the input model file path.
-		if modelPath, err = createModelPath(def.ModelName); err != nil {
-			return errors.New(fmt.Sprintln("Error:", modelPath, err))
+		if pathIn, err = createModelPath(def.ModelName); err != nil {
+			return errors.New(fmt.Sprintln("Error:", pathIn, err))
 		}
 		if sharedData.Debug() {
-			log.Println("\t\tmodelPath=", modelPath)
-		}
-
-		// Create the output path
-		if outPath, err = createOutputPath(def.FileName); err != nil {
-			log.Fatalln(err)
-		}
-		if sharedData.Debug() {
-			log.Println("\t\t outPath=", outPath)
+			log.Println("\t\tmodelPath=", pathIn)
 		}
 
 		// Now generate the file.
-		switch def.FileType {
-		case "copy":
-			if sharedData.Noop() {
-				if !sharedData.Quiet() {
-					log.Printf("\tShould have copied from %s to %s\n", modelPath, outPath)
-				}
-			} else {
-				if amt, err := copyFile(modelPath, outPath); err == nil {
-					if !sharedData.Quiet() {
-						log.Printf("\tCopied %d bytes from %s to %s\n", amt, modelPath, outPath)
+		if def.PerTable {
+			appData.ForTables(
+				func(v appData.DbTable) {
+					data := TaskData{FD: def, TD:&tmplData, Table:v, PathIn:pathIn}
+					if data.PathOut, err = createOutputPath(def.FileDir, def.FileName, v.Name); err != nil {
+						log.Fatalln(err)
 					}
-				} else {
-					log.Fatalf("Error - Copied %d bytes from %s to %s with error %s\n",
-						amt, modelPath, outPath, err)
-				}
+					if sharedData.Debug() {
+						log.Println("\t\t outPath=", data.PathOut)
+					}
+					// Generate the file.
+					inputQueue <- data
+				})
+		} else {
+			data := TaskData{FD:def, TD:&tmplData, PathIn:pathIn}
+			// Create the output path
+			if data.PathOut, err = createOutputPath(def.FileDir, def.FileName, ""); err != nil {
+				log.Fatalln(err)
 			}
-		case "html":
-			if err = GenHtmlFile(modelPath, outPath, tmplData); err == nil {
-				if !sharedData.Quiet() {
-					log.Printf("\tGenerated HTML from %s to %s\n", modelPath, outPath)
-				}
-			} else {
-				log.Fatalf("Error - Generated HTML from %s to %s with error %s\n",
-					modelPath, outPath, err)
+			if sharedData.Debug() {
+				log.Println("\t\t outPath=", data.PathOut)
 			}
-		case "text":
-			if err = GenTextFile(modelPath, outPath, tmplData); err == nil {
-				if !sharedData.Quiet() {
-					log.Printf("\tGenerated HTML from %s to %s\n", modelPath, outPath)
-				}
-			} else {
-				log.Fatalf("Error - Generated HTML from %s to %s with error %s\n",
-					modelPath, outPath, err)
-			}
-		default:
-			return errors.New(fmt.Sprint("Error: Invalid file type:", def.FileType,
-				"for", def.ModelName, err))
+			// Generate the file.
+			inputQueue <- data
 		}
 	}
+	close(inputQueue)
+
+	<-done
 
 	return nil
 }

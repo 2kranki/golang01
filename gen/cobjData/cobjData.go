@@ -16,107 +16,6 @@ import (
 	"strings"
 )
 
-type DbTypeConv struct {
-	DbType		string
-	GoType		string
-}
-
-var typeConvMsSql = []DbTypeConv{
-	{"BLOB", "[]byte"},						// BLOB
-	{"BOOLEAN", "???"},						// BOOLEAN
-	{"CHAR", "???"},						// CHAR[(length)]
-	{"CHARACTER", "???"},					// CHARACTER[(length)]
-	{"CLOB", "[]byte"},						// CLOB
-	{"DATE", "time.Time"},
-	{"DATETIME", "time.Time"},
-	{"DEC", "???"},							// DEC[(p[,s])]
-	{"DECIMAL", "???"},						// DECIMAL[(p[,s])]
-	{"FLOAT", "float64"},					// FLOAT(p)
-	{"INT", "int64"},
-	{"INTEGER", "int64"},
-	{"NULL", "nil"},
-	{"NUMERIC", "???"},						// NUMERIC [(p[,s])]
-	{"NVARCHAR", "string"},					// NVARCHAR(length)
-	{"REAL", "???"},
-	{"SMALLINT", "???"},
-	{"TEXT", "string"},
-	{"TIME", "time.Time"},
-	{"TIMESTAMP", "time.Time"},
-	{"VARCHAR", "???"},						// VARCHAR(length)
-}
-
-var typeConvMySql = []DbTypeConv{
-	{"BLOB", "[]byte"},						// BLOB
-	{"BOOLEAN", "???"},						// BOOLEAN
-	{"CHAR", "???"},						// CHAR[(length)]
-	{"CHARACTER", "???"},					// CHARACTER[(length)]
-	{"CLOB", "[]byte"},						// CLOB
-	{"DATE", "time.Time"},
-	{"DATETIME", "time.Time"},
-	{"DEC", "???"},							// DEC[(p[,s])]
-	{"DECIMAL", "???"},						// DECIMAL[(p[,s])]
-	{"FLOAT", "float64"},					// FLOAT(p)
-	{"INT", "int64"},
-	{"INTEGER", "int64"},
-	{"NULL", "nil"},
-	{"NUMERIC", "???"},						// NUMERIC [(p[,s])]
-	{"NVARCHAR", "string"},					// NVARCHAR(length)
-	{"REAL", "???"},
-	{"SMALLINT", "???"},
-	{"TEXT", "string"},
-	{"TIME", "time.Time"},
-	{"TIMESTAMP", "time.Time"},
-	{"VARCHAR", "???"},						// VARCHAR(length)
-}
-
-var typeConvPostgres = []DbTypeConv{
-	{"BLOB", "[]byte"},						// BLOB
-	{"BOOLEAN", "???"},						// BOOLEAN
-	{"CHAR", "???"},						// CHAR[(length)]
-	{"CHARACTER", "???"},					// CHARACTER[(length)]
-	{"CLOB", "[]byte"},						// CLOB
-	{"DATE", "time.Time"},
-	{"DATETIME", "time.Time"},
-	{"DEC", "???"},							// DEC[(p[,s])]
-	{"DECIMAL", "???"},						// DECIMAL[(p[,s])]
-	{"FLOAT", "float64"},					// FLOAT(p)
-	{"INT", "int64"},
-	{"INTEGER", "int64"},
-	{"NULL", "nil"},
-	{"NUMERIC", "???"},						// NUMERIC [(p[,s])]
-	{"NVARCHAR", "string"},					// NVARCHAR(length)
-	{"REAL", "???"},
-	{"SMALLINT", "???"},
-	{"TEXT", "string"},
-	{"TIME", "time.Time"},
-	{"TIMESTAMP", "time.Time"},
-	{"VARCHAR", "???"},						// VARCHAR(length)
-}
-
-var typeConvSqlite = []DbTypeConv{
-	{"BLOB", "[]byte"},						// BLOB
-	{"BOOLEAN", "???"},						// BOOLEAN
-	{"CHAR", "???"},						// CHAR[(length)]
-	{"CHARACTER", "???"},					// CHARACTER[(length)]
-	{"CLOB", "[]byte"},						// CLOB
-	{"DATE", "time.Time"},
-	{"DATETIME", "time.Time"},
-	{"DEC", "???"},							// DEC[(p[,s])]
-	{"DECIMAL", "???"},						// DECIMAL[(p[,s])]
-	{"FLOAT", "float64"},					// FLOAT(p)
-	{"INT", "int64"},
-	{"INTEGER", "int64"},
-	{"NULL", "nil"},
-	{"NUMERIC", "???"},						// NUMERIC [(p[,s])]
-	{"NVARCHAR", "???"},					// NVARCHAR(length)
-	{"REAL", "???"},
-	{"SMALLINT", "???"},
-	{"TEXT", "string"},
-	{"TIME", "time.Time"},
-	{"TIMESTAMP", "time.Time"},
-	{"VARCHAR", "???"},						// VARCHAR(length)
-}
-
 type DbField struct {
 	Name		string		`json:"Name,omitempty"`
 	Type		string		`json:"Type,omitempty"`
@@ -131,43 +30,14 @@ type Database struct {
     Fields		[]DbField       `json:"Fields,omitempty"`
 }
 
-func (t *Database) CreateInsertStr() string {
-
-	insertStr := ""
-	for _, v := range t.Fields {
-		insertStr += v.Name + ","
-	}
-	if len(insertStr) > 0 {
-		insertStr = insertStr[0:len(insertStr)-1]
-	}
-	return insertStr
-}
-
 var	cobjStruct	Database
 
 func CObjStruct() *Database {
-	return &appStruct
+	return &cobjStruct
 }
 
-func CreateInsertSql(t interface{}) string {
-	//var Fields 	[]map[string] interface{}
-	//var ok		bool
-	var x		string
-
-	//insertStr := ""
-	return x
-}
-
-func CreateTableStruct(t interface{}) string {
-	//var Fields 	[]map[string] interface{}
-	//var ok		bool
-	var x		string
-
-	//insertStr := ""
-	return x
-}
-
-func GenAccessFunc(t DbTable) string {
+// GenHeaderDefns
+func GenHeaderDefns() string {
 	var str			strings.Builder
 	str.WriteString(fmt.Sprintf("\tfunc %sDeleteRow( ) {\n", t.Name))
 	str.WriteString("\t}\n\n")
@@ -218,35 +88,59 @@ func GenAccessFunc(t DbTable) string {
 	return str.String()
 }
 
-func GenAccessFuncs() string {
+// GenInternalDefn generates the internal field definitions.
+func GenInternalDefn(f DbField) string {
 	var str			strings.Builder
-	for _, v := range appStruct.Tables {
-		str.WriteString(GenAccessFunc(v))
-	}
+
+	str.WriteString("\t")
+	str.WriteString(f.Type)
+	str.WriteString("\t")
+	str.WriteString(f.Name)
+	str.WriteString(";\n")
+
 	return str.String()
 }
 
-func getTypeConv(db string) []DbTypeConv {
-	switch db {
-	case "mariadb":
-		return typeConvMsSql
-	case "mssql":
-		return typeConvMsSql
-	case "mysql":
-		return typeConvMySql
-	case "postgres":
-		return typeConvMySql
-	case "sqlite":
-		return typeConvSqlite
+// GenInternalDefns generates the internal field definitions.
+func GenInternalDefns() string {
+	var str			strings.Builder
+
+	for _, v := range cobjStruct.Fields {
+		str.WriteString(GenInternalDefn(v))
 	}
-	return nil
+	str.WriteString("\n")
+
+	return str.String()
+}
+
+// GenBody generates the getter/setter bodies.
+func GenGSBody(f DbField) string {
+	var str			strings.Builder
+
+	str.WriteString(fmt.Sprintf("\tfunc %sDeleteRow( ) {\n", f.Name))
+	str.WriteString("\t}\n\n")
+
+	return str.String()
+}
+
+// GenGetSetBodies generates the getter/setter bodies.
+func GenGetSetBodies() string {
+	var str			strings.Builder
+
+	for _, v := range cobjStruct.Fields {
+		str.WriteString(GenInternalDefn(v))
+	}
+
+	return str.String()
 }
 
 // init() adds the functions needed for templating to
 // shared data.
 func init() {
 	//sharedData.SetFunc("GenFlagSetup", GenFlagSetup)
-	sharedData.SetFunc("GenAccessFuncs", GenAccessFuncs)
+	sharedData.SetFunc("GenGetSetBodies", GenGetSetBodies)
+	sharedData.SetFunc("GenHeaderDefns", GenHeaderDefns)
+	sharedData.SetFunc("GenInternalDefns", GenInternalDefns)
 }
 
 // ReadJsonFileApp reads the input JSON file for app
@@ -261,19 +155,13 @@ func ReadJsonFileApp(fn string) error {
 		log.Println("json path:", jsonPath)
 	}
 
-	// Read in the json file generically
-	if appJson, err = util.ReadJsonFile(jsonPath); err != nil {
-		return errors.New(fmt.Sprintln("Error: unmarshalling", jsonPath, ", JSON input file:", err))
-	}
-
 	// Read in the json file structurally
-	if err = util.ReadJsonFileToData(jsonPath, &appStruct); err != nil {
+	if err = util.ReadJsonFileToData(jsonPath, &cobjStruct); err != nil {
 		return errors.New(fmt.Sprintln("Error: unmarshalling", jsonPath, ", JSON input file:", err))
 	}
 
 	if sharedData.Debug() {
-		log.Println("\tJson Data:", appJson)
-		log.Println("\tJson Struct:", appStruct)
+		log.Println("\tJson Struct:", cobjStruct)
 	}
 
 	return nil

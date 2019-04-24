@@ -3,23 +3,15 @@
 
 //  Handle HTTP Events
 
-// Generated: [[Time]]
+// Generated: 2019-04-24 11:09:33.44631 -0400 EDT m=+0.001906926
 
 
 package handlers
 
 import (
-	[[ if eq .TD.Data.SqlType "mariadb" ]]
-		ERROR - NOT IMPLEMENTED
-	[[ else if eq .TD.Data.SqlType "mssql" ]]
-	_ "github.com/2kranki/go-mssqldb"
-	[[ else if eq .TD.Data.SqlType "mysql" ]]
-		_ "github.com/go-sql-driver/mysql"
-	[[ else if eq .TD.Data.SqlType "postgres" ]]
-		_ "github.com/lib/pq"
-	[[ else if eq .TD.Data.SqlType "sqlite" ]]
+	
 	_ "github.com/2kranki/go-sqlite3"
-	[[ end ]]
+	
     "html/template"
 )
 
