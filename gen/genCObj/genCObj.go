@@ -15,7 +15,7 @@
 package genCObj
 
 import (
-	"../appData"
+	"../dbPkg"
 	"../mainData"
 	"../shared"
 	"../util"
@@ -83,9 +83,7 @@ var FileDefns []FileDefn = []FileDefn{
 // We also maintain the data in structs for easier
 // access by the generation functions.
 type TmplData struct {
-	DataJson map[string]interface{}
-	Data     *appData.Database
-	MainJson map[string]interface{}
+	Data     *dbPkg.Database
 	Main     *mainData.MainData
 }
 
@@ -173,7 +171,7 @@ func readJsonFiles() error {
 		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.MainPath(), err))
 	}
 
-	if err = appData.ReadJsonFileApp(sharedData.DataPath()); err != nil {
+	if err = dbPkg.ReadJsonFile(sharedData.DataPath()); err != nil {
 		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.DataPath(), err))
 	}
 
@@ -182,7 +180,6 @@ func readJsonFiles() error {
 
 func GenCObj(inDefns map[string]interface{}) error {
 	var err error
-	var ok bool
 
 	if sharedData.Debug() {
 		log.Println("\tsql_app: In Debug Mode")
@@ -195,14 +192,8 @@ func GenCObj(inDefns map[string]interface{}) error {
     }
 
 	// Set up template data
-	if tmplData.MainJson, ok = mainData.MainJson().(map[string]interface{}); !ok {
-		log.Fatalln("Error - Could not type assert mainData.MainJson()")
-	}
 	tmplData.Main = mainData.MainStruct()
-	if tmplData.DataJson, ok = appData.AppJson().(map[string]interface{}); !ok {
-		log.Fatalln("Error - Could not type assert appData.AppJson()")
-	}
-	tmplData.Data = appData.AppStruct()
+	tmplData.Data = dbPkg.DbStruct()
 
 	// Set up the output directory structure
     if !sharedData.Noop() {

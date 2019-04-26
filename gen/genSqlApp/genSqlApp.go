@@ -38,7 +38,9 @@ type FileDefn struct {
 	FileName  	string 		`json:"FileName,omitempty"`
 	FileType  	string 		`json:"Type,omitempty"`  		// text, sql, html
 	Class     	string 		`json:"Class,omitempty"` 		// single, table
-	PerTable  	bool		`json:"PerTable,omitempty"` 	// true == generate one file per table
+	PerGrp  	int			`json:"PerGrp,omitempty"` 		// 0 == generate one file
+	//														// 1 == generate one file for a database
+	// 														// 2 == generate one file for a table
 }
 
 // FileDefns controls what files are generated.
@@ -48,56 +50,56 @@ var FileDefns []FileDefn = []FileDefn{
 		"base.html.tmpl",
 		"copy",
 		"one",
-		false,
+		0,
 	},
 	{"form.html",
 		"/tmpl",
 		"form.html",
 		"copy",
 		"one",
-		false,
+		0,
 	},
 	{"main.go.tmpl.txt",
 		"",
 		"main.go",
 		"text",
 		"one",
-		false,
+		0,
 	},
 	{"mainExec.go.tmpl.txt",
 		"",
 		"mainExec.go",
 		"text",
 		"single",
-		false,
+		0,
 	},
 	{"handlers.go.tmpl.txt",
 		"/handlers",
 		"handlers.go",
 		"text",
 		"single",
-		false,
+		0,
 	},
-	{"table.handlers.go.tmpl.txt",
+	{"handlers.table.go.tmpl.txt",
 		"/handlers",
 		".go",
 		"text",
 		"single",
-		true,
+		2,
 	},
-	{"tableio.go.tmpl.txt",
-		"/tableio",
-		"tableio.go",
-		"text",
-		"single",
-		false,
-	},
-	{"table.io.go.tmpl.txt",
-		"/tableio",
+	{"io.go.tmpl.txt",
+		"/io",
 		".go",
 		"text",
 		"single",
-		true,
+		1,
+	},
+	{"io.table.go.tmpl.txt",
+		"/io",
+		".go",
+		"text",
+		"single",
+		2,
 	},
 }
 
@@ -109,7 +111,7 @@ var FileDefns []FileDefn = []FileDefn{
 // access by the generation functions.
 type TmplData struct {
 	//DataJson 	map[string]interface{}
-	Data     	*appData.Database
+	Data     	*dbPkg.Database
 	//MainJson 	map[string]interface{}
 	Main     	*mainData.MainData
 	Name		string						// Table Name (if present)
@@ -120,7 +122,7 @@ var tmplData TmplData
 type TaskData struct {
 	FD			FileDefn
 	TD			*TmplData
-	Table		appData.DbTable
+	Table		*dbPkg.DbTable
 	PathIn	  	string						// Input File Path
 	PathOut	  	string						// Output File Path
 
@@ -256,7 +258,7 @@ func readJsonFiles() error {
 		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.MainPath(), err))
 	}
 
-	if err = appData.ReadJsonFileApp(sharedData.DataPath()); err != nil {
+	if err = dbPkg.ReadJsonFile(sharedData.DataPath()); err != nil {
 		return errors.New(fmt.Sprintln("Error: Reading Main Json Input:", sharedData.DataPath(), err))
 	}
 
@@ -286,7 +288,7 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 	//if tmplData.DataJson, ok = appData.AppJson().(map[string]interface{}); !ok {
 	//	log.Fatalln("Error - Could not type assert appData.AppJson()")
 	//}
-	tmplData.Data = appData.AppStruct()
+	tmplData.Data = dbPkg.DbStruct()
 
 	// Set up the output directory structure
     if !sharedData.Noop() {
@@ -302,7 +304,7 @@ func GenSqlApp(inDefns map[string]interface{}) error {
         if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
             log.Fatalln("Error: Could not create output directory:", tmpName, err)
         }
-        tmpName = path.Clean(sharedData.OutDir() + "/tableio")
+        tmpName = path.Clean(sharedData.OutDir() + "/io" + tmplData.Data.Name)
         if err = os.MkdirAll(tmpName, os.ModeDir+0777); err != nil {
             log.Fatalln("Error: Could not create output directory:", tmpName, err)
         }
@@ -334,20 +336,8 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 		}
 
 		// Now generate the file.
-		if def.PerTable {
-			appData.ForTables(
-				func(v appData.DbTable) {
-					data := TaskData{FD: def, TD:&tmplData, Table:v, PathIn:pathIn}
-					if data.PathOut, err = createOutputPath(def.FileDir, def.FileName, v.Name); err != nil {
-						log.Fatalln(err)
-					}
-					if sharedData.Debug() {
-						log.Println("\t\t outPath=", data.PathOut)
-					}
-					// Generate the file.
-					inputQueue <- data
-				})
-		} else {
+		switch def.PerGrp {
+		case 0:
 			data := TaskData{FD:def, TD:&tmplData, PathIn:pathIn}
 			// Create the output path
 			if data.PathOut, err = createOutputPath(def.FileDir, def.FileName, ""); err != nil {
@@ -358,6 +348,30 @@ func GenSqlApp(inDefns map[string]interface{}) error {
 			}
 			// Generate the file.
 			inputQueue <- data
+		case 1:
+			data := TaskData{FD:def, TD:&tmplData, PathIn:pathIn}
+			// Create the output path
+			if data.PathOut, err = createOutputPath(def.FileDir, def.FileName, ""); err != nil {
+				log.Fatalln(err)
+			}
+			if sharedData.Debug() {
+				log.Println("\t\t outPath=", data.PathOut)
+			}
+			// Generate the file.
+			inputQueue <- data
+		case 2:
+			dbPkg.ForTables(
+				func(v *dbPkg.DbTable) {
+					data := TaskData{FD: def, TD:&tmplData, Table:v, PathIn:pathIn}
+					if data.PathOut, err = createOutputPath(def.FileDir, def.FileName, v.Name); err != nil {
+						log.Fatalln(err)
+					}
+					if sharedData.Debug() {
+						log.Println("\t\t outPath=", data.PathOut)
+					}
+					// Generate the file.
+					inputQueue <- data
+				})
 		}
 	}
 	close(inputQueue)

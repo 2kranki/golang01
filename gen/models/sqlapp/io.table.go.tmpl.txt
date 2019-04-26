@@ -23,9 +23,9 @@ import (
 	"strconv"
 )
 
-[[
+[[.Table.CreateStruct]]
 
-var createSql = `[[CreateSql .Table]]`
+var createSql = `[[.Table.CreateSql]]`
 
 // [[.Table.Name]]Create creates the table in the
 // given database deleting the current table if
@@ -38,23 +38,41 @@ func [[.Table.Name]]Create() error {
     return err
 }
 
-func [[.Table.Name]]RowDelete() {
+func [[.Table.Name]]RowDelete(key string) error {
 
+    if key == "" {
+	    return errors.New("400. Bad Request.")
+    }
+
+    // Do the SQL deletion.
+	_, err := db.Exec("DELETE FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]]=$1;", key)
+	if err != nil {
+		return errors.New("500. Internal Server Error")
+	}
+
+	return nil
 }
 
-func [[.Table.Name]]RowGet(r *http.Request) (interface{}, error) {
-    key := r.FormValue("{{$t.PrimaryKey}}")
+func [[.Table.Name]]RowFind(key string) (interface{}, error) {
+    data := [[.Table.StructName]]{}
+
     if key == "" {
 	    return data, errors.New("400. Bad Request.")
     }
 
+	row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] = $1", isbn)
+
+	err := row.Scan([[.Table.ScanFields]])
+	if err != nil {
+		return data, err
+	}
 }
 
 func [[.Table.Name]]RowInsert() {
 
 }
 
-func [[.Table.Name]]RowNext(r *http.Request) (interface{}, error) {
+func [[.Table.Name]]RowNext([[.Table.PrimaryKey.Name]] string) (interface{}, error) {
     key := r.FormValue("{{$t.PrimaryKey}}")
     if key == "" {
 	    return data, errors.New("400. Bad Request.")
@@ -62,7 +80,7 @@ func [[.Table.Name]]RowNext(r *http.Request) (interface{}, error) {
 
 }
 
-func [[.Table.Name]]RowPrev(r *http.Request) (interface{}, error) {
+func [[.Table.Name]]RowPrev([[.Table.PrimaryKey.Name]] string) (interface{}, error) {
     key := r.FormValue("{{$t.PrimaryKey}}")
     if key == "" {
 	    return data, errors.New("400. Bad Request.")

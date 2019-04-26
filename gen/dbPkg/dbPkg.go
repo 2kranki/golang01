@@ -1,6 +1,6 @@
 // See License.txt in main repository directory
 
-// appData contains the data and functions to generate
+// dbPkg contains the data and functions to generate
 // table and field data for html forms, handlers and
 // table sql i/o for a specific database.  Multiple
 // databases should be handled with multiple ??? of
@@ -31,15 +31,15 @@ var typeConvMsSql = []DbTypeConv{
 	{"CLOB", "[]byte"},						// CLOB
 	{"DATE", "time.Time"},
 	{"DATETIME", "time.Time"},
-	{"DEC", "???"},							// DEC[(p[,s])]
-	{"DECIMAL", "???"},						// DECIMAL[(p[,s])]
+	{"DEC", "float64"},						// DEC[(p[,s])]
+	{"DECIMAL", "float64"},					// DECIMAL[(p[,s])]
 	{"FLOAT", "float64"},					// FLOAT(p)
 	{"INT", "int64"},
 	{"INTEGER", "int64"},
 	{"NULL", "nil"},
 	{"NUMERIC", "???"},						// NUMERIC [(p[,s])]
 	{"NVARCHAR", "string"},					// NVARCHAR(length)
-	{"REAL", "???"},
+	{"REAL", "float64"},
 	{"SMALLINT", "???"},
 	{"TEXT", "string"},
 	{"TIME", "time.Time"},
@@ -55,8 +55,8 @@ var typeConvMySql = []DbTypeConv{
 	{"CLOB", "[]byte"},						// CLOB
 	{"DATE", "time.Time"},
 	{"DATETIME", "time.Time"},
-	{"DEC", "???"},							// DEC[(p[,s])]
-	{"DECIMAL", "???"},						// DECIMAL[(p[,s])]
+	{"DEC", "float64"},						// DEC[(p[,s])]
+	{"DECIMAL", "float64"},					// DECIMAL[(p[,s])]
 	{"FLOAT", "float64"},					// FLOAT(p)
 	{"INT", "int64"},
 	{"INTEGER", "int64"},
@@ -79,8 +79,8 @@ var typeConvPostgres = []DbTypeConv{
 	{"CLOB", "[]byte"},						// CLOB
 	{"DATE", "time.Time"},
 	{"DATETIME", "time.Time"},
-	{"DEC", "???"},							// DEC[(p[,s])]
-	{"DECIMAL", "???"},						// DECIMAL[(p[,s])]
+	{"DEC", "float64"},						// DEC[(p[,s])]
+	{"DECIMAL", "float64"},					// DECIMAL[(p[,s])]
 	{"FLOAT", "float64"},					// FLOAT(p)
 	{"INT", "int64"},
 	{"INTEGER", "int64"},
@@ -103,20 +103,20 @@ var typeConvSqlite = []DbTypeConv{
 	{"CLOB", "[]byte"},						// CLOB
 	{"DATE", "time.Time"},
 	{"DATETIME", "time.Time"},
-	{"DEC", "???"},							// DEC[(p[,s])]
-	{"DECIMAL", "???"},						// DECIMAL[(p[,s])]
+	{"DEC", "float64"},						// DEC[(p[,s])]
+	{"DECIMAL", "float64"},					// DECIMAL[(p[,s])]
 	{"FLOAT", "float64"},					// FLOAT(p)
 	{"INT", "int64"},
 	{"INTEGER", "int64"},
 	{"NULL", "nil"},
-	{"NUMERIC", "???"},						// NUMERIC [(p[,s])]
-	{"NVARCHAR", "???"},					// NVARCHAR(length)
-	{"REAL", "???"},
-	{"SMALLINT", "???"},
+	{"NUMERIC", "float64"},					// NUMERIC [(p[,s])]
+	{"NVARCHAR", "string"},					// NVARCHAR(length)
+	{"REAL", "float64"},
+	{"SMALLINT", "int64"},
 	{"TEXT", "string"},
 	{"TIME", "time.Time"},
 	{"TIMESTAMP", "time.Time"},
-	{"VARCHAR", "???"},						// VARCHAR(length)
+	{"VARCHAR", "string"},						// VARCHAR(length)
 }
 
 // DbField defines a Table's field mostly in terms of
@@ -131,15 +131,45 @@ type DbField struct {
 	List		bool	    `json:"List,omitempty"`			// Include in List Report
 }
 
-func (f *DbField) CreateStructField() string {
+func (f *DbField) CreateSql(cm string) string {
+	var str			strings.Builder
+	var ft			string
+	var nl			string
+	var pk			string
+
+	if f.Len > 0 {
+		if f.Dec > 0 {
+			ft = fmt.Sprintf("%s(%d,%d)", f.Type, f.Len, f.Dec)
+		} else {
+			ft = fmt.Sprintf("%s(%d)", f.Type, f.Len)
+		}
+	} else {
+		ft = f.Type
+	}
+	nl = " NOT NULL"
+	if f.Nullable {
+		nl = ""
+	}
+	pk = ""
+	if f.PrimaryKey {
+		pk = " PRIMARY KEY"
+	}
+	str.WriteString(fmt.Sprintf("\t%s\t%s%s%s%s\n", f.Name, ft, nl, pk, cm))
+
+	return str.String()
+}
+
+func (f *DbField) CreateStruct() string {
 	var str			strings.Builder
 
 	str.WriteString(fmt.Sprintf("\t%s\t", strings.Title(f.Name)))
-	str.WriteString(fmt.Sprintf("%s\n",
-		strings.Title(ConvFieldToGoType(dbStruct.SqlType, f.Type))))
-	str.WriteString("\n")
+	str.WriteString(fmt.Sprintf("%s\n", f.GoType()))
 
 	return str.String()
+}
+
+func (f *DbField) GoType() string {
+	return ConvFieldToGoType(dbStruct.SqlType, f.Type)
 }
 
 // DbTable stands for Database Table and defines
@@ -163,51 +193,22 @@ func (t *DbTable) CreateInsertStr() string {
 	return insertStr
 }
 
-type Database struct {
-	Name	string			`json:"Name,omitempty"`
-	SqlType	string			`json:"SqlType,omitempty"`
-	Tables  []DbTable		`json:"Tables,omitempty"`
-}
-
-var	dbStruct	Database
-
-func DbStruct() *Database {
-	return &dbStruct
-}
-
-func CreateSql(t interface{}) string {
+func (t *DbTable) CreateSql() string {
 	var str			strings.Builder
 
-	table := t.(DbTable)
-
-	str.WriteString(fmt.Sprintf("DROP TABLE %s IF EXISTS;\n", table.Name))
+	str.WriteString(fmt.Sprintf("DROP TABLE %s IF EXISTS;\n", t.Name))
 	if dbStruct.SqlType == "mssql" {
 		str.WriteString("GO\n")
 	}
-	str.WriteString(fmt.Sprintf("CREATE TABLE %s (\n", table.Name))
-	for i,f := range table.Fields {
-		var ft			string
-		var pk			string
+	str.WriteString(fmt.Sprintf("CREATE TABLE %s (\n", t.Name))
+	for i,f := range t.Fields {
 		var cm  		string
 
-		if f.Len > 0 {
-			if f.Dec > 0 {
-				ft = fmt.Sprintf("%s(%d,%d)", f.Type, f.Len, f.Dec)
-			} else {
-				ft = fmt.Sprintf("%s(%d)", f.Type, f.Len)
-			}
-		} else {
-			ft = f.Type
-		}
-		pk = ""
-		if f.PrimaryKey {
-			pk = "PRIMARY KEY"
-		}
 		cm = ""
-		if i != (len(table.Fields) - 1) {
+		if i != (len(t.Fields) - 1) {
 			cm = ","
 		}
-		str.WriteString(fmt.Sprintf("\t%s\t%s %s%s\n", f.Name, ft, pk, cm))
+		str.WriteString(f.CreateSql(cm))
 	}
 	str.WriteString(fmt.Sprintf(");\n"))
 	if dbStruct.SqlType == "mssql" {
@@ -217,6 +218,87 @@ func CreateSql(t interface{}) string {
 	return str.String()
 }
 
+// PrimaryKey returns the first field that it finds
+// that is marked as a primary key.
+func (t *DbTable) PrimaryKey() *DbField {
+
+	for i,_ := range t.Fields {
+		if t.Fields[i].PrimaryKey {
+			return &t.Fields[i]
+		}
+	}
+	return nil
+}
+
+func (t *DbTable) CreateStruct( ) string {
+	var str			strings.Builder
+
+	str.WriteString(fmt.Sprintf("type %s struct {\n", strings.Title(t.Name)))
+	for i,_ := range t.Fields {
+		str.WriteString(t.Fields[i].CreateStruct())
+	}
+	str.WriteString("}\n")
+
+	return str.String()
+}
+
+func (t *DbTable) ForFields(f func(f *DbField) ) {
+	for i,_ := range t.Fields {
+		f(&t.Fields[i])
+	}
+}
+
+// ScanFields returns struct fields to be used in
+// a row.Scan.  It assumes that the struct's name
+// is "data"
+func (t *DbTable) ScanFields() string {
+	var str			strings.Builder
+
+	for i,f := range t.Fields {
+		cm := ","
+		if i == len(t.Fields) - 1 {
+			cm = ""
+		}
+		str.WriteString(fmt.Sprintf("&data.%s%s ", f.Name, cm))
+		if t.Fields[i].PrimaryKey {
+			return &t.Fields[i]
+		}
+	}
+	return str.String()
+}
+func (t *DbTable) StructName( ) string {
+	return strings.Title(t.Name)
+}
+
+type Database struct {
+	Name	string			`json:"Name,omitempty"`
+	SqlType	string			`json:"SqlType,omitempty"`
+	Server	string			`json:"Server,omitempty"`
+	Port	string			`json:"Port,omitempty"`
+	PW		string			`json:"PW,omitempty"`
+	Tables  []DbTable		`json:"Tables,omitempty"`
+}
+
+func (d *Database) ForTables(f func(t *DbTable) ) {
+	for i,_ := range d.Tables {
+		f(&d.Tables[i])
+	}
+}
+
+func (d *Database) TitleName( ) string {
+	return strings.Title(d.Name)
+}
+
+var	dbStruct	Database
+
+func DbStruct() *Database {
+	return &dbStruct
+}
+
+func DefaultJsonFileName() string {
+	return "db.json.txt"
+}
+
 func InsertSql(t interface{}) string {
 	//var Fields 	[]map[string] interface{}
 	//var ok		bool
@@ -224,24 +306,6 @@ func InsertSql(t interface{}) string {
 
 	//insertStr := ""
 	return x
-}
-
-func CreateTableStruct(t interface{}) string {
-	var str			strings.Builder
-	var tbl			DbTable
-	//var Fields 	[]map[string] interface{}
-	//var ok		bool
-	var f			*DbField
-
-	tbl = t.(DbTable)
-	str.WriteString(fmt.Sprintf("type %s struct {\n", strings.Title(tbl.Name)))
-	for i,_ := range tbl.Fields {
-		f = &tbl.Fields[i]
-		str.WriteString(f.CreateStructField())
-	}
-	str.WriteString("}\n")
-
-	return str.String()
 }
 
 func ForTables(f func(*DbTable)) {
@@ -368,15 +432,13 @@ func GenListBody(t *DbTable) string {
 // init() adds the functions needed for templating to
 // shared data.
 func init() {
-	sharedData.SetFunc("CreateTableStruct", CreateTableStruct)
-	sharedData.SetFunc("CreateSql", CreateSql)
 	sharedData.SetFunc("GenAccessFuncs", GenAccessFuncs)
 }
 
 // ReadJsonFileDb reads the input JSON file for app
 // and stores the generic JSON Table as well as the
 // decoded structs.
-func ReadJsonFileDb(fn string) error {
+func ReadJsonFile(fn string) error {
 	var err		    error
 	var jsonPath	string
 

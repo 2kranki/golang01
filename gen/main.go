@@ -31,9 +31,7 @@ import (
 // We also maintain the data in structs for easier
 // access by the generation functions.
 type TmplData struct {
-	DataJson	*map[string] interface{}
 	Data		*interface{}
-	MainJson	*map[string] interface{}
 	Main		*mainData.MainData
 }
 

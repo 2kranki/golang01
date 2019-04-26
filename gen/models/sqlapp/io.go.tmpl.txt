@@ -1,9 +1,10 @@
 // vi:nu:et:sts=4 ts=4 sw=4
 // See License.txt in main repository directory
 
-//
+// io[[.TD.Data.Name]] contains all the functions
+// and data to interact with the SQL Database.
 
-package tableio
+package io[[.TD.Data.Name]]
 
 import (
     "database/sql"
@@ -25,6 +26,10 @@ import (
 
 
 var db *sql.DB
+var	dbPW       	string
+var dbPort     	string
+var dbServer    string
+var dbUser     	string
 
 // ioClose cleans up anything that needs to be
 // accomplished before the database is closed
@@ -83,3 +88,29 @@ func ioDisconnect() {
     }
 }
 
+func Name() string {
+    return "[[.TD.Data.Name]]"
+}
+func Port() string {
+   return dbPort
+}
+
+func setPort(port string) {
+   dbPort = pw
+}
+
+func PW() string {
+   return dbPW
+}
+
+func setPW(pw string) {
+   dbPW = pw
+}
+
+func Server() string {
+   return dbServer
+}
+
+func setServer(server string) {
+   dbServer = server
+}

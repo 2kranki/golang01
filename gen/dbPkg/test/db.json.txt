@@ -21,35 +21,10 @@
                     "List":true
                 },
                 {
-                    "Name":"CustAddr1",
-                    "Type":"NVARCHAR",
-                    "Len":30
-                },
-                {
-                    "Name":"CustAddr2",
-                    "Type":"NVARCHAR",
-                    "Len":30
-                },
-                {
-                    "Name":"CustCity",
-                    "Type":"NVARCHAR",
-                    "Len":20
-                },
-                {
-                    "Name":"CustState",
-                    "Type":"NVARCHAR",
-                    "Len":10
-                },
-                {
-                    "Name":"CustZip",
-                    "Type":"NVARCHAR",
-                    "Len": 15
-                },
-                {
                     "Name":"CustCurBal",
                     "Type":"DEC",
                     "Len": 15,
-                    "Scale":2
+                    "Dec":2
                 }
             ]
         },
@@ -97,7 +72,7 @@
                     "Name":"VendCurBal",
                     "Type":"DEC",
                     "Len": 15,
-                    "Scale":2
+                    "Dec":2
                 }
             ]
         }
