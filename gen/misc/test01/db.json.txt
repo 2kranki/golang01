@@ -16,40 +16,47 @@
                 },
                 {
                     "Name":"CustName",
+                    "Null":true,
                     "Type":"NVARCHAR",
                     "Len":30,
                     "List":true
                 },
                 {
                     "Name":"CustAddr1",
+                    "Null":true,
                     "Type":"NVARCHAR",
                     "Len":30
                 },
                 {
                     "Name":"CustAddr2",
+                    "Null":true,
                     "Type":"NVARCHAR",
                     "Len":30
                 },
                 {
                     "Name":"CustCity",
+                    "Null":true,
                     "Type":"NVARCHAR",
                     "Len":20
                 },
                 {
                     "Name":"CustState",
+                    "Null":true,
                     "Type":"NVARCHAR",
                     "Len":10
                 },
                 {
                     "Name":"CustZip",
+                    "Null":true,
                     "Type":"NVARCHAR",
                     "Len": 15
                 },
                 {
                     "Name":"CustCurBal",
+                    "Null":true,
                     "Type":"DEC",
-                    "Len": 15,
-                    "Scale":2
+                    "Len":15,
+                    "Dec":2
                 }
             ]
         },
@@ -59,45 +66,53 @@
             "Fields":[
                 {
                     "Name":"VendNo",
-                    "Type":"int",
+                    "Type":"INT",
                     "PrimaryKey":true,
                     "List":true
                 },
                 {
                     "Name":"VendName",
-                    "Type":"string",
+                    "Null":true,
+                    "Type":"NVARCHAR",
                     "Len":30,
                     "List":true
                 },
                 {
                     "Name":"VendAddr1",
-                    "Type":"string",
+                    "Null":true,
+                    "Type":"NVARCHAR",
                     "Len":30
                 },
                 {
                     "Name":"VendAddr2",
-                    "Type":"string",
+                    "Null":true,
+                    "Type":"NVARCHAR",
                     "Len":30
                 },
                 {
                     "Name":"VendCity",
-                    "Type":"string",
+                    "Null":true,
+                    "Type":"NVARCHAR",
                     "Len":20
                 },
                 {
                     "Name":"VendState",
-                    "Type":"string",
+                    "Null":true,
+                    "Type":"NVARCHAR",
                     "Len":10
                 },
                 {
                     "Name":"VendZip",
-                    "Type":"int64"
+                    "Null":true,
+                    "Type":"NVARCHAR",
+                    "Len":15
                 },
                 {
                     "Name":"VendCurBal",
+                    "Null":true,
                     "Type":"DEC",
-                    "Len": 15,
-                    "Scale":2
+                    "Len":15,
+                    "Dec":2
                 }
             ]
         }

@@ -23,6 +23,21 @@ import (
 	"strconv"
 )
 
+[[
+
+var createSql = `[[CreateSql .Table]]`
+
+// [[.Table.Name]]Create creates the table in the
+// given database deleting the current table if
+// present.
+func [[.Table.Name]]Create() error {
+    var err     error
+
+    err = db.Exec(createSql)
+
+    return err
+}
+
 func [[.Table.Name]]RowDelete() {
 
 }
@@ -36,6 +51,22 @@ func [[.Table.Name]]RowGet(r *http.Request) (interface{}, error) {
 }
 
 func [[.Table.Name]]RowInsert() {
+
+}
+
+func [[.Table.Name]]RowNext(r *http.Request) (interface{}, error) {
+    key := r.FormValue("{{$t.PrimaryKey}}")
+    if key == "" {
+	    return data, errors.New("400. Bad Request.")
+    }
+
+}
+
+func [[.Table.Name]]RowPrev(r *http.Request) (interface{}, error) {
+    key := r.FormValue("{{$t.PrimaryKey}}")
+    if key == "" {
+	    return data, errors.New("400. Bad Request.")
+    }
 
 }
 

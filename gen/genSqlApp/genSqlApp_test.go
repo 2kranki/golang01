@@ -8,14 +8,14 @@ package genSqlApp
 import (
 	"testing"
 	"time"
-	"../appData"
+	"../dbPkg"
 	"../shared"
 )
 
 const jsonTestPath = "../misc/"
 
 func TestReadJsonFiles(t *testing.T) {
-	var data        *appData.Database
+	var data        *dbPkg.Database
     var err         error
 
 	sharedData.SetDebug(true)

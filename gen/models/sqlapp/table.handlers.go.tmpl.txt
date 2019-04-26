@@ -53,7 +53,24 @@ import (
         w.Write([]byte("Show a particular record..."))
     }
 
-    // [[.Table.Name]]HndlrCreated handles an add row request which comes from
+    // [[.Table.Name]]HndlrDelete handles an delete request which comes from
+    // the row display form.
+    func [[.Table.Name]]HndlrDelete(w http.ResponseWriter, r *http.Request) {
+        if r.Method != "GET" {
+            http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+            return
+        }
+
+        // Verify any fields that need it.
+
+        // Delete the row with data given.
+
+        // Display the next row in the form with status message.
+
+        w.Write([]byte("Process the form data from the row deletion form..."))
+    }
+
+    // [[.Table.Name]]HndlrInsert handles an add row request which comes from
     // the row display form.
     func [[.Table.Name]]HndlrCreated(w http.ResponseWriter, r *http.Request) {
         if r.Method != "POST" {
@@ -65,26 +82,9 @@ import (
 
         // Insert the row of data given.
 
-        // Display the row in the form.
+        // Display the row in the form with status message.
 
         w.Write([]byte("Process the form data from the row creation form..."))
-    }
-
-    // [[.Table.Name]]HndlrDeleted handles an delete request which comes from
-    // the row display form.
-    func [[.Table.Name]]HndlrDeleted(w http.ResponseWriter, r *http.Request) {
-        if r.Method != "GET" {
-            http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-            return
-        }
-
-        // Verify any fields that need it.
-
-        // Delete the row with data given.
-
-        // Display the next row in the form.
-
-        w.Write([]byte("Process the form data from the row deletion form..."))
     }
 
     // [[.Table.Name]]HndlrNext handles an next request which comes from
@@ -97,6 +97,7 @@ import (
         }
 
         // Get the next row to display.
+        // (If at end of table, wrap to beginning of table(???).)
 
         // Display the row in the form.
 
@@ -119,9 +120,9 @@ import (
         w.Write([]byte("Process the form data from the row deletion form..."))
     }
 
-    // [[.Table.Name]]HndlrUpdated handles an update request which comes from
+    // [[.Table.Name]]HndlrUpdate handles an update request which comes from
     // the row display form.
-    func [[.Table.Name]]HndlrUpdated(w http.ResponseWriter, r *http.Request) {
+    func [[.Table.Name]]HndlrUpdate(w http.ResponseWriter, r *http.Request) {
         if r.Method != "POST" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return

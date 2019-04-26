@@ -21,12 +21,9 @@
         * go get <package>
         * compile and install program
         * set up database and create tables
-    * genSql
-        * Push the FileDefn entries on a chan and have a go function pull them off
-            and execute them.  That way, we can have files generated on partial
-            data such as a table.
     * table display/maintenance
-        * tableio.go
+        * tableio.go - change to <database_name>DB so that we can have
+        * several db's per JSON definition
         * tablehndlr.go
         * toubleform.html per table
             * Try to do all the single record stuff in one form
@@ -35,4 +32,4 @@
             * Consider doing paging
             * Allow some selection criteria
             * generate switch to single record mode and back
-
+* possibly json to struct converter and vice versa

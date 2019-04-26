@@ -15,7 +15,7 @@
 package genSqlApp
 
 import (
-	"../appData"
+	"../dbPkg"
 	"../mainData"
 	"../shared"
 	"../util"

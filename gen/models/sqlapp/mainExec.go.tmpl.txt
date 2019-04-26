@@ -91,11 +91,11 @@ func exec() {
 	[[ range $t := .TD.Data.Tables -]]
 	    r.HandleFunc("/[[$t.Name]]",                    handlers.[[$t.Name]]HndlrIndex)
 	    r.HandleFunc("/[[$t.Name]]/show",               handlers.[[$t.Name]]HndlrShow)
-	    r.HandleFunc("/[[$t.Name]]/created",            handlers.[[$t.Name]]HndlrCreated)
-	    r.HandleFunc("/[[$t.Name]]/deleted",            handlers.[[$t.Name]]HndlrDeleted)
+	    r.HandleFunc("/[[$t.Name]]/insert",             handlers.[[$t.Name]]HndlrInsert)
+	    r.HandleFunc("/[[$t.Name]]/delete",             handlers.[[$t.Name]]HndlrDelete)
 	    r.HandleFunc("/[[$t.Name]]/next",               handlers.[[$t.Name]]HndlrNext)
 	    r.HandleFunc("/[[$t.Name]]/prev",               handlers.[[$t.Name]]HndlrPrev)
-	    r.HandleFunc("/[[$t.Name]]/updated",            handlers.[[$t.Name]]HndlrUpdated)
+	    r.HandleFunc("/[[$t.Name]]/update",             handlers.[[$t.Name]]HndlrUpdate)
 	[[ end -]]
 
 	srvUrl := fmt.Sprintf("%s:%s", http_srvr, http_port)

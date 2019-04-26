@@ -1,7 +1,10 @@
 // See License.txt in main repository directory
 
 // Shared contains the shared variables and data used by
-// main and the other packages.
+// main and the other packages.  This was created to remove
+// circular references from main's data and it's being used
+// in sub-packages which have the need of reference and
+// sometimes manipulating or adding to that data.
 
 package sharedData
 

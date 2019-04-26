@@ -1,10 +1,12 @@
 // See License.txt in main repository directory
 
-// Template Functions used in generation
-// See the specific template files for how the functions
-// and data are used.
+// appData contains the data and functions to generate
+// table and field data for html forms, handlers and
+// table sql i/o for a specific database.  Multiple
+// databases should be handled with multiple ??? of
+// this package.
 
-package appData
+package dbPkg
 
 import (
 	"../shared"
@@ -117,13 +119,27 @@ var typeConvSqlite = []DbTypeConv{
 	{"VARCHAR", "???"},						// VARCHAR(length)
 }
 
+// DbField defines a Table's field mostly in terms of
+// SQL.
 type DbField struct {
 	Name		string		`json:"Name,omitempty"`			// Field Name
 	Type		string		`json:"Type,omitempty"`			// SQL Type
 	Len		    int		    `json:"Len,omitempty"`			// Data Maximum Length
 	Dec		    int		    `json:"Dec,omitempty"`			// Decimal Positions
 	PrimaryKey  bool	    `json:"PrimaryKey,omitempty"`
+	Nullable	bool		`json:"Null,omitempty"`
 	List		bool	    `json:"List,omitempty"`			// Include in List Report
+}
+
+func (f *DbField) CreateStructField() string {
+	var str			strings.Builder
+
+	str.WriteString(fmt.Sprintf("\t%s\t", strings.Title(f.Name)))
+	str.WriteString(fmt.Sprintf("%s\n",
+		strings.Title(ConvFieldToGoType(dbStruct.SqlType, f.Type))))
+	str.WriteString("\n")
+
+	return str.String()
 }
 
 // DbTable stands for Database Table and defines
@@ -153,18 +169,55 @@ type Database struct {
 	Tables  []DbTable		`json:"Tables,omitempty"`
 }
 
-var	appStruct	Database
-var	appJson		interface{}
+var	dbStruct	Database
 
-func AppJson() interface{} {
-	return appJson
+func DbStruct() *Database {
+	return &dbStruct
 }
 
-func AppStruct() *Database {
-	return &appStruct
+func CreateSql(t interface{}) string {
+	var str			strings.Builder
+
+	table := t.(DbTable)
+
+	str.WriteString(fmt.Sprintf("DROP TABLE %s IF EXISTS;\n", table.Name))
+	if dbStruct.SqlType == "mssql" {
+		str.WriteString("GO\n")
+	}
+	str.WriteString(fmt.Sprintf("CREATE TABLE %s (\n", table.Name))
+	for i,f := range table.Fields {
+		var ft			string
+		var pk			string
+		var cm  		string
+
+		if f.Len > 0 {
+			if f.Dec > 0 {
+				ft = fmt.Sprintf("%s(%d,%d)", f.Type, f.Len, f.Dec)
+			} else {
+				ft = fmt.Sprintf("%s(%d)", f.Type, f.Len)
+			}
+		} else {
+			ft = f.Type
+		}
+		pk = ""
+		if f.PrimaryKey {
+			pk = "PRIMARY KEY"
+		}
+		cm = ""
+		if i != (len(table.Fields) - 1) {
+			cm = ","
+		}
+		str.WriteString(fmt.Sprintf("\t%s\t%s %s%s\n", f.Name, ft, pk, cm))
+	}
+	str.WriteString(fmt.Sprintf(");\n"))
+	if dbStruct.SqlType == "mssql" {
+		str.WriteString("GO\n")
+	}
+
+	return str.String()
 }
 
-func CreateInsertSql(t interface{}) string {
+func InsertSql(t interface{}) string {
 	//var Fields 	[]map[string] interface{}
 	//var ok		bool
 	var x		string
@@ -174,91 +227,26 @@ func CreateInsertSql(t interface{}) string {
 }
 
 func CreateTableStruct(t interface{}) string {
+	var str			strings.Builder
+	var tbl			DbTable
 	//var Fields 	[]map[string] interface{}
 	//var ok		bool
-	var x		string
+	var f			*DbField
 
-	//insertStr := ""
-	return x
+	tbl = t.(DbTable)
+	str.WriteString(fmt.Sprintf("type %s struct {\n", strings.Title(tbl.Name)))
+	for i,_ := range tbl.Fields {
+		f = &tbl.Fields[i]
+		str.WriteString(f.CreateStructField())
+	}
+	str.WriteString("}\n")
+
+	return str.String()
 }
 
-// decodeDbField decodes a DbField from a generic
-func decodeDbField(i interface{}) *DbField {
-	var f		DbField
-	var m		map[string]interface{}
-	var ok		bool
-
-	if m, ok = i.(map[string]interface{}); !ok {
-		return nil
-	}
-	if f.Name, ok = m["Name"].(string); !ok {
-		return nil
-	}
-	if f.Type, ok = m["Type"].(string); !ok {
-		return nil
-	}
-	if f.Len, ok = m["Len"].(int); !ok {
-		return nil
-	}
-	if f.PrimaryKey, ok = m["PrimaryKey"].(bool); !ok {
-		return nil
-	}
-	if f.List, ok = m["List"].(bool); !ok {
-		return nil
-	}
-	return &f
-}
-
-func decodeDbTable(i interface{}) *DbTable {
-	var t		DbTable
-	var m		map[string]interface{}
-	//var fields	[]interface{}
-	var fields	[]DbField
-	var ok		bool
-
-	if m, ok = i.(map[string]interface{}); !ok {
-		return nil
-	}
-	if t.Name, ok = m["Name"].(string); !ok {
-		return nil
-	}
-	if fields, ok = m["Fields"].([]DbField); !ok {
-		return nil
-	}
-	for _, v := range fields {
-		t.Fields = append(t.Fields, *decodeDbField(v))
-	}
-	return &t
-}
-
-func decodeDatabase(i interface{}) *Database {
-	var t		Database
-	var m		map[string]interface{}
-	//var fields	[]interface{}
-	var tables	[]DbTable
-	var ok		bool
-
-	if m, ok = i.(map[string]interface{}); !ok {
-		return nil
-	}
-	if t.Name, ok = m["Name"].(string); !ok {
-		return nil
-	}
-	if t.SqlType, ok = m["SqlType"].(string); !ok {
-		return nil
-	}
-	if tables, ok = m["Tables"].([]DbTable); !ok {
-		return nil
-	}
-	for _, v := range tables {
-		t.Tables = append(t.Tables, *decodeDbTable(v))
-	}
-	return &t
-}
-
-func ForTables(f func(DbTable)) {
-	for _, v := range appStruct.Tables {
-		f(v)
+func ForTables(f func(*DbTable)) {
+	for i,_ := range dbStruct.Tables {
+		f(&dbStruct.Tables[i])
 	}
 }
 
@@ -315,7 +303,7 @@ func GenAccessFunc(t DbTable) string {
 
 func GenAccessFuncs() string {
 	var str			strings.Builder
-	for _, v := range appStruct.Tables {
+	for _, v := range dbStruct.Tables {
 		str.WriteString(GenAccessFunc(v))
 	}
 	return str.String()
@@ -359,33 +347,36 @@ func GenForm(t DbTable) string {
 	return str.String()
 }
 
-func getTypeConv(db string) []DbTypeConv {
-	switch db {
-	case "mariadb":
-		return typeConvMsSql
-	case "mssql":
-		return typeConvMsSql
-	case "mysql":
-		return typeConvMySql
-	case "postgres":
-		return typeConvMySql
-	case "sqlite":
-		return typeConvSqlite
+func GenListField(f DbField) string {
+	var str			strings.Builder
+
+	if f.PrimaryKey {
+		str.WriteString("<a href=\"\">")
 	}
-	return nil
+
+	return str.String()
+}
+
+func GenListBody(t *DbTable) string {
+	var str			strings.Builder
+	for _, v := range t.Fields {
+		str.WriteString(GenListField(v))
+	}
+	return str.String()
 }
 
 // init() adds the functions needed for templating to
 // shared data.
 func init() {
-	//sharedData.SetFunc("GenFlagSetup", GenFlagSetup)
+	sharedData.SetFunc("CreateTableStruct", CreateTableStruct)
+	sharedData.SetFunc("CreateSql", CreateSql)
 	sharedData.SetFunc("GenAccessFuncs", GenAccessFuncs)
 }
 
-// ReadJsonFileApp reads the input JSON file for app
+// ReadJsonFileDb reads the input JSON file for app
 // and stores the generic JSON Table as well as the
 // decoded structs.
-func ReadJsonFileApp(fn string) error {
+func ReadJsonFileDb(fn string) error {
 	var err		    error
 	var jsonPath	string
 
@@ -394,19 +385,13 @@ func ReadJsonFileApp(fn string) error {
 		log.Println("json path:", jsonPath)
 	}
 
-	// Read in the json file generically
-	if appJson, err = util.ReadJsonFile(jsonPath); err != nil {
-		return errors.New(fmt.Sprintln("Error: unmarshalling", jsonPath, ", JSON input file:", err))
-	}
-
 	// Read in the json file structurally
-	if err = util.ReadJsonFileToData(jsonPath, &appStruct); err != nil {
+	if err = util.ReadJsonFileToData(jsonPath, &dbStruct); err != nil {
 		return errors.New(fmt.Sprintln("Error: unmarshalling", jsonPath, ", JSON input file:", err))
 	}
 
 	if sharedData.Debug() {
-		log.Println("\tJson Data:", appJson)
-		log.Println("\tJson Struct:", appStruct)
+		log.Println("\tJson Struct:", dbStruct)
 	}
 
 	return nil
@@ -415,9 +400,75 @@ func ReadJsonFileApp(fn string) error {
 func TableNames() []string {
 	var list	[]string
 
-	for _, v := range appStruct.Tables {
+	for _, v := range dbStruct.Tables {
 		list = append(list, v.Name)
 	}
 
 	return list
+}
+
+func typeConv(dbType string) []DbTypeConv {
+	var table  		[]DbTypeConv
+
+	switch dbType {
+	case "mariadb":
+		table = typeConvMsSql
+	case "mssql":
+		table = typeConvMsSql
+	case "mysql":
+		table = typeConvMySql
+	case "postgres":
+		table = typeConvMySql
+	case "sqlite":
+		table = typeConvSqlite
+	}
+
+	return table
+}
+
+func ConvFieldToGoType(dbType string, ft string) string {
+	var table  		[]DbTypeConv
+
+	if table = typeConv(dbType); table == nil {
+		return ""
+	}
+	for i, _ := range table {
+		if strings.EqualFold(ft, table[i].DbType) {
+			return table[i].GoType
+		}
+	}
+
+	return ""
+}
+
+func ValidateData() error {
+
+	if x := typeConv(dbStruct.SqlType); x == nil {
+		return errors.New(fmt.Sprintf("SqlType of %s is not supported!",dbStruct.SqlType))
+	}
+	if dbStruct.Name == "" {
+		return errors.New(fmt.Sprintf("Database Name is missing!"))
+	}
+	if len(dbStruct.Tables) == 0 {
+		return errors.New(fmt.Sprintf("There are no tables defined for %s!", dbStruct.Name))
+	}
+	for i, t := range dbStruct.Tables {
+		if t.Name == "" {
+			return errors.New(fmt.Sprintf("%d Table Name is missing!", i))
+		}
+		if len(t.Fields) == 0 {
+			return errors.New(fmt.Sprintf("There are no fields defined for %s!", t.Name))
+		}
+		for j,f := range t.Fields {
+			if f.Name == "" {
+				return errors.New(fmt.Sprintf("%d Field Name is missing from table %s!", j, t.Name))
+			}
+			if typ := ConvFieldToGoType(dbStruct.SqlType, f.Type); typ == "" {
+				return errors.New(fmt.Sprintf("%s:%s Field Type is invalid!", t.Name, f.Name))
+			}
+		}
+	}
+
+
+	return nil
 }
