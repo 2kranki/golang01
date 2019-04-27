@@ -6,7 +6,7 @@
 // Generated: [[Time]]
 
 
-package handlers
+package hndlr[[.TD.Data.TitledName]]
 
 import (
 	[[ if eq .TD.Data.SqlType "mariadb" ]]

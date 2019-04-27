@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>[[Title .]]</title>
+    <title>[[.Table.Name]] Maintenance</title>
     <style>
-        [[Style .]]
         html, body, p {
             padding: 0;
             border: 0;
@@ -26,9 +25,8 @@
             font-size: 1rem;
         }
     </style>
-    [[Header .]]
 </head>
 <body>
-    [[Body .]]
+    [[.Table.Form]]
 </body>
 </html>

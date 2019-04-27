@@ -218,22 +218,10 @@ func (t *DbTable) CreateSql() string {
 	return str.String()
 }
 
-// PrimaryKey returns the first field that it finds
-// that is marked as a primary key.
-func (t *DbTable) PrimaryKey() *DbField {
-
-	for i,_ := range t.Fields {
-		if t.Fields[i].PrimaryKey {
-			return &t.Fields[i]
-		}
-	}
-	return nil
-}
-
 func (t *DbTable) CreateStruct( ) string {
 	var str			strings.Builder
 
-	str.WriteString(fmt.Sprintf("type %s struct {\n", strings.Title(t.Name)))
+	str.WriteString(fmt.Sprintf("type %s struct {\n", t.TitledName))
 	for i,_ := range t.Fields {
 		str.WriteString(t.Fields[i].CreateStruct())
 	}
@@ -248,6 +236,56 @@ func (t *DbTable) ForFields(f func(f *DbField) ) {
 	}
 }
 
+func (t *DbTable) Form() string {
+	var str			strings.Builder
+	str.WriteString(fmt.Sprintf("<form id=\"%s\" method=\"post\">\n", t.Name))
+	for _, v := range t.Fields {
+		str.WriteString(fmt.Sprintf("<p>%s</p>\n",v.Name))
+	}
+	str.WriteString("<p/>\n<p/>\n<p/>\n")
+	str.WriteString("\t<input type=submit onclick='onPrev()' value=\"Prev\">\n")
+	str.WriteString("\t<input type=submit onclick='onAdd()' value=\"Add\">\n")
+	str.WriteString("\t<input type=submit onclick='onDelete()' value=\"Delete\">\n")
+	str.WriteString("\t<input type=submit onclick='onUpdate()' value=\"Update\">\n")
+	str.WriteString("\t<input type=submit onclick='onNext()' value=\"Next\">\n")
+	str.WriteString("\t<input type=reset onclick='onReset()' value=\"Reset\">\n")
+	str.WriteString("</form>\n\n")
+	str.WriteString("<script>\n")
+	str.WriteString("\tfunction onAdd() {\n")
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Create/Process\";\n", t.Name))
+	str.WriteString("\t}\n")
+	str.WriteString("\tfunction onDelete() {\n")
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Delete/Process\";\n",t.Name))
+	str.WriteString("\t}\n")
+	str.WriteString("\tfunction onNext() {\n")
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Next\";\n",t.Name))
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").method = \"get\";\n",t.Name))
+	str.WriteString("\t}\n")
+	str.WriteString("\tfunction onPrev() {\n")
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Prev\";\n",t.Name))
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").method = \"get\";\n",t.Name))
+	str.WriteString("\t}\n")
+	str.WriteString("\tfunction onReset() {\n")
+	str.WriteString("\t}\n")
+	str.WriteString("\tfunction onUpdate() {\n")
+	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Update/Process\";\n",t.Name))
+	str.WriteString("\t}\n")
+	str.WriteString("</script>\n")
+	return str.String()
+}
+
+// PrimaryKey returns the first field that it finds
+// that is marked as a primary key.
+func (t *DbTable) PrimaryKey() *DbField {
+
+	for i,_ := range t.Fields {
+		if t.Fields[i].PrimaryKey {
+			return &t.Fields[i]
+		}
+	}
+	return nil
+}
+
 // ScanFields returns struct fields to be used in
 // a row.Scan.  It assumes that the struct's name
 // is "data"
@@ -260,13 +298,11 @@ func (t *DbTable) ScanFields() string {
 			cm = ""
 		}
 		str.WriteString(fmt.Sprintf("&data.%s%s ", f.Name, cm))
-		if t.Fields[i].PrimaryKey {
-			return &t.Fields[i]
-		}
 	}
 	return str.String()
 }
-func (t *DbTable) StructName( ) string {
+
+func (t *DbTable) TitledName( ) string {
 	return strings.Title(t.Name)
 }
 
@@ -285,7 +321,7 @@ func (d *Database) ForTables(f func(t *DbTable) ) {
 	}
 }
 
-func (d *Database) TitleName( ) string {
+func (d *Database) TitledName( ) string {
 	return strings.Title(d.Name)
 }
 
@@ -370,44 +406,6 @@ func GenAccessFuncs() string {
 	for _, v := range dbStruct.Tables {
 		str.WriteString(GenAccessFunc(v))
 	}
-	return str.String()
-}
-
-func GenForm(t DbTable) string {
-	var str			strings.Builder
-	str.WriteString(fmt.Sprintf("<form id=\"%s\" method=\"post\">\n", t.Name))
-	for _, v := range t.Fields {
-		str.WriteString(fmt.Sprintf("<p>%s</p>\n",v.Name))
-	}
-	str.WriteString("<p/>\n<p/>\n<p/>\n")
-	str.WriteString("\t<input type=submit onclick='onPrev()' value=\"Prev\">\n")
-	str.WriteString("\t<input type=submit onclick='onAdd()' value=\"Add\">\n")
-	str.WriteString("\t<input type=submit onclick='onDelete()' value=\"Delete\">\n")
-	str.WriteString("\t<input type=submit onclick='onUpdate()' value=\"Update\">\n")
-	str.WriteString("\t<input type=submit onclick='onNext()' value=\"Next\">\n")
-	str.WriteString("\t<input type=reset onclick='onReset()' value=\"Reset\">\n")
-	str.WriteString("</form>\n\n")
-	str.WriteString("<script>\n")
-	str.WriteString("\tfunction onAdd() {\n")
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Create/Process\";\n", t.Name))
-	str.WriteString("\t}\n")
-	str.WriteString("\tfunction onDelete() {\n")
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Delete/Process\";\n",t.Name))
-	str.WriteString("\t}\n")
-	str.WriteString("\tfunction onNext() {\n")
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Next\";\n",t.Name))
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").method = \"get\";\n",t.Name))
-	str.WriteString("\t}\n")
-	str.WriteString("\tfunction onPrev() {\n")
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Prev\";\n",t.Name))
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").method = \"get\";\n",t.Name))
-	str.WriteString("\t}\n")
-	str.WriteString("\tfunction onReset() {\n")
-	str.WriteString("\t}\n")
-	str.WriteString("\tfunction onUpdate() {\n")
-	str.WriteString(fmt.Sprintf("\t\tdocument.getElementById(\"%s\").action = \"/Update/Process\";\n",t.Name))
-	str.WriteString("\t}\n")
-	str.WriteString("</script>\n")
 	return str.String()
 }
 

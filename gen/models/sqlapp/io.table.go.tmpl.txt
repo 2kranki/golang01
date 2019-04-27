@@ -3,7 +3,7 @@
 
 //
 
-package tableio
+package io[[.TD.Data.TitledName]]
 
 import (
     "database/sql"
@@ -27,10 +27,10 @@ import (
 
 var createSql = `[[.Table.CreateSql]]`
 
-// [[.Table.Name]]Create creates the table in the
+// [[.Table.TitledName]]Create creates the table in the
 // given database deleting the current table if
 // present.
-func [[.Table.Name]]Create() error {
+func [[.Table.TitledName]]Create() error {
     var err     error
 
     err = db.Exec(createSql)
@@ -38,7 +38,7 @@ func [[.Table.Name]]Create() error {
     return err
 }
 
-func [[.Table.Name]]RowDelete(key string) error {
+func [[.Table.TitledName]]RowDelete(key string) error {
 
     if key == "" {
 	    return errors.New("400. Bad Request.")
@@ -53,8 +53,8 @@ func [[.Table.Name]]RowDelete(key string) error {
 	return nil
 }
 
-func [[.Table.Name]]RowFind(key string) (interface{}, error) {
-    data := [[.Table.StructName]]{}
+func [[.Table.TitledName]]RowFind(key string) (interface{}, error) {
+    data := [[.Table.TitledName]]{}
 
     if key == "" {
 	    return data, errors.New("400. Bad Request.")
@@ -68,11 +68,23 @@ func [[.Table.Name]]RowFind(key string) (interface{}, error) {
 	}
 }
 
-func [[.Table.Name]]RowInsert() {
+func [[.Table.TitledName]]RowFirst() (interface{}, error) {
+    data := [[.Table.TitledName]]{}
+
+    return data,nil
+}
+
+func [[.Table.TitledName]]RowInsert() {
 
 }
 
-func [[.Table.Name]]RowNext([[.Table.PrimaryKey.Name]] string) (interface{}, error) {
+func [[.Table.TitledName]]RowLast() (interface{}, error) {
+    data := [[.Table.TitledName]]{}
+
+    return data,nil
+}
+
+func [[.Table.TitledName]]RowNext([[.Table.PrimaryKey.Name]] string) (interface{}, error) {
     key := r.FormValue("{{$t.PrimaryKey}}")
     if key == "" {
 	    return data, errors.New("400. Bad Request.")
@@ -80,7 +92,7 @@ func [[.Table.Name]]RowNext([[.Table.PrimaryKey.Name]] string) (interface{}, err
 
 }
 
-func [[.Table.Name]]RowPrev([[.Table.PrimaryKey.Name]] string) (interface{}, error) {
+func [[.Table.TitledName]]RowPrev([[.Table.PrimaryKey.Name]] string) (interface{}, error) {
     key := r.FormValue("{{$t.PrimaryKey}}")
     if key == "" {
 	    return data, errors.New("400. Bad Request.")
