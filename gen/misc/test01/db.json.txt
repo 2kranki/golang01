@@ -14,51 +14,51 @@
             "Fields":[
                 {
                     "Name":"CustNo",
-                    "Type":"INT",
+                    "TypeDef":"int",
                     "PrimaryKey":true,
                     "List":true
                 },
                 {
                     "Name":"CustName",
                     "Null":true,
-                    "Type":"NVARCHAR",
+                    "TypeDef":"text",
                     "Len":30,
                     "List":true
                 },
                 {
                     "Name":"CustAddr1",
                     "Null":true,
-                    "Type":"NVARCHAR",
+                    "TypeDef":"text",
                     "Len":30
                 },
                 {
                     "Name":"CustAddr2",
                     "Null":true,
-                    "Type":"NVARCHAR",
+                    "TypeDef":"text",
                     "Len":30
                 },
                 {
                     "Name":"CustCity",
                     "Null":true,
-                    "Type":"NVARCHAR",
+                    "TypeDef":"text",
                     "Len":20
                 },
                 {
                     "Name":"CustState",
                     "Null":true,
-                    "Type":"NVARCHAR",
+                    "TypeDef":"text",
                     "Len":10
                 },
                 {
                     "Name":"CustZip",
                     "Null":true,
-                    "Type":"NVARCHAR",
+                    "TypeDef":"text",
                     "Len": 15
                 },
                 {
                     "Name":"CustCurBal",
                     "Null":true,
-                    "Type":"DEC",
+                    "TypeDef":"money",
                     "Len":15,
                     "Dec":2
                 }
@@ -70,51 +70,51 @@
             "Fields":[
                 {
                     "Name":"VendNo",
-                    "Type":"INT",
+                    "TypeDef":"int",
                     "PrimaryKey":true,
                     "List":true
                 },
                 {
                     "Name":"VendName",
                     "Null":true,
-                    "Type":"NVARCHAR",
+                    "TypeDef":"text",
                     "Len":30,
                     "List":true
                 },
                 {
                     "Name":"VendAddr1",
                     "Null":true,
-                    "Type":"NVARCHAR",
+                    "TypeDef":"text",
                     "Len":30
                 },
                 {
                     "Name":"VendAddr2",
                     "Null":true,
-                    "Type":"NVARCHAR",
+                    "TypeDef":"text",
                     "Len":30
                 },
                 {
                     "Name":"VendCity",
                     "Null":true,
-                    "Type":"NVARCHAR",
+                    "TypeDef":"text",
                     "Len":20
                 },
                 {
                     "Name":"VendState",
                     "Null":true,
-                    "Type":"NVARCHAR",
+                    "TypeDef":"text",
                     "Len":10
                 },
                 {
                     "Name":"VendZip",
                     "Null":true,
-                    "Type":"NVARCHAR",
+                    "TypeDef":"text",
                     "Len":15
                 },
                 {
                     "Name":"VendCurBal",
                     "Null":true,
-                    "Type":"DEC",
+                    "TypeDef":"money",
                     "Len":15,
                     "Dec":2
                 }

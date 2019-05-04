@@ -1,0 +1,80 @@
+// vi:nu:et:sts=4 ts=4 sw=4
+// See License.txt in main repository directory
+
+// io[[.TD.Data.TitledName]] contains all the functions
+// and data to interact with the SQL Database.
+
+package io[[.TD.Data.TitledName]]
+
+import (
+    "fmt"
+    "log"
+	"testing"
+)
+
+
+var db *sql.DB
+var	dbPW       	string
+var dbPort     	string
+var dbServer    string
+var dbUser     	string
+
+func TestIoClose(t *testing.T) {
+    //db.Close()
+}
+
+func TestIoConnect(t *testing.T) {
+    var err         error
+
+    err = db.Ping()
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+}
+
+func TestioCreateTables(t *testing.T) {
+    var err         error
+
+    err = db.Ping()
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+}
+
+func TestioDeleteTables(t *testing.T) {
+    var err         error
+
+    err = db.Ping()
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+}
+
+func TestIoDisconnect(t *testing.T) {
+    var err         error
+
+    //err = db.Ping()
+    if err != nil {
+        log.Fatalln("Error: Cannot connect: ", err)
+    }
+}
+
+[[- range $t := .TD.Data.Tables ]]
+    func Test[[$t.TitledName]]RowDelete(t *testing.T) {
+        var err         error
+
+        //err = db.Ping()
+        if err != nil {
+            log.Fatalln("Error: Cannot connect: ", err)
+        }
+    }
+
+    func Test[[$t.TitledName]]RowInsert(t *testing.T) {
+        var err         error
+
+        //err = db.Ping()
+        if err != nil {
+            log.Fatalln("Error: Cannot connect: ", err)
+        }
+    }
+[[ end ]]

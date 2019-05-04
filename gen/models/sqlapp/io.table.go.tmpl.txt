@@ -6,7 +6,7 @@
 package io[[.TD.Data.TitledName]]
 
 import (
-    "database/sql"
+    //"database/sql"
 	"errors"
 	[[ if eq .TD.Data.SqlType "mariadb" ]]
 		ERROR - NOT IMPLEMENTED
@@ -19,33 +19,44 @@ import (
 	[[ else if eq .TD.Data.SqlType "sqlite" ]]
 	    _ "github.com/2kranki/go-sqlite3"
 	[[ end ]]
-	"net/http"
-	"strconv"
+	//"net/http"
+	//"strconv"
 )
 
 [[.Table.CreateStruct]]
 
-var createSql = `[[.Table.CreateSql]]`
 
 // [[.Table.TitledName]]Create creates the table in the
 // given database deleting the current table if
 // present.
 func [[.Table.TitledName]]Create() error {
+    var createSql = `[[.Table.CreateSql]]`
     var err     error
 
-    err = db.Exec(createSql)
+    err = [[.Table.TitledName]]Delete()
+    if err != nil {
+        return err
+    }
+    _, err = db.Exec(createSql)
+
+    return err
+}
+
+// [[.Table.TitledName]]Delete deletes the table in the
+// given database if present.
+func [[.Table.TitledName]]Delete() error {
+    var deleteSql = `[[.Table.DeleteSql]]`
+    var err     error
+
+    _, err = db.Exec(deleteSql)
 
     return err
 }
 
 func [[.Table.TitledName]]RowDelete(key string) error {
 
-    if key == "" {
-	    return errors.New("400. Bad Request.")
-    }
-
     // Do the SQL deletion.
-	_, err := db.Exec("DELETE FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]]=$1;", key)
+	_, err := db.Exec("DELETE FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] = $1;", key)
 	if err != nil {
 		return errors.New("500. Internal Server Error")
 	}
@@ -60,47 +71,64 @@ func [[.Table.TitledName]]RowFind(key string) (interface{}, error) {
 	    return data, errors.New("400. Bad Request.")
     }
 
-	row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] = $1", isbn)
+	row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] = $1", key)
 
 	err := row.Scan([[.Table.ScanFields]])
 	if err != nil {
 		return data, err
 	}
+
+	return data, nil
 }
 
 func [[.Table.TitledName]]RowFirst() (interface{}, error) {
     data := [[.Table.TitledName]]{}
 
-    return data,nil
+    row := db.QueryRow("SELECT * FROM [[.Table.Name]] ORDER BY [[.Table.PrimaryKey.Name]] LIMIT 1")
+
+	err := row.Scan([[.Table.ScanFields]])
+	if err != nil {
+		return data, err
+	}
+
+    return data, nil
 }
 
-func [[.Table.TitledName]]RowInsert() {
+func [[.Table.TitledName]]RowInsert(d *[[.Table.TitledName]]) {
 
 }
 
 func [[.Table.TitledName]]RowLast() (interface{}, error) {
     data := [[.Table.TitledName]]{}
 
-    return data,nil
+    row := db.QueryRow("SELECT * FROM [[.Table.Name]] ORDER BY [[.Table.PrimaryKey.Name]] DESC LIMIT 1")
+
+	err := row.Scan([[.Table.ScanFields]])
+
+    return data, err
 }
 
-func [[.Table.TitledName]]RowNext([[.Table.PrimaryKey.Name]] string) (interface{}, error) {
-    key := r.FormValue("{{$t.PrimaryKey}}")
-    if key == "" {
-	    return data, errors.New("400. Bad Request.")
-    }
+func [[.Table.TitledName]]RowNext(key string) (interface{}, error) {
+    data := [[.Table.TitledName]]{}
 
+    row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] > $1 ORDER BY [[.Table.PrimaryKey.Name]] ASC LIMIT 1", key)
+
+	err := row.Scan([[.Table.ScanFields]])
+
+    return data, err
 }
 
-func [[.Table.TitledName]]RowPrev([[.Table.PrimaryKey.Name]] string) (interface{}, error) {
-    key := r.FormValue("{{$t.PrimaryKey}}")
-    if key == "" {
-	    return data, errors.New("400. Bad Request.")
-    }
+func [[.Table.TitledName]]RowPrev(key string) (interface{}, error) {
+    data := [[.Table.TitledName]]{}
 
+    row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] < $1 ORDER BY [[.Table.PrimaryKey.Name]] DESC LIMIT 1", key)
+
+	err := row.Scan([[.Table.ScanFields]])
+
+    return data, err
 }
 
-func [[.Table.Name]]RowUpdate() {
+func [[.Table.Name]]RowUpdate(d *[[.Table.TitledName]]) {
 
 }
 

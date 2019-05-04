@@ -4,6 +4,7 @@
 // SQL Application main program
 
 // Generated: [[Time]]
+[[- $n := .TD.Data.TitledName]]
 
 package main
 
@@ -13,7 +14,7 @@ import (
     "log"
 	"net/http"
 	"time"
-	"./handlers"
+	"./hndlr[[$n]]"
 )
 
 func HndlrFavIcon(w http.ResponseWriter, r *http.Request) {
@@ -88,14 +89,14 @@ func exec() {
 	    r.HandleFunc("/debugPrev", HndlrDebugPrev)
 	    r.HandleFunc("/debugReset", HndlrDebugReset)
 	    r.HandleFunc("/debugUpdate", HndlrDebugUpdate)
-	[[ range $t := .TD.Data.Tables -]]
-	    r.HandleFunc("/[[$t.Name]]",                    handlers.[[$t.Name]]HndlrIndex)
-	    r.HandleFunc("/[[$t.Name]]/show",               handlers.[[$t.Name]]HndlrShow)
-	    r.HandleFunc("/[[$t.Name]]/insert",             handlers.[[$t.Name]]HndlrInsert)
-	    r.HandleFunc("/[[$t.Name]]/delete",             handlers.[[$t.Name]]HndlrDelete)
-	    r.HandleFunc("/[[$t.Name]]/next",               handlers.[[$t.Name]]HndlrNext)
-	    r.HandleFunc("/[[$t.Name]]/prev",               handlers.[[$t.Name]]HndlrPrev)
-	    r.HandleFunc("/[[$t.Name]]/update",             handlers.[[$t.Name]]HndlrUpdate)
+	[[range $t := .TD.Data.Tables -]]
+	    r.HandleFunc("/[[$t.Name]]",                    hndlr[[$n]].[[$t.Name]]HndlrIndex)
+	    r.HandleFunc("/[[$t.Name]]/show",               hndlr[[$n]].[[$t.Name]]HndlrShow)
+	    r.HandleFunc("/[[$t.Name]]/insert",             hndlr[[$n]].[[$t.Name]]HndlrInsert)
+	    r.HandleFunc("/[[$t.Name]]/delete",             hndlr[[$n]].[[$t.Name]]HndlrDelete)
+	    r.HandleFunc("/[[$t.Name]]/next",               hndlr[[$n]].[[$t.Name]]HndlrNext)
+	    r.HandleFunc("/[[$t.Name]]/prev",               hndlr[[$n]].[[$t.Name]]HndlrPrev)
+	    r.HandleFunc("/[[$t.Name]]/update",             hndlr[[$n]].[[$t.Name]]HndlrUpdate)
 	[[ end -]]
 
 	srvUrl := fmt.Sprintf("%s:%s", http_srvr, http_port)

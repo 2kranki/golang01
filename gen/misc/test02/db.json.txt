@@ -10,44 +10,44 @@
             "Fields":[
                 {
                     "Name":"CustNo",
-                    "Type":"INT",
+                    "Type":"int",
                     "PrimaryKey":true,
                     "List":true
                 },
                 {
                     "Name":"CustName",
-                    "Type":"NVARCHAR",
+                    "Type":"text",
                     "Len":30,
                     "List":true
                 },
                 {
                     "Name":"CustAddr1",
-                    "Type":"NVARCHAR",
+                    "Type":"text",
                     "Len":30
                 },
                 {
                     "Name":"CustAddr2",
-                    "Type":"NVARCHAR",
+                    "Type":"text",
                     "Len":30
                 },
                 {
                     "Name":"CustCity",
-                    "Type":"NVARCHAR",
+                    "Type":"text",
                     "Len":20
                 },
                 {
                     "Name":"CustState",
-                    "Type":"NVARCHAR",
+                    "Type":"text",
                     "Len":10
                 },
                 {
                     "Name":"CustZip",
-                    "Type":"NVARCHAR",
+                    "Type":"text",
                     "Len": 15
                 },
                 {
                     "Name":"CustCurBal",
-                    "Type":"DEC",
+                    "Type":"money",
                     "Len": 15,
                     "Scale":2
                 }
@@ -65,37 +65,37 @@
                 },
                 {
                     "Name":"VendName",
-                    "Type":"string",
+                    "Type":"text",
                     "Len":30,
                     "List":true
                 },
                 {
                     "Name":"VendAddr1",
-                    "Type":"string",
+                    "Type":"text",
                     "Len":30
                 },
                 {
                     "Name":"VendAddr2",
-                    "Type":"string",
+                    "Type":"text",
                     "Len":30
                 },
                 {
                     "Name":"VendCity",
-                    "Type":"string",
+                    "Type":"text",
                     "Len":20
                 },
                 {
                     "Name":"VendState",
-                    "Type":"string",
+                    "Type":"text",
                     "Len":10
                 },
                 {
                     "Name":"VendZip",
-                    "Type":"int64"
+                    "Type":"text"
                 },
                 {
                     "Name":"VendCurBal",
-                    "Type":"DEC",
+                    "Type":"money",
                     "Len": 15,
                     "Scale":2
                 }

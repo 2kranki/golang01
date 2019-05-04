@@ -21,6 +21,7 @@ import (
 	_ "github.com/2kranki/go-sqlite3"
 	[[ end ]]
     "html/template"
+    //"../io[[.TD.Data.TitledName]]"
 )
 
 

@@ -8,7 +8,9 @@ package io[[.TD.Data.TitledName]]
 
 import (
     "database/sql"
-	"errors"
+	//"errors"
+    "fmt"
+    "log"
 	[[ if eq .TD.Data.SqlType "mariadb" ]]
 		ERROR - NOT IMPLEMENTED
 	[[ else if eq .TD.Data.SqlType  "mssql" ]]
@@ -20,8 +22,8 @@ import (
 	[[ else if eq .TD.Data.SqlType "sqlite" ]]
 	    _ "github.com/2kranki/go-sqlite3"
 	[[ end ]]
-	"net/http"
-	"strconv"
+	//"net/http"
+	//"strconv"
 )
 
 
@@ -39,17 +41,19 @@ func ioClose() {
 }
 
 func ioConnect() {
+    var err         error
+
 	[[ if eq .TD.Data.SqlType "mariadb" ]]
 		ERROR - NOT IMPLEMENTED
 	[[ else if eq .TD.Data.SqlType "mssql" ]]
 	    connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s&connection+timeout=30",
-	                            user,pw,server,port,db)
+	                            dbUser,dbPW,dbServer,dbPort,"[[.TD.Data.TitledName]]")
 	    db, err := sql.Open("mssql", connStr)
 	[[ else if eq .TD.Data.SqlType "mysql" ]]
 		ERROR - NOT IMPLEMENTED
 	[[ else if eq .TD.Data.SqlType "postgres" ]]
 	    connStr := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
-	                            user,pw,server,port,db)
+	                            dbUser,dbPW,dbServer,dbPort,"[[.TD.Data.TitledName]]")
         db, err = sql.Open("postgres", connStr)
 	[[ else if eq .TD.Data.SqlType "sqlite" ]]
 	    db, err = sql.Open("sqlite3", host)
@@ -63,18 +67,31 @@ func ioConnect() {
     }
 }
 
+func ioCreateTables() {
+    var err         error
+
+	[[range $t := .TD.Data.Tables -]]
+        err = [[$t.TitledName]]Create()
+        if err != nil {
+            log.Fatalln("Error: Cannot connect: ", err)
+        }
+	[[ end -]]
+}
+
 func ioDisconnect() {
+    var err         error
+
 	[[ if eq .TD.Data.SqlType "mariadb" ]]
 		ERROR - NOT IMPLEMENTED
 	[[ else if eq .TD.Data.SqlType "mssql" ]]
 	    connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s&connection+timeout=30",
-	                            user,pw,server,port,db)
+	                            dbUser,dbPW,dbServer,dbPort,"[[.TD.Data.TitledName]]")
 	    db, err := sql.Open("mssql", connStr)
 	[[ else if eq .TD.Data.SqlType "mysql" ]]
 		ERROR - NOT IMPLEMENTED
 	[[ else if eq .TD.Data.SqlType "postgres" ]]
 	    connStr := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
-	                            user,pw,server,port,db)
+	                            dbUser,dbPW,dbServer,dbPort,"[[.TD.Data.TitledName]]")
         db, err = sql.Open("postgres", connStr)
 	[[ else if eq .TD.Data.SqlType "sqlite" ]]
 	    db, err = sql.Open("sqlite3", host)
@@ -96,7 +113,7 @@ func Port() string {
 }
 
 func setPort(port string) {
-   dbPort = pw
+   dbPort = port
 }
 
 func PW() string {

@@ -21,8 +21,27 @@ import (
 	_ "github.com/2kranki/go-sqlite3"
 	[[ end ]]
     //"html/template"
+    "../io[[.TD.Data.TitledName]]"
 	"net/http"
+	"strconv"
 )
+
+    // [[.Table.Name]]Req2Struct converts the form values to a struct.
+    func [[.Table.Name]]Req2Struct(r *http.Request) (io[[.TD.Data.TitledName]].[[.Table.TitledName]], error) {
+        var err         error
+        var wrk         string
+
+        data  := io[[.TD.Data.TitledName]].[[.Table.Name]]{}
+        [[range $f := .Table.Fields -]]
+            [[$f.RValueToStruct "data" -]]
+            if err != nil {
+                goto exitFunc
+            }
+        [[end]]
+
+    exitFunc:
+        return data, err
+    }
 
     // [[.Table.Name]]HndlrIndex handles the display of the table index.
     func [[.Table.Name]]HndlrIndex(w http.ResponseWriter, r *http.Request) {
@@ -41,23 +60,8 @@ import (
 
     // [[.Table.Name]]HndlrShow handles displaying of the table row form display.
     func [[.Table.Name]]HndlrShow(w http.ResponseWriter, r *http.Request) {
-        if r.Method != "GET" {
-            http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-            return
-        }
-
-        // Get the row to display.
-
-        // Display the row in the form.
-
-        w.Write([]byte("Show a particular record..."))
-    }
-
-    // [[.Table.Name]]HndlrDelete handles an delete request which comes from
-    // the row display form.
-    func [[.Table.Name]]HndlrDelete(w http.ResponseWriter, r *http.Request) {
         var err     error
-        var [[.Table.PrimaryKey.Name]] string
+        var key     string
 
         if r.Method != "GET" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
@@ -65,13 +69,48 @@ import (
         }
 
         // Verify any fields that need it.
-	    [[.Table.PrimaryKey.Name]] := r.FormValue("[[.Table.PrimaryKey.Name]]")
-	    if [[.Table.PrimaryKey.Name]] == "" {
-		    return errors.New("400. Bad Request.")
+	    key = r.FormValue("[[.Table.PrimaryKey.Name]]")
+	    if key == "" {
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
+	    }
+
+        // Get the row to display.
+        data, err := io[[.TD.Data.TitledName]].[[.Table.Name]]RowFind(key)
+	    if err != nil {
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
+	    }
+
+        // Display the row in the form.
+        Tmpls.ExecuteTemplate(w, "[[.TD.Data.TitledName]].[[.Table.Name]].form.gohtml", data)
+
+    }
+
+    // [[.Table.Name]]HndlrDelete handles an delete request which comes from
+    // the row display form.
+    func [[.Table.Name]]HndlrDelete(w http.ResponseWriter, r *http.Request) {
+        var err     error
+        var key     string
+
+        if r.Method != "GET" {
+            http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+            return
+        }
+
+        // Verify any fields that need it.
+	    key = r.FormValue("[[.Table.PrimaryKey.Name]]")
+	    if key == "" {
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
 	    }
 
         // Delete the row with data given.
-        err = tableio.[[.Table.Name]]RowDelete([[.Table.PrimaryKey.Name]])
+        err = io[[.TD.Data.TitledName]].[[.Table.Name]]RowDelete(key)
+	    if err != nil {
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
+	    }
 
         // Display the next row in the form with status message.
 
@@ -80,25 +119,34 @@ import (
 
     // [[.Table.Name]]HndlrInsert handles an add row request which comes from
     // the row display form.
-    func [[.Table.Name]]HndlrCreated(w http.ResponseWriter, r *http.Request) {
+    func [[.Table.Name]]HndlrInsert(w http.ResponseWriter, r *http.Request) {
+        var err         error
+
         if r.Method != "POST" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return
         }
 
+        // Create a record from the data given.
+        data, err := [[.Table.Name]]Req2Struct(r)
+        if err != nil {
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
+        }
+
         // Verify any fields that need it.
 
-        // Insert the row of data given.
-
         // Display the row in the form with status message.
+        Tmpls.ExecuteTemplate(w, "[[.TD.Data.TitledName]].[[.Table.Name]].form.gohtml", data)
 
-        w.Write([]byte("Process the form data from the row creation form..."))
     }
 
     // [[.Table.Name]]HndlrNext handles an next request which comes from
     // the row display form and should display the next row from the
     // current one.
     func [[.Table.Name]]HndlrNext(w http.ResponseWriter, r *http.Request) {
+
+        // Verify HTTP parameters
         if r.Method != "GET" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return
@@ -108,7 +156,8 @@ import (
         // (If at end of table, wrap to beginning of table(???).)
 	    [[.Table.PrimaryKey.Name]] := r.FormValue("[[.Table.PrimaryKey.Name]]")
 	    if [[.Table.PrimaryKey.Name]] == "" {
-		    return errors.New("400. Bad Request.")
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
 	    }
 
         // Display the row in the form.
@@ -128,7 +177,8 @@ import (
         // Get the previous row to display.
 	    [[.Table.PrimaryKey.Name]] := r.FormValue("[[.Table.PrimaryKey.Name]]")
 	    if [[.Table.PrimaryKey.Name]] == "" {
-		    return errors.New("400. Bad Request.")
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
 	    }
 
         // Display the row in the form.
@@ -139,6 +189,8 @@ import (
     // [[.Table.Name]]HndlrUpdate handles an update request which comes from
     // the row display form.
     func [[.Table.Name]]HndlrUpdate(w http.ResponseWriter, r *http.Request) {
+        var err         error
+
         if r.Method != "POST" {
             http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
             return
@@ -146,10 +198,15 @@ import (
 
         // Verify any fields that need it.
 
-        // Delete the row with data given.
+        // Update the row with data given.
+        data, err := [[.Table.Name]]Req2Struct(r)
+        if err != nil {
+            http.Error(w, http.StatusText(400), http.StatusBadRequest)
+            return
+        }
 
         // Display the next row in the form.
+        Tmpls.ExecuteTemplate(w, "[[.TD.Data.TitledName]].[[.Table.Name]].form.gohtml", data)
 
-        w.Write([]byte("Process the form data from the row update form..."))
     }
 

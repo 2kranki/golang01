@@ -156,7 +156,8 @@ func SetupShared(execPath string, cmd string) error {
 		}
 	}
 
-	sharedData.SetTime(time.Now().String())
+	wrkTime := time.Now().String()[:19]
+	sharedData.SetTime(string(wrkTime))
 	sharedData.SetFunc("Time", sharedData.Time)
 
 

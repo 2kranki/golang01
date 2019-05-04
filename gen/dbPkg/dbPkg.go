@@ -18,112 +18,56 @@ import (
 	"strings"
 )
 
-type DbTypeConv struct {
-	DbType		string
-	GoType		string
+const (
+	DBTYPE_MARIABDB	= 1 << iota
+	DBTYPE_MSSQL
+	DBTYPE_MYSQL
+	DBTYPE_POSTGRES
+	DBTYPE_SQLITE
+)
+
+type TypeDefn struct {
+	Name		string		`json:"Name,omitempty"`		// Type Name
+	Html		string		`json:"Html,omitempty"`		// HTML Type
+	Sql			string		`json:"Sql,omitempty"`		// SQL Type
+	Go			string		`json:"Go,omitempty"`		// GO Type
+	DftLen		int			`json:"DftLen,omitempty"`	// Default Length (used if length is not
+	//													//	given)(0 == Max Length)
 }
 
-var typeConvMsSql = []DbTypeConv{
-	{"BLOB", "[]byte"},						// BLOB
-	{"BOOLEAN", "???"},						// BOOLEAN
-	{"CHAR", "???"},						// CHAR[(length)]
-	{"CHARACTER", "???"},					// CHARACTER[(length)]
-	{"CLOB", "[]byte"},						// CLOB
-	{"DATE", "time.Time"},
-	{"DATETIME", "time.Time"},
-	{"DEC", "float64"},						// DEC[(p[,s])]
-	{"DECIMAL", "float64"},					// DECIMAL[(p[,s])]
-	{"FLOAT", "float64"},					// FLOAT(p)
-	{"INT", "int64"},
-	{"INTEGER", "int64"},
-	{"NULL", "nil"},
-	{"NUMERIC", "???"},						// NUMERIC [(p[,s])]
-	{"NVARCHAR", "string"},					// NVARCHAR(length)
-	{"REAL", "float64"},
-	{"SMALLINT", "???"},
-	{"TEXT", "string"},
-	{"TIME", "time.Time"},
-	{"TIMESTAMP", "time.Time"},
-	{"VARCHAR", "???"},						// VARCHAR(length)
+type TypeDefns []TypeDefn
+
+func (t TypeDefns) FindDefn(Name string) *TypeDefn {
+	for i,v := range t {
+		if Name == v.Name {
+			return &t[i]
+		}
+	}
+	return nil
 }
 
-var typeConvMySql = []DbTypeConv{
-	{"BLOB", "[]byte"},						// BLOB
-	{"BOOLEAN", "???"},						// BOOLEAN
-	{"CHAR", "???"},						// CHAR[(length)]
-	{"CHARACTER", "???"},					// CHARACTER[(length)]
-	{"CLOB", "[]byte"},						// CLOB
-	{"DATE", "time.Time"},
-	{"DATETIME", "time.Time"},
-	{"DEC", "float64"},						// DEC[(p[,s])]
-	{"DECIMAL", "float64"},					// DECIMAL[(p[,s])]
-	{"FLOAT", "float64"},					// FLOAT(p)
-	{"INT", "int64"},
-	{"INTEGER", "int64"},
-	{"NULL", "nil"},
-	{"NUMERIC", "???"},						// NUMERIC [(p[,s])]
-	{"NVARCHAR", "string"},					// NVARCHAR(length)
-	{"REAL", "???"},
-	{"SMALLINT", "???"},
-	{"TEXT", "string"},
-	{"TIME", "time.Time"},
-	{"TIMESTAMP", "time.Time"},
-	{"VARCHAR", "???"},						// VARCHAR(length)
-}
-
-var typeConvPostgres = []DbTypeConv{
-	{"BLOB", "[]byte"},						// BLOB
-	{"BOOLEAN", "???"},						// BOOLEAN
-	{"CHAR", "???"},						// CHAR[(length)]
-	{"CHARACTER", "???"},					// CHARACTER[(length)]
-	{"CLOB", "[]byte"},						// CLOB
-	{"DATE", "time.Time"},
-	{"DATETIME", "time.Time"},
-	{"DEC", "float64"},						// DEC[(p[,s])]
-	{"DECIMAL", "float64"},					// DECIMAL[(p[,s])]
-	{"FLOAT", "float64"},					// FLOAT(p)
-	{"INT", "int64"},
-	{"INTEGER", "int64"},
-	{"NULL", "nil"},
-	{"NUMERIC", "???"},						// NUMERIC [(p[,s])]
-	{"NVARCHAR", "string"},					// NVARCHAR(length)
-	{"REAL", "???"},
-	{"SMALLINT", "???"},
-	{"TEXT", "string"},
-	{"TIME", "time.Time"},
-	{"TIMESTAMP", "time.Time"},
-	{"VARCHAR", "???"},						// VARCHAR(length)
-}
-
-var typeConvSqlite = []DbTypeConv{
-	{"BLOB", "[]byte"},						// BLOB
-	{"BOOLEAN", "???"},						// BOOLEAN
-	{"CHAR", "???"},						// CHAR[(length)]
-	{"CHARACTER", "???"},					// CHARACTER[(length)]
-	{"CLOB", "[]byte"},						// CLOB
-	{"DATE", "time.Time"},
-	{"DATETIME", "time.Time"},
-	{"DEC", "float64"},						// DEC[(p[,s])]
-	{"DECIMAL", "float64"},					// DECIMAL[(p[,s])]
-	{"FLOAT", "float64"},					// FLOAT(p)
-	{"INT", "int64"},
-	{"INTEGER", "int64"},
-	{"NULL", "nil"},
-	{"NUMERIC", "float64"},					// NUMERIC [(p[,s])]
-	{"NVARCHAR", "string"},					// NVARCHAR(length)
-	{"REAL", "float64"},
-	{"SMALLINT", "int64"},
-	{"TEXT", "string"},
-	{"TIME", "time.Time"},
-	{"TIMESTAMP", "time.Time"},
-	{"VARCHAR", "string"},						// VARCHAR(length)
+var tds	= TypeDefns {
+	{Name:"date", 		Html:"date", 		Sql:"DATE", 		Go:"string",	DftLen:0,},
+	{Name:"datetime",	Html:"datetime",	Sql:"DATETIME",		Go:"string",	DftLen:0,},
+	{Name:"email", 		Html:"email", 		Sql:"NVARCHAR", 	Go:"string",	DftLen:50,},
+	{Name:"dec", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
+	{Name:"decimal", 	Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
+	{Name:"int", 		Html:"number",		Sql:"INT",			Go:"int",		DftLen:0,},
+	{Name:"integer", 	Html:"number",		Sql:"INT",			Go:"int",		DftLen:0,},
+	{Name:"money", 		Html:"number",		Sql:"DEC",			Go:"float64",	DftLen:0,},
+	{Name:"number", 	Html:"number",		Sql:"INT",			Go:"int",		DftLen:0,},
+	{Name:"tel", 		Html:"tel",			Sql:"NVARCHAR",		Go:"string",	DftLen:19,},	//+nnn (nnn) nnn-nnnn
+	{Name:"text", 		Html:"text",		Sql:"NVARCHAR",		Go:"string",	DftLen:0,},
+	{Name:"time", 		Html:"time",		Sql:"TIME",			Go:"string",	DftLen:0,},
+	{Name:"url", 		Html:"url",			Sql:"NVARCHAR",		Go:"string",	DftLen:50,},
 }
 
 // DbField defines a Table's field mostly in terms of
 // SQL.
 type DbField struct {
 	Name		string		`json:"Name,omitempty"`			// Field Name
-	Type		string		`json:"Type,omitempty"`			// SQL Type
+	Label		string		`json:"Label,omitempty"`		// Form Label
+	TypeDefn	string		`json:"TypeDef,omitempty"`		// Type Definition
 	Len		    int		    `json:"Len,omitempty"`			// Data Maximum Length
 	Dec		    int		    `json:"Dec,omitempty"`			// Decimal Positions
 	PrimaryKey  bool	    `json:"PrimaryKey,omitempty"`
@@ -137,14 +81,21 @@ func (f *DbField) CreateSql(cm string) string {
 	var nl			string
 	var pk			string
 
+	td := tds.FindDefn(f.TypeDefn)
+	if td == nil {
+		log.Fatalln("Error - Could not find Type definition for field,",
+			f.Name,"type:",f.TypeDefn)
+	}
+	tdd := td.Sql
+
 	if f.Len > 0 {
 		if f.Dec > 0 {
-			ft = fmt.Sprintf("%s(%d,%d)", f.Type, f.Len, f.Dec)
+			ft = fmt.Sprintf("%s(%d,%d)", tdd, f.Len, f.Dec)
 		} else {
-			ft = fmt.Sprintf("%s(%d)", f.Type, f.Len)
+			ft = fmt.Sprintf("%s(%d)", tdd, f.Len)
 		}
 	} else {
-		ft = f.Type
+		ft = tdd
 	}
 	nl = " NOT NULL"
 	if f.Nullable {
@@ -162,14 +113,72 @@ func (f *DbField) CreateSql(cm string) string {
 func (f *DbField) CreateStruct() string {
 	var str			strings.Builder
 
-	str.WriteString(fmt.Sprintf("\t%s\t", strings.Title(f.Name)))
-	str.WriteString(fmt.Sprintf("%s\n", f.GoType()))
+	td := tds.FindDefn(f.TypeDefn)
+	if td == nil {
+		log.Fatalln("Error - Could not find Type definition for field,",
+			f.Name,"type:",f.TypeDefn)
+	}
+
+	tdd := td.Go
+	str.WriteString(fmt.Sprintf("\t%s\t%s\n", strings.Title(f.Name),tdd))
 
 	return str.String()
 }
 
-func (f *DbField) GoType() string {
-	return ConvFieldToGoType(dbStruct.SqlType, f.Type)
+func (f *DbField) FormInput() string {
+	var str			strings.Builder
+
+	td := tds.FindDefn(f.TypeDefn)
+	if td == nil {
+		log.Fatalln("Error - Could not find Type definition for field,",
+			f.Name,"type:",f.TypeDefn)
+	}
+
+	tdd := td.Html
+	str.WriteString(fmt.Sprintf("\t<label>%s: <input type=\"%s\" value={{%s}}></label>\n",
+		strings.Title(f.Label), strings.Title(tdd), f.TitledName()))
+
+	return str.String()
+}
+
+func (f *DbField) RValueToStruct(dn string) string {
+	var str			string
+
+	td := tds.FindDefn(f.TypeDefn)
+	if td == nil {
+		log.Fatalln("Error - Could not find Type definition for field,",
+			f.Name,"type:",f.TypeDefn)
+	}
+
+	tdd := td.Name
+	switch tdd {
+	case "dec":
+		fallthrough
+	case "decimal":
+		str = fmt.Sprintf("\t%s.%s = strconv.Atoi(r.FormValue(\"%s\"))\n", dn, f.TitledName(), f.TitledName())
+	case "int":
+		fallthrough
+	case "integer":
+		{
+			wrk := "\twrk = r.FormValue(\"%s\")\n" +
+				"\t%s.%s, err = strconv.Atoi(wrk)\n"
+			str = fmt.Sprintf(wrk, f.TitledName(), dn, f.TitledName())
+		}
+	case "money":
+		{
+			wrk := 	"\twrk = r.FormValue(\"%s\")\n" +
+					"\t%s.%s, err = strconv.ParseFloat(wrk, 64)\n"
+			str = fmt.Sprintf(wrk, f.TitledName(), dn, f.TitledName())
+		}
+	default:
+		str = fmt.Sprintf("\t%s.%s = r.FormValue(\"%s\")\n", dn, f.TitledName(), f.TitledName())
+	}
+
+	return str
+}
+
+func (f *DbField) TitledName( ) string {
+	return strings.Title(f.Name)
 }
 
 // DbTable stands for Database Table and defines
@@ -196,10 +205,6 @@ func (t *DbTable) CreateInsertStr() string {
 func (t *DbTable) CreateSql() string {
 	var str			strings.Builder
 
-	str.WriteString(fmt.Sprintf("DROP TABLE %s IF EXISTS;\n", t.Name))
-	if dbStruct.SqlType == "mssql" {
-		str.WriteString("GO\n")
-	}
 	str.WriteString(fmt.Sprintf("CREATE TABLE %s (\n", t.Name))
 	for i,f := range t.Fields {
 		var cm  		string
@@ -221,12 +226,22 @@ func (t *DbTable) CreateSql() string {
 func (t *DbTable) CreateStruct( ) string {
 	var str			strings.Builder
 
-	str.WriteString(fmt.Sprintf("type %s struct {\n", t.TitledName))
+	str.WriteString(fmt.Sprintf("type %s struct {\n", t.TitledName()))
 	for i,_ := range t.Fields {
 		str.WriteString(t.Fields[i].CreateStruct())
 	}
 	str.WriteString("}\n")
 
+	return str.String()
+}
+
+func (t *DbTable) DeleteSql() string {
+	var str			strings.Builder
+
+	str.WriteString(fmt.Sprintf("DROP TABLE %s IF EXISTS;\n", t.Name))
+	if dbStruct.SqlType == "mssql" {
+		str.WriteString("GO\n")
+	}
 	return str.String()
 }
 
@@ -467,43 +482,15 @@ func TableNames() []string {
 	return list
 }
 
-func typeConv(dbType string) []DbTypeConv {
-	var table  		[]DbTypeConv
-
-	switch dbType {
-	case "mariadb":
-		table = typeConvMsSql
-	case "mssql":
-		table = typeConvMsSql
-	case "mysql":
-		table = typeConvMySql
-	case "postgres":
-		table = typeConvMySql
-	case "sqlite":
-		table = typeConvSqlite
-	}
-
-	return table
-}
-
-func ConvFieldToGoType(dbType string, ft string) string {
-	var table  		[]DbTypeConv
-
-	if table = typeConv(dbType); table == nil {
-		return ""
-	}
-	for i, _ := range table {
-		if strings.EqualFold(ft, table[i].DbType) {
-			return table[i].GoType
-		}
-	}
-
-	return ""
-}
-
 func ValidateData() error {
 
-	if x := typeConv(dbStruct.SqlType); x == nil {
+	switch dbStruct.SqlType {
+	case "mariadb":
+	case "mssql":
+	case "mysql":
+	case "postgres":
+	case "sqlite":
+	default:
 		return errors.New(fmt.Sprintf("SqlType of %s is not supported!",dbStruct.SqlType))
 	}
 	if dbStruct.Name == "" {
@@ -523,12 +510,13 @@ func ValidateData() error {
 			if f.Name == "" {
 				return errors.New(fmt.Sprintf("%d Field Name is missing from table %s!", j, t.Name))
 			}
-			if typ := ConvFieldToGoType(dbStruct.SqlType, f.Type); typ == "" {
-				return errors.New(fmt.Sprintf("%s:%s Field Type is invalid!", t.Name, f.Name))
+			td := tds.FindDefn(f.TypeDefn)
+			if td == nil {
+				log.Fatalln("Error - Could not find Type definition for field,",
+					f.Name,"type:",f.TypeDefn)
 			}
 		}
 	}
-
 
 	return nil
 }
