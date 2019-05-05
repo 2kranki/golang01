@@ -66,7 +66,7 @@ func [[.Table.TitledName]]RowDelete(key string) error {
 	return nil
 }
 
-func [[.Table.TitledName]]RowFind(key string) (interface{}, error) {
+func [[.Table.TitledName]]RowFind(key string) ([[.Table.TitledName]], error) {
     data := [[.Table.TitledName]]{}
 
     if key == "" {
@@ -75,7 +75,7 @@ func [[.Table.TitledName]]RowFind(key string) (interface{}, error) {
 
 	row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] = $1", key)
 
-	err := row.Scan([[.Table.ScanFields]])
+	err := row.Scan([[.Table.ScanFields "&data"]])
 	if err != nil {
 		return data, err
 	}
@@ -83,12 +83,12 @@ func [[.Table.TitledName]]RowFind(key string) (interface{}, error) {
 	return data, nil
 }
 
-func [[.Table.TitledName]]RowFirst() (interface{}, error) {
+func [[.Table.TitledName]]RowFirst() ([[.Table.TitledName]], error) {
     data := [[.Table.TitledName]]{}
 
     row := db.QueryRow("SELECT * FROM [[.Table.Name]] ORDER BY [[.Table.PrimaryKey.Name]] LIMIT 1")
 
-	err := row.Scan([[.Table.ScanFields]])
+	err := row.Scan([[.Table.ScanFields "&data"]])
 	if err != nil {
 		return data, err
 	}
@@ -96,41 +96,53 @@ func [[.Table.TitledName]]RowFirst() (interface{}, error) {
     return data, nil
 }
 
-func [[.Table.TitledName]]RowInsert(d *[[.Table.TitledName]]) {
+func [[.Table.TitledName]]RowInsert(d *[[.Table.TitledName]]) error {
+    var err     error
 
+    // Validate the input record.
+
+    // Add it to the table.
+    _, err = db.Exec("INSERT INTO [[.Table.Name]] ([[.Table.CreateInsertStr]]) VALUES ([[.Table.CreateValueStr]])",
+                        [[.Table.ScanFields "d"]])
+	if err != nil {
+		err = errors.New("500. Internal Server Error." + err.Error())
+	}
+	return err
 }
 
-func [[.Table.TitledName]]RowLast() (interface{}, error) {
+func [[.Table.TitledName]]RowLast() ([[.Table.TitledName]], error) {
     data := [[.Table.TitledName]]{}
 
     row := db.QueryRow("SELECT * FROM [[.Table.Name]] ORDER BY [[.Table.PrimaryKey.Name]] DESC LIMIT 1")
 
-	err := row.Scan([[.Table.ScanFields]])
+	err := row.Scan([[.Table.ScanFields "&data"]])
 
     return data, err
 }
 
-func [[.Table.TitledName]]RowNext(key string) (interface{}, error) {
+func [[.Table.TitledName]]RowNext(key string) ([[.Table.TitledName]], error) {
     data := [[.Table.TitledName]]{}
 
     row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] > $1 ORDER BY [[.Table.PrimaryKey.Name]] ASC LIMIT 1", key)
 
-	err := row.Scan([[.Table.ScanFields]])
+	err := row.Scan([[.Table.ScanFields "&data"]])
 
     return data, err
 }
 
-func [[.Table.TitledName]]RowPrev(key string) (interface{}, error) {
+func [[.Table.TitledName]]RowPrev(key string) ([[.Table.TitledName]], error) {
     data := [[.Table.TitledName]]{}
 
     row := db.QueryRow("SELECT * FROM [[.Table.Name]] WHERE [[.Table.PrimaryKey.Name]] < $1 ORDER BY [[.Table.PrimaryKey.Name]] DESC LIMIT 1", key)
 
-	err := row.Scan([[.Table.ScanFields]])
+	err := row.Scan([[.Table.ScanFields "&data"]])
 
     return data, err
 }
 
-func [[.Table.Name]]RowUpdate(d *[[.Table.TitledName]]) {
+func [[.Table.Name]]RowUpdate(d *[[.Table.TitledName]]) error {
+    var err     error
 
+    return err
 }
 

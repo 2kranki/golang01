@@ -190,16 +190,10 @@ type DbTable struct {
 	Fields		[]DbField	`json:"Fields,omitempty"`
 }
 
+// CreateInsertStr() creates a string of all the field
+// names which can be used in SQL INSERT statements.
 func (t *DbTable) CreateInsertStr() string {
-
-	insertStr := ""
-	for _, v := range t.Fields {
-		insertStr += v.Name + ","
-	}
-	if len(insertStr) > 0 {
-		insertStr = insertStr[0:len(insertStr)-1]
-	}
-	return insertStr
+	return t.ScanFields("")
 }
 
 func (t *DbTable) CreateSql() string {
@@ -233,6 +227,21 @@ func (t *DbTable) CreateStruct( ) string {
 	str.WriteString("}\n")
 
 	return str.String()
+}
+
+// CreateValueStr() creates a string of $nnn's
+// which can be used in SQL INSERT VALUE statements.
+func (t *DbTable) CreateValueStr() string {
+
+	insertStr := ""
+	for i, _ := range t.Fields {
+		cm := ", "
+		if i == len(t.Fields) - 1 {
+			cm = ""
+		}
+		insertStr += fmt.Sprintf("$%d%s", i+1, cm)
+	}
+	return insertStr
 }
 
 func (t *DbTable) DeleteSql() string {
@@ -304,15 +313,19 @@ func (t *DbTable) PrimaryKey() *DbField {
 // ScanFields returns struct fields to be used in
 // a row.Scan.  It assumes that the struct's name
 // is "data"
-func (t *DbTable) ScanFields() string {
+func (t *DbTable) ScanFields(prefix string) string {
 	var str			strings.Builder
 
 	for i,f := range t.Fields {
-		cm := ","
+		cm := ", "
 		if i == len(t.Fields) - 1 {
 			cm = ""
 		}
-		str.WriteString(fmt.Sprintf("&data.%s%s ", f.Name, cm))
+		if len(prefix) > 0 {
+			str.WriteString(fmt.Sprintf("%s.%s%s", prefix, f.Name, cm))
+		} else {
+			str.WriteString(fmt.Sprintf("%s%s", f.Name, cm))
+		}
 	}
 	return str.String()
 }
