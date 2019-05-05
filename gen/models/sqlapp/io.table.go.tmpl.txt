@@ -3,6 +3,8 @@
 
 //
 
+// Generated: [[Time]]
+
 package io[[.TD.Data.TitledName]]
 
 import (
@@ -30,7 +32,7 @@ import (
 // given database deleting the current table if
 // present.
 func [[.Table.TitledName]]Create() error {
-    var createSql = `[[.Table.CreateSql]]`
+    var createSql = "[[.Table.CreateSql]]"
     var err     error
 
     err = [[.Table.TitledName]]Delete()
@@ -45,7 +47,7 @@ func [[.Table.TitledName]]Create() error {
 // [[.Table.TitledName]]Delete deletes the table in the
 // given database if present.
 func [[.Table.TitledName]]Delete() error {
-    var deleteSql = `[[.Table.DeleteSql]]`
+    var deleteSql = "[[.Table.DeleteSql]]"
     var err     error
 
     _, err = db.Exec(deleteSql)

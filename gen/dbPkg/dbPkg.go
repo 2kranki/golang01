@@ -105,7 +105,7 @@ func (f *DbField) CreateSql(cm string) string {
 	if f.PrimaryKey {
 		pk = " PRIMARY KEY"
 	}
-	str.WriteString(fmt.Sprintf("\t%s\t%s%s%s%s\n", f.Name, ft, nl, pk, cm))
+	str.WriteString(fmt.Sprintf("\\t%s\\t%s%s%s%s\\n", f.Name, ft, nl, pk, cm))
 
 	return str.String()
 }
@@ -205,7 +205,7 @@ func (t *DbTable) CreateInsertStr() string {
 func (t *DbTable) CreateSql() string {
 	var str			strings.Builder
 
-	str.WriteString(fmt.Sprintf("CREATE TABLE %s (\n", t.Name))
+	str.WriteString(fmt.Sprintf("CREATE TABLE %s (\\n", t.Name))
 	for i,f := range t.Fields {
 		var cm  		string
 
@@ -215,9 +215,9 @@ func (t *DbTable) CreateSql() string {
 		}
 		str.WriteString(f.CreateSql(cm))
 	}
-	str.WriteString(fmt.Sprintf(");\n"))
+	str.WriteString(fmt.Sprintf(");\\n"))
 	if dbStruct.SqlType == "mssql" {
-		str.WriteString("GO\n")
+		str.WriteString("GO\\n")
 	}
 
 	return str.String()
@@ -238,9 +238,9 @@ func (t *DbTable) CreateStruct( ) string {
 func (t *DbTable) DeleteSql() string {
 	var str			strings.Builder
 
-	str.WriteString(fmt.Sprintf("DROP TABLE %s IF EXISTS;\n", t.Name))
+	str.WriteString(fmt.Sprintf("DROP TABLE IF EXISTS %s;\\n", t.Name))
 	if dbStruct.SqlType == "mssql" {
-		str.WriteString("GO\n")
+		str.WriteString("GO\\n")
 	}
 	return str.String()
 }

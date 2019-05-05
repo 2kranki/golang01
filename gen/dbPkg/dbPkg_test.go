@@ -84,7 +84,7 @@ func TestCreate(t *testing.T) {
 func TestReadJsonFileDb(t *testing.T) {
 	var err			error
 
-	log.Printf("TestReadJsonFileDb()..\n")
+	t.Logf("TestReadJsonFileDb()..\n")
 	sharedData.SetDebug(true)
 	sharedData.SetMainPath("../misc/test01/db.json.txt")
 	if err = ReadJsonFile(sharedData.MainPath()); err != nil {

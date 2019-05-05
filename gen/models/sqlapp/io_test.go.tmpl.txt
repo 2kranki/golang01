@@ -4,77 +4,123 @@
 // io[[.TD.Data.TitledName]] contains all the functions
 // and data to interact with the SQL Database.
 
+// Generated: [[Time]]
+
 package io[[.TD.Data.TitledName]]
+[[- $n := .TD.Data.TitledName]]
 
 import (
-    "fmt"
+    //"fmt"
     "log"
 	"testing"
 )
 
 
-var db *sql.DB
-var	dbPW       	string
-var dbPort     	string
-var dbServer    string
-var dbUser     	string
-
-func TestIoClose(t *testing.T) {
-    //db.Close()
+func SetupConnectParms() {
+	[[ if eq .TD.Data.SqlType "mariadb" ]]
+		ERROR - NOT IMPLEMENTED
+	[[ else if eq .TD.Data.SqlType  "mssql" ]]
+		SetPort("1401")
+		SetPW("Passw0rd!")
+		SetServer("localhost")
+		SetUser("SA")
+	[[ else if eq .TD.Data.SqlType "mysql" ]]
+		ERROR - NOT IMPLEMENTED
+	[[ else if eq .TD.Data.SqlType "postgres" ]]
+		SetPort("5432")
+		SetPW("Passw0rd!")
+		SetServer("localhost")
+		SetUser("postgres")
+	[[ else if eq .TD.Data.SqlType "sqlite" ]]
+		SetServer("test.db")
+	[[ end ]]
 }
 
-func TestIoConnect(t *testing.T) {
+func TestConnect(t *testing.T) {
     var err         error
 
-    err = db.Ping()
-    if err != nil {
-        log.Fatalln("Error: Cannot connect: ", err)
+	t.Logf("TestConnect()...\n")
+	SetupConnectParms()
+    err = Connect()
+    if err == nil {
+	    err = Disconnect()
+        if err != nil {
+            t.Fatalf("Error: %s\n\n", err)
+        }
+    } else {
+            t.Fatalf("Error: %s\n\n", err)
     }
+	t.Logf("TestConnect() - End of Test\n\n\n")
 }
 
-func TestioCreateTables(t *testing.T) {
+func TestCreateTables(t *testing.T) {
     var err         error
 
-    err = db.Ping()
+	t.Logf("TestCreateTables()...\n")
+	SetupConnectParms()
+    err = Connect()
     if err != nil {
-        log.Fatalln("Error: Cannot connect: ", err)
+        t.Fatal("Error: Cannot connect: ", err)
     }
-}
 
-func TestioDeleteTables(t *testing.T) {
-    var err         error
-
-    err = db.Ping()
+    err = TablesCreate()
     if err != nil {
-        log.Fatalln("Error: Cannot connect: ", err)
+        t.Fatal("Error: Cannot create tables: ", err)
     }
+
+    err = Disconnect()
+    if err != nil {
+        t.Fatal("Error: Cannot disconnect: ", err)
+    }
+	t.Logf("TestCreateTables() - End of Test\n\n\n")
 }
 
-func TestIoDisconnect(t *testing.T) {
+func TestDeleteTables(t *testing.T) {
     var err         error
 
+	t.Logf("TestDeleteTables()...\n")
+	SetupConnectParms()
     //err = db.Ping()
     if err != nil {
         log.Fatalln("Error: Cannot connect: ", err)
     }
+	t.Logf("TestDeleteTables() - End of Test\n\n\n")
+}
+
+func TestDisconnect(t *testing.T) {
+    var err         error
+
+	t.Logf("TestDisconnect()...\n")
+	SetupConnectParms()
+    err = Disconnect()
+    if err == nil {
+        t.Fatal("Error: Never Connected!\n\n\n")
+    }
+	t.Logf("TestDisconnect() - End of Test\n\n\n")
 }
 
 [[- range $t := .TD.Data.Tables ]]
     func Test[[$t.TitledName]]RowDelete(t *testing.T) {
         var err         error
 
+        t.Logf("Test[[$t.TitledName]]RowDelete()...\n")
+	    SetupConnectParms()
         //err = db.Ping()
         if err != nil {
             log.Fatalln("Error: Cannot connect: ", err)
         }
+	    t.Logf("Test[[$t.TitledName]]RowDelete() - End of Test\n\n\n")
     }
 
     func Test[[$t.TitledName]]RowInsert(t *testing.T) {
         var err         error
 
+    	t.Logf("Test[[$t.TitledName]]RowInsert()...\n")
+	    SetupConnectParms()
         //err = db.Ping()
         if err != nil {
             log.Fatalln("Error: Cannot connect: ", err)
         }
+	    t.Logf("Test[[$t.TitledName]]RowInsert() - End of Test\n\n\n")
     }
 [[ end ]]

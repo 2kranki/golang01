@@ -2,11 +2,12 @@
 
 {
     "Name":"Finances",
-    "SqlType":"postgres",       # mariadb | mssql | mysql | postgres | sqlite (required)
-    "Server":"localhost",
-    "Port":"5432",
-    "PW":"Passw0rd",
-    "User":"",
+    "SqlType":"sqlite",         # mariadb | mssql | mysql | postgres | sqlite (required)
+    "Server":"test.db",
+    #"Server":"localhost",
+    #"Port":"5432",
+    #"PW":"Passw0rd",
+    #"User":"",
     "Tables":[
         {
             "Name":"Customer",

@@ -4,11 +4,13 @@
 // io[[.TD.Data.TitledName]] contains all the functions
 // and data to interact with the SQL Database.
 
+// Generated: [[Time]]
+
 package io[[.TD.Data.TitledName]]
 
 import (
     "database/sql"
-	//"errors"
+	"errors"
     "fmt"
     "log"
 	[[ if eq .TD.Data.SqlType "mariadb" ]]
@@ -27,20 +29,13 @@ import (
 )
 
 
-var db *sql.DB
+var db          *sql.DB
 var	dbPW       	string
 var dbPort     	string
 var dbServer    string
 var dbUser     	string
 
-// ioClose cleans up anything that needs to be
-// accomplished before the database is closed
-// and then closes the database connection.
-func ioClose() {
-    db.Close()
-}
-
-func ioConnect() {
+func Connect() error {
     var err         error
 
 	[[ if eq .TD.Data.SqlType "mariadb" ]]
@@ -56,53 +51,60 @@ func ioConnect() {
 	                            dbUser,dbPW,dbServer,dbPort,"[[.TD.Data.TitledName]]")
         db, err = sql.Open("postgres", connStr)
 	[[ else if eq .TD.Data.SqlType "sqlite" ]]
-	    db, err = sql.Open("sqlite3", host)
+	    connStr := fmt.Sprintf("%s", dbServer)
+	    db, err = sql.Open("sqlite3", connStr)
 	[[ end ]]
     if err != nil {
-        log.Fatalln("Error: Cannot connect: ", err)
+        log.Fatalln("Error: Cannot Connect: ", err)
     }
     err = db.Ping()
     if err != nil {
-        log.Fatalln("Error: Cannot connect: ", err)
+        log.Fatalln("Error: Cannot Ping: ", err)
     }
+
+    return nil
 }
 
-func ioCreateTables() {
+// Disconnect() cleans up anything that needs to be
+// accomplished before the database is closed
+// and then closes the database connection.
+func Disconnect() error {
+    var err         error
+
+    if db != nil {
+        err = db.Close()
+        db = nil
+    } else {
+        err = errors.New("Error: Database was not connected!")
+    }
+
+    return err
+}
+
+func TablesCreate() error {
     var err         error
 
 	[[range $t := .TD.Data.Tables -]]
         err = [[$t.TitledName]]Create()
         if err != nil {
-            log.Fatalln("Error: Cannot connect: ", err)
+            log.Fatalln("Error: Cannot create table: ", err)
         }
-	[[ end -]]
+	[[ end ]]
+
+	return err
 }
 
-func ioDisconnect() {
+func TablesDelete() error {
     var err         error
 
-	[[ if eq .TD.Data.SqlType "mariadb" ]]
-		ERROR - NOT IMPLEMENTED
-	[[ else if eq .TD.Data.SqlType "mssql" ]]
-	    connStr := fmt.Sprintf("sqlserver://%s:%s@%s:%s?database=%s&connection+timeout=30",
-	                            dbUser,dbPW,dbServer,dbPort,"[[.TD.Data.TitledName]]")
-	    db, err := sql.Open("mssql", connStr)
-	[[ else if eq .TD.Data.SqlType "mysql" ]]
-		ERROR - NOT IMPLEMENTED
-	[[ else if eq .TD.Data.SqlType "postgres" ]]
-	    connStr := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
-	                            dbUser,dbPW,dbServer,dbPort,"[[.TD.Data.TitledName]]")
-        db, err = sql.Open("postgres", connStr)
-	[[ else if eq .TD.Data.SqlType "sqlite" ]]
-	    db, err = sql.Open("sqlite3", host)
+	[[range $t := .TD.Data.Tables -]]
+        err = [[$t.TitledName]]Delete()
+        if err != nil {
+            log.Fatalln("Error: Cannot delete table: ", err)
+        }
 	[[ end ]]
-    if err != nil {
-        log.Fatalln("Error: Cannot connect: ", err)
-    }
-    err = db.Ping()
-    if err != nil {
-        log.Fatalln("Error: Cannot connect: ", err)
-    }
+
+	return err
 }
 
 func Name() string {
@@ -112,7 +114,7 @@ func Port() string {
    return dbPort
 }
 
-func setPort(port string) {
+func SetPort(port string) {
    dbPort = port
 }
 
@@ -120,7 +122,7 @@ func PW() string {
    return dbPW
 }
 
-func setPW(pw string) {
+func SetPW(pw string) {
    dbPW = pw
 }
 
@@ -128,6 +130,14 @@ func Server() string {
    return dbServer
 }
 
-func setServer(server string) {
+func SetServer(server string) {
    dbServer = server
+}
+
+func User() string {
+   return dbServer
+}
+
+func SetUser(user string) {
+   dbUser = user
 }

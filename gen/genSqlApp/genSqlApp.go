@@ -36,12 +36,13 @@ import (
 type FileDefn struct {
 	ModelName		string 		`json:"ModelName,omitempty"`
 	FileDir			string		`json:"FileDir,omitempty"`		// Output File Directory
-	FileName  		string 		`json:"FileName,omitempty"`
+	FileName  		string 		`json:"FileName,omitempty"`		// Output File Name
 	FileType  		string 		`json:"Type,omitempty"`  		// text, sql, html
+	FilePerms		os.FileMode	`json:"FilePerms,omitempty"`	// Output File Permissions
 	Class     		string 		`json:"Class,omitempty"` 		// single, table
 	PerGrp  		int			`json:"PerGrp,omitempty"` 		// 0 == generate one file
-	//														// 1 == generate one file for a database
-	// 														// 2 == generate one file for a table
+	//															// 1 == generate one file for a database
+	// 															// 2 == generate one file for a table
 }
 
 // FileDefns controls what files are generated.
@@ -50,6 +51,15 @@ var FileDefns []FileDefn = []FileDefn{
 		"/tmpl",
 		"base.html.tmpl",
 		"copy",
+		0644,
+		"one",
+		0,
+	},
+	{"bld.sh.txt",
+		"",
+		"bld.sh",
+		"copy",
+		0755,
 		"one",
 		0,
 	},
@@ -57,6 +67,7 @@ var FileDefns []FileDefn = []FileDefn{
 		"/tmpl",
 		"${DbName}.${TblName}.form.gohtml",
 		"text",
+		0644,
 		"one",
 		2,
 	},
@@ -64,6 +75,7 @@ var FileDefns []FileDefn = []FileDefn{
 		"",
 		"main.go",
 		"text",
+		0644,
 		"one",
 		0,
 	},
@@ -71,6 +83,7 @@ var FileDefns []FileDefn = []FileDefn{
 		"",
 		"mainExec.go",
 		"text",
+		0644,
 		"single",
 		0,
 	},
@@ -78,6 +91,7 @@ var FileDefns []FileDefn = []FileDefn{
 		"/hndlr${DbName}",
 		"hndlr${DbName}.go",
 		"text",
+		0644,
 		"single",
 		0,
 	},
@@ -85,6 +99,7 @@ var FileDefns []FileDefn = []FileDefn{
 		"/hndlr${DbName}",
 		"${TblName}.go",
 		"text",
+		0644,
 		"single",
 		2,
 	},
@@ -92,6 +107,7 @@ var FileDefns []FileDefn = []FileDefn{
 		"/io${DbName}",
 		"io${DbName}.go",
 		"text",
+		0644,
 		"single",
 		0,
 	},
@@ -99,6 +115,7 @@ var FileDefns []FileDefn = []FileDefn{
 		"/io${DbName}",
 		"io${DbName}_test.go",
 		"text",
+		0644,
 		"single",
 		0,
 	},
@@ -106,6 +123,7 @@ var FileDefns []FileDefn = []FileDefn{
 		"/io${DbName}",
 		"${TblName}.go",
 		"text",
+		0644,
 		"single",
 		2,
 	},
@@ -146,6 +164,7 @@ func (t *TaskData) genFile() {
 			}
 		} else {
 			if amt, err := copyFile(t.PathIn, t.PathOut); err == nil {
+				os.Chmod(t.PathOut, t.FD.FilePerms)
 				if !sharedData.Quiet() {
 					log.Printf("\tCopied %d bytes from %s to %s\n", amt, t.PathIn, t.PathOut)
 				}
@@ -156,6 +175,7 @@ func (t *TaskData) genFile() {
 		}
 	case "html":
 		if err = GenHtmlFile(t.PathIn, t.PathOut, t); err == nil {
+			os.Chmod(t.PathOut, t.FD.FilePerms)
 			if !sharedData.Quiet() {
 				log.Printf("\tGenerated HTML from %s to %s\n", t.PathIn, t.PathOut)
 			}
@@ -165,6 +185,7 @@ func (t *TaskData) genFile() {
 		}
 	case "text":
 		if err = GenTextFile(t.PathIn, t.PathOut, t); err == nil {
+			os.Chmod(t.PathOut, t.FD.FilePerms)
 			if !sharedData.Quiet() {
 				log.Printf("\tGenerated HTML from %s to %s\n", t.PathIn, t.PathOut)
 			}
