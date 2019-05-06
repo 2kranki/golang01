@@ -183,7 +183,7 @@ func TestDisconnect(t *testing.T) {
         }
 
         // Now read the middle record.
-        t.Logf("\tReading Middle Record\n")
+        t.Logf("\tReading via Find the Middle Record\n")
         rcd, err = [[$t.TitledName]]RowFind("2")
         if err != nil {
             t.Fatalf("Error: : Record Middle Failed: %s\n\n\n", err)
@@ -193,6 +193,32 @@ func TestDisconnect(t *testing.T) {
         }
         if rcd.Name != "C" {
             t.Fatalf("Error: : Record Middle Verification Failed\n\n\n")
+        }
+
+        // Now read the first record via Find.
+        t.Logf("\tReading via Find the First Record\n")
+        rcd, err = [[$t.TitledName]]RowFind("0")
+        if err != nil {
+            t.Fatalf("Error: : Record First Failed: %s\n\n\n", err)
+        }
+        if rcd.Num != 0 {
+            t.Fatalf("Error: : Record First Verification Failed\n\n\n")
+        }
+        if rcd.Name != "A" {
+            t.Fatalf("Error: : Record First Verification Failed\n\n\n")
+        }
+
+        // Now read the last record via Find.
+        t.Logf("\tReading via Find the Last Record\n")
+        rcd, err = [[$t.TitledName]]RowFind("4")
+        if err != nil {
+            t.Fatalf("Error: : Record Last Failed: %s\n\n\n", err)
+        }
+        if rcd.Num != 4 {
+            t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
+        }
+        if rcd.Name != "E" {
+            t.Fatalf("Error: : Record Last Verification Failed\n\n\n")
         }
 
         //err = TablesDelete()

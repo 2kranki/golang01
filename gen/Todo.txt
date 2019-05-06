@@ -33,3 +33,7 @@
             * Allow some selection criteria
             * generate switch to single record mode and back
 * possibly json to struct converter and vice versa
+* Check into for possible inclusion:
+    * https://github.com/volatiletech/openapi-generator
+    * https://github.com/volatiletech/sqlboiler
+    * https://github.com/gin-gonic/gin

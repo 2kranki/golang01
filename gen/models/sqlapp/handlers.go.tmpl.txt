@@ -24,8 +24,8 @@ import (
     //"../io[[.TD.Data.TitledName]]"
 )
 
-
-var Tmpls *template.Template
+var tmplsDir        string
+var Tmpls           *template.Template
 
 func Title(i interface{}) string {
     return "Title() - NOT Implemented"
@@ -36,7 +36,18 @@ func Body(i interface{}) string {
 }
 
 func init() {
+    tmplsDir = "./"
+}
+
+func SetTmplsDir(d string) {
+    tmplsDir = d
+}
+
+// SetupTmpls initializes the functions used in the templates
+// and loads them.
+func SetupTmpls() {
     funcs := map[string]interface{}{"Title":Title, "Body":Body,}
-	Tmpls = template.Must(template.New("tmpls").Funcs(funcs).ParseGlob("tmpl/*.tmpl"))
+    path := tmplsDir + "tmpl/*.tmpl"
+	Tmpls = template.Must(template.New("tmpls").Funcs(funcs).ParseGlob(path))
 }
 
