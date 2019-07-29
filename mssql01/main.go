@@ -115,7 +115,7 @@ func main() {
     flag.Usage = usage
 	flag.BoolVar(&debug, "debug", false, "enable debugging")
 	flag.StringVar(&pw, "pw", "Passw0rd!", "the database password")
-	flag.StringVar(&port, "port", "1401", "the database port")
+	flag.StringVar(&port, "port", "1402", "the database port")
 	flag.StringVar(&server, "server", "localhost", "the database server")
 	flag.StringVar(&user, "user", "sa", "the database user")
 	flag.StringVar(&db, "db", "TeachDB", "the database name")

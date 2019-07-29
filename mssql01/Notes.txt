@@ -19,8 +19,10 @@ go get github.com/denisenkom/go-mssqldb
 # Then to just run the code, you do (make sure that you start docker first):
 go run main.go
 # I actually like better this:
-go build
-./console01
+go run main.go
+
+# I use docker image, mssql_new, from my docker01 repository, because it automatically
+# loads various databases for testing. 
 
 # Ok, this program is done for now.  I will work on it more as a different name a little
 # later.  To do this program, I read the entire "Golang" book and am 1/3 of the way through
