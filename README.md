@@ -11,3 +11,10 @@ and not gauranteed to work correctly.  Those are:
     console05
     gen
 
+
+The 'html' directory gives an example of parsing HTML with Go using
+its experimental library. I wrote it to get an example, because I
+need to parse html for regression testing in genapp.
+
+
+
