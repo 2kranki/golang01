@@ -17,41 +17,20 @@
             align-items: left;
             height: 100vh;
         }
-        p {
-            margin-left: 4rem;
-            font-size: 2rem;
-            color: black;
-        }
-        .link {
-            font-size: 1rem;
-        }
-        label {
-            display:block;
-            position:relative;
-        }
-
-        label span {
-            font-weight:bold;
-            position:absolute;
-            left: 3px;
-        }
-
-        label input, label textarea, label select {
-            margin-left: 120px;
-        }
     </style>
 </head>
 <body>
     <form id="listForm" method="get" action="/Customer">
     <table>
-        <tbody>
+        <!-- The Data List -->
+        <tbody name="keys">
             <tr>
                 <td><a href="/Customer/find?key0%3d0">0</a></td>
-                <td>A</td>
+                <td name="key0">A</td>
             </tr>
             <tr>
                 <td><a href="/Customer/find?key0%3d1">1</a></td>
-                <td>B</td>
+                <td name="key1">B</td>
             </tr>
         </tbody>
     </table>
@@ -60,34 +39,12 @@
         <p/>
         <p/>
         <input type=submit onclick='onListFirst()' value="First">
-        <input type=submit onclick='onListPrev()'  value="Prev">
-        <input type=submit onclick='onListNext()'  value="Next">
-        <input type=submit onclick='onListLast()'  value="Last">
-        <input type=submit onclick='onListMenu()'  value="Menu">
     </form>
     <p/>
     <p></p>
     <script>
         function onListFirst() {
             document.getElementById("listForm").action = "/Customer/list/first";
-            document.getElementById("listForm").method = "get";
-        }
-        function onListLast() {
-            document.getElementById("listForm").action = "/Customer/list/last";
-            document.getElementById("listForm").method = "get";
-        }
-        function onListMenu() {
-            document.getElementById("listForm").action = "/";
-            document.getElementById("listForm").method = "get";
-        }
-        function onListNext() {
-            key = document.getElementById("offset").value
-            document.getElementById("listForm").action = "/Customer/list/next?key="+key;
-            document.getElementById("listForm").method = "get";
-        }
-        function onListPrev() {
-            key = document.getElementById("offset").value
-            document.getElementById("listForm").action = "/Customer/list/prev?key="+key;
             document.getElementById("listForm").method = "get";
         }
     </script>

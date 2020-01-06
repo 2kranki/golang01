@@ -1,9 +1,9 @@
 // vi:nu:et:sts=4 ts=4 sw=4
-// How to parse html in Golang
+// How to parse html in Golang using the HTML Tokenizer.
 //
 // Warning: The HTML Tokenizer is a one-pass parser.  It is not a tree
-//          structure that you can do passes over. If you want that,
-//          you will need to build it yourself.
+//          structure that you can do passes over. If you want a tree
+//          like structure, then you should use html.Parse().
 // 
 
 package main
@@ -30,33 +30,62 @@ loop:
         tt := tokens.Next()
         fmt.Printf("Token: type:%T  ", tt)
         switch tt {
+
         // ErrorToken means that an error occurred during tokenization
         case html.ErrorToken:
-            fmt.Println("End")
+            fmt.Println("End:", tokens.Err().Error())
             break loop
+
         // TextToken means a text node
         case html.TextToken:
             t := tokens.Token()
-            fmt.Println("Text:",t.Data)
+            fmt.Print("Text:",t.Data)
+            for i:=0; i<len(t.Attr); i++ {
+                fmt.Print(" Attr:", t.Attr[i])
+            }
+            fmt.Println(" Text:",t.Data)
+
         // A StartTagToken looks like <a>
         case html.StartTagToken:
             t := tokens.Token()
             depth++
+            for i:=0; i<len(t.Attr); i++ {
+                fmt.Print(" Attr:", t.Attr[i])
+            }
             fmt.Println("StartTag:", depth, t.Data)
+
         // An EndTagToken looks like </a>
         case html.EndTagToken:
             t := tokens.Token()
+            for i:=0; i<len(t.Attr); i++ {
+                fmt.Print(" Attr:", t.Attr[i])
+            }
             depth--
             fmt.Println("EndTag:", depth, t.Data)
+
          // A SelfClosingTagToken tag looks like <br/>
         case html.SelfClosingTagToken:
+            t := tokens.Token()
+            for i:=0; i<len(t.Attr); i++ {
+                fmt.Print(" Attr:", t.Attr[i])
+            }
             fmt.Println("Self Closing:",tt)
+
         // A CommentToken looks like <!--x-->
         case html.CommentToken:
-            fmt.Println("Comment:",tt)
+            t := tokens.Token()
+            for i:=0; i<len(t.Attr); i++ {
+                fmt.Print(" Attr:", t.Attr[i])
+            }
+            fmt.Println("Comment:",t.Data)
+
         // A DoctypeToken looks like <!DOCTYPE x>
         case html.DoctypeToken:
-            fmt.Println("DocType:",tt)
+            t := tokens.Token()
+            for i:=0; i<len(t.Attr); i++ {
+                fmt.Print(" Attr:", t.Attr[i])
+            }
+            fmt.Println("DocType:",t.Data)
         }
     }
 
