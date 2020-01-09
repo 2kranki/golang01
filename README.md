@@ -12,9 +12,10 @@ and not gauranteed to work correctly.  Those are:
     gen
 
 
-The 'html' directory gives an example of parsing HTML with Go using
-its experimental library. I wrote it to get an example, because I
-need to parse html for regression testing in genapp.
+The 'html' and 'html2' directories give an example of parsing HTML 
+with Go using its experimental library. I wrote it to get an example,
+because I need to parse html for regression testing in genapp. I have
+updated the 'html' main.go to perform the validation that I wanted.
 
 
 
