@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>App01sq/Customer Maintenance</title>
+    <style>
+        html, body, p {
+            padding: 0;
+            border: 0;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: left;
+            height: 100vh;
+        }
+        p {
+            margin-left: 4rem;
+            font-size: 2rem;
+            color: black;
+        }
+        .link {
+            font-size: 1rem;
+        }
+        label {
+            display:block;
+            position:relative;
+        }
+
+        label span {
+            font-weight:bold;
+            position:absolute;
+            left: 3px;
+        }
+
+        label input, label textarea, label select {
+            margin-left: 120px;
+        }
+    </style>
+</head>
+<body>
+    <form id="dataForm" method="get" action="/Customer">
+        <table>
+	<tr><td><label>Num</label></td> <td><input type="number" name="Num" id="Num" value="3"></td></tr>
+	<tr><td><label>Name</label></td> <td><input type="text" name="Name" id="Name" value="D"></td></tr>
+	<tr><td><label>Addr1</label></td> <td><input type="text" name="Addr1" id="Addr1" value="D"></td></tr>
+	<tr><td><label>Addr2</label></td> <td><input type="text" name="Addr2" id="Addr2" value="D"></td></tr>
+	<tr><td><label>City</label></td> <td><input type="text" name="City" id="City" value="D"></td></tr>
+	<tr><td><label>State</label></td> <td><input type="text" name="State" id="State" value="D"></td></tr>
+	<tr><td><label>Zip</label></td> <td><input type="text" name="Zip" id="Zip" value="D"></td></tr>
+	<tr><td><label>Country</label></td> <td><input type="text" name="Country" id="Country" value="D"></td></tr>
+	<tr><td><label>Curbal</label></td> <td><input type="number" name="Curbal" id="Curbal" value="D"></td></tr>
+</table>
+<input type="hidden" id="key0" name="key0"value="3">
+
+        <p/>
+        <p/>
+        <p/>
+        <input type=submit onclick='onFirst()' value="First">
+        <input type=submit onclick='onPrev()' value="Prev">
+        <input type=submit onclick='onAdd()' value="Add">
+        <input type=submit onclick='onDelete()' value="Delete">
+        <input type=submit onclick='onUpdate()' value="Update">
+        <input type=submit onclick='onNext()' value="Next">
+        <input type=submit onclick='onLast()' value="Last">
+        <input type=reset onclick='onReset()' value="Reset">
+        <input type=submit onclick='onMenu()' value="Menu">
+    </form>
+    <p/>
+    <p></p>
+    <script>
+        
+        
+        
+        
+        keyCnt = 1;
+        keys = [ "num" ];
+        function onAdd() {
+            document.getElementById("dataForm").action = "/Customer/insert";
+            document.getElementById("dataForm").method = "post";
+        }
+        function onDelete() {
+            			key0 = document.getElementById("key0").value
+        
+            
+            document.getElementById("dataForm").action = "/Customer/delete"+"?"+"key="+key0;
+            document.getElementById("dataForm").method = "get";
+        }
+        function onFirst() {
+            document.getElementById("dataForm").action = "/Customer/first";
+            document.getElementById("dataForm").method = "get";
+        }
+        function onLast() {
+            document.getElementById("dataForm").action = "/Customer/last";
+            document.getElementById("dataForm").method = "get";
+        }
+        function onMenu() {
+            document.getElementById("dataForm").action = "/";
+            document.getElementById("dataForm").method = "get";
+        }
+        function onNext() {
+            document.getElementById("dataForm").action = "/Customer/next";
+            document.getElementById("dataForm").method = "get";
+        }
+        function onPrev() {
+            			key0 = document.getElementById("key0").value
+
+            document.getElementById("dataForm").action = "/Customer/prev"+"?"+"key="+key0;
+            document.getElementById("dataForm").method = "get";
+        }
+        function onReset() {
+            document.getElementById("dataForm").action = "/Customer/reset";
+            
+        }
+        function onUpdate() {
+            document.getElementById("dataForm").action = "/Customer/update";
+            document.getElementById("dataForm").method = "post";
+        }
+    </script>
+</body>
+</html>
+

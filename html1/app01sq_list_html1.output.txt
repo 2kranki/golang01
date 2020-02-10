@@ -60,14 +60,12 @@ Token: type:%!V(html.TokenType=1)   Text:
 Token: type:%!V(html.TokenType=2)   StartTag: 8 td
 Token: type:%!V(html.TokenType=2)   Attr:{ href /Customer/find?key0%3d0} StartTag: 9 a
 Token: type:%!V(html.TokenType=1)   Text: 0
-			NameOdd: 0
 Token: type:%!V(html.TokenType=3)   EndTag: 8 a
 Token: type:%!V(html.TokenType=3)   EndTag: 7 td
 Token: type:%!V(html.TokenType=1)   Text: 
                 
 Token: type:%!V(html.TokenType=2)   Attr:{ name key0} StartTag: 8 td
 Token: type:%!V(html.TokenType=1)   Text: A
-			NameEven: A
 Token: type:%!V(html.TokenType=3)   EndTag: 7 td
 Token: type:%!V(html.TokenType=1)   Text: 
             
@@ -80,14 +78,12 @@ Token: type:%!V(html.TokenType=1)   Text:
 Token: type:%!V(html.TokenType=2)   StartTag: 8 td
 Token: type:%!V(html.TokenType=2)   Attr:{ href /Customer/find?key0%3d1} StartTag: 9 a
 Token: type:%!V(html.TokenType=1)   Text: 1
-			NameOdd: 1
 Token: type:%!V(html.TokenType=3)   EndTag: 8 a
 Token: type:%!V(html.TokenType=3)   EndTag: 7 td
 Token: type:%!V(html.TokenType=1)   Text: 
                 
 Token: type:%!V(html.TokenType=2)   Attr:{ name key1} StartTag: 8 td
 Token: type:%!V(html.TokenType=1)   Text: B
-			NameEven: B
 Token: type:%!V(html.TokenType=3)   EndTag: 7 td
 Token: type:%!V(html.TokenType=1)   Text: 
             
@@ -143,91 +139,6 @@ Token: type:%!V(html.TokenType=1)   Text:
 
 
 Token: type:%!V(html.TokenType=0)   End: EOF
-==>Test succeeded!
-
-
-Token: type:%!V(html.TokenType=5)   Comment:  vi:nu:et:sts=4 ts=4 sw=4 
-Token: type:%!V(html.TokenType=1)   Text: 
-
-Token: type:%!V(html.TokenType=6)   DocType: html
-Token: type:%!V(html.TokenType=1)   Text: 
-
-Token: type:%!V(html.TokenType=2)   Attr:{ lang en} StartTag: 1 html
-Token: type:%!V(html.TokenType=1)   Text: 
-
-Token: type:%!V(html.TokenType=2)   StartTag: 2 head
-Token: type:%!V(html.TokenType=1)   Text: 
-    
-Token: type:%!V(html.TokenType=2)   Attr:{ charset UTF-8} StartTag: 3 meta
-Token: type:%!V(html.TokenType=1)   Text: 
-    
-Token: type:%!V(html.TokenType=2)   StartTag: 4 title
-Token: type:%!V(html.TokenType=1)   Text: App01sq/customer List
-Token: type:%!V(html.TokenType=3)   EndTag: 3 title
-Token: type:%!V(html.TokenType=1)   Text: 
-    
-Token: type:%!V(html.TokenType=2)   StartTag: 4 style
-Token: type:%!V(html.TokenType=1)   Text: 
-        html, body, p {
-            padding: 0;
-            border: 0;
-            margin: 0;
-        }
-        body {
-            display: flex;
-            flex-flow: column nowrap;
-            justify-content: center;
-            align-items: left;
-            height: 100vh;
-        }
-    
-Token: type:%!V(html.TokenType=3)   EndTag: 3 style
-Token: type:%!V(html.TokenType=1)   Text: 
-
-Token: type:%!V(html.TokenType=3)   EndTag: 2 head
-Token: type:%!V(html.TokenType=1)   Text: 
-
-Token: type:%!V(html.TokenType=2)   StartTag: 3 body
-Token: type:%!V(html.TokenType=1)   Text: 
-    
-Token: type:%!V(html.TokenType=2)   Attr:{ id listForm} Attr:{ method get} Attr:{ action /Customer} StartTag: 4 form
-Token: type:%!V(html.TokenType=1)   Text: 
-    
-Token: type:%!V(html.TokenType=2)   StartTag: 5 table
-Token: type:%!V(html.TokenType=1)   Text: 
-        
-Token: type:%!V(html.TokenType=5)   Comment:  The Data List 
-Token: type:%!V(html.TokenType=1)   Text: 
-        
-Token: type:%!V(html.TokenType=2)   Attr:{ name keys} StartTag: 6 tbody
-Token: type:%!V(html.TokenType=1)   Text: 
-            
-Token: type:%!V(html.TokenType=2)   StartTag: 7 tr
-Token: type:%!V(html.TokenType=1)   Text: 
-                
-Token: type:%!V(html.TokenType=2)   StartTag: 8 td
-Token: type:%!V(html.TokenType=2)   Attr:{ href /Customer/find?key0%3d0} StartTag: 9 a
-Token: type:%!V(html.TokenType=1)   Text: 3
-			NameOdd: 3
-Token: type:%!V(html.TokenType=3)   EndTag: 8 a
-Token: type:%!V(html.TokenType=3)   EndTag: 7 td
-Token: type:%!V(html.TokenType=1)   Text: 
-                
-Token: type:%!V(html.TokenType=2)   Attr:{ name key0} StartTag: 8 td
-Token: type:%!V(html.TokenType=1)   Text: A
-			NameEven: A
-Token: type:%!V(html.TokenType=3)   EndTag: 7 td
-Token: type:%!V(html.TokenType=1)   Text: 
-            
-Token: type:%!V(html.TokenType=3)   EndTag: 6 tr
-Token: type:%!V(html.TokenType=1)   Text: 
-            
-Token: type:%!V(html.TokenType=2)   StartTag: 7 tr
-Token: type:%!V(html.TokenType=1)   Text: 
-                
-Token: type:%!V(html.TokenType=2)   StartTag: 8 td
-Token: type:%!V(html.TokenType=2)   Attr:{ href /Customer/find?key0%3d1} StartTag: 9 a
-Token: type:%!V(html.TokenType=1)   Text: 1
-==>Test failed!
+==>Scan completed!
 
 

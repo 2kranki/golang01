@@ -1,102 +1,148 @@
 // vi:nu:et:sts=4 ts=4 sw=4
-// How to parse html in Golang using the HTML Parser which
-// returns a tree instead of a stream of tokens.
+// How to parse html in Golang using the HTML Tokenizer.
 //
-// For documentation on this, see:
-// https://godoc.org/golang.org/x/net/html#NodeType
+// Warning: The HTML Tokenizer is a one-pass parser.  It is not a tree
+//          structure that you can do passes over. If you want a tree
+//          like structure, then you should use html.Parse().
+// 
+
+
+// 1/9/2020 - I modified this to validate the array data. I needed this
+//          validation for unit testing in genapp and was the reason that
+//          I did this experimentation.
+//          See: https://github.com/2kranki/genapp
+
+
 
 package main
 
 import "fmt"
 import "io/ioutil"
-import "log"
+import "os"
 import "strings"
 import "golang.org/x/net/html"
 
+func ValidateFile(path string) error {
+    var in_td       bool = false
+    var num_td      int
+    var nameEven    string
+    var nameOdd     string
 
-func print_node(node *html.Node, indent int) {
-    fmt.Print(strings.Repeat(" ",indent))
-
-    switch node.Type {
-
-    // ErrorNode means that an error occurred during tokenization ???
-    case html.ErrorNode:
-        fmt.Print("Text:",node.Data)
-        for i:=0; i<len(node.Attr); i++ {
-            fmt.Print(" Attr:", node.Attr[i])
-        }
-        fmt.Println(" Error:", node.Data)
-
-    // TextToken means a text node
-    case html.TextNode:
-        fmt.Print("Text:",node.Data)
-        for i:=0; i<len(node.Attr); i++ {
-            fmt.Print(" Attr:", node.Attr[i])
-        }
-        fmt.Println(" Text:",node.Data)
-
-    // ???
-    case html.DocumentNode:
-        for i:=0; i<len(node.Attr); i++ {
-            fmt.Print(" Attr:", node.Attr[i])
-        }
-        fmt.Println(" Document:", node.Data)
-
-    // ???
-    case html.ElementNode:
-        for i:=0; i<len(node.Attr); i++ {
-            fmt.Print(" Attr:", node.Attr[i])
-        }
-        fmt.Println(" Element:", node.Data)
-
-    // A CommentToken looks like <!--x-->
-    case html.CommentNode:
-        for i:=0; i<len(node.Attr); i++ {
-            fmt.Print(" Attr:", node.Attr[i])
-        }
-        fmt.Println(" Comment:",node.Data)
-
-    // A DoctypeToken looks like <!DOCTYPE x>
-    case html.DoctypeNode:
-        for i:=0; i<len(node.Attr); i++ {
-            fmt.Print(" Attr:", node.Attr[i])
-        }
-        fmt.Println(" DocType:",node.Data)
-
-    default:
-        for i:=0; i<len(node.Attr); i++ {
-            fmt.Print(" Attr:", node.Attr[i])
-        }
-        fmt.Println(" UNKNOWN:",node.Data)
-    }
-
-}
-
-func visit_Preorder(node *html.Node, indent int) {
-    print_node(node, indent)
-    if node.FirstChild != nil {
-        visit_Preorder(node.FirstChild, indent+3)
-    }
-    if node.NextSibling != nil {
-        visit_Preorder(node.NextSibling, indent)
-    }
-}
-
-func main() {
-
-    b, err := ioutil.ReadFile("./data/app01sq_list_html2.txt")
+    b, err := ioutil.ReadFile(path)
     if err != nil {
-        log.Fatal(err)
+        fmt.Print(err)
     }
     str := string(b)
     rdr := strings.NewReader(str)
 
-    tokens, err := html.Parse(rdr)
-    if err != nil {
-        log.Fatal(err)
-    }
-    visit_Preorder(tokens, 0)
+    tokens := html.NewTokenizer(rdr)
 
-    fmt.Println("We are done!")
+    depth := 0
+loop:
+    for {
+        tt := tokens.Next()
+        fmt.Printf("Token: type:%V  ", tt)
+        switch tt {
+
+        // ErrorToken means that an error occurred during tokenization
+        case html.ErrorToken:
+            fmt.Println(" End:", tokens.Err().Error())
+            break loop
+
+        // TextToken means a text node
+        case html.TextToken:
+            t := tokens.Token()
+            for i:=0; i<len(t.Attr); i++ {
+                fmt.Print(" Attr:", t.Attr[i])
+            }
+            fmt.Println(" Text:",t.Data)
+            if in_td && len(t.Data) == 1 {
+                if (num_td & 1) == 1 {
+                    if nameOdd != "" && (nameOdd[0] + 1) != t.Data[0] {
+                        fmt.Println("==>Test failed!\n\n")
+                        return fmt.Errorf("Invalid name: %s %s\n",nameOdd,t.Data)
+                    }
+                    nameOdd = t.Data
+                    fmt.Println("\t\t\tNameOdd:",nameOdd)
+                } else {
+                    if nameEven != "" && (nameEven[0] + 1) != t.Data[0] {
+                        fmt.Println("==>Test failed!\n\n")
+                        return fmt.Errorf("Invalid name: %s %s\n",nameEven,t.Data)
+                    }
+                    nameEven = t.Data
+                    fmt.Println("\t\t\tNameEven:",nameEven)
+                }
+            }
+
+        // A StartTagToken looks like <a>
+        case html.StartTagToken:
+            t := tokens.Token()
+            depth++
+            for i:=0; i<len(t.Attr); i++ {
+                fmt.Print(" Attr:", t.Attr[i])
+            }
+            fmt.Println(" StartTag:", depth, t.Data)
+            if t.Data == "td" {
+                in_td = true
+                num_td++
+            }
+
+        // An EndTagToken looks like </a>
+        case html.EndTagToken:
+            t := tokens.Token()
+            for i:=0; i<len(t.Attr); i++ {
+                fmt.Print(" Attr:", t.Attr[i])
+            }
+            depth--
+            fmt.Println(" EndTag:", depth, t.Data)
+            if t.Data == "td" {
+                in_td = false
+            }
+
+         // A SelfClosingTagToken tag looks like <br/>
+        case html.SelfClosingTagToken:
+            t := tokens.Token()
+            for i:=0; i<len(t.Attr); i++ {
+                fmt.Print(" Attr:", t.Attr[i])
+            }
+            fmt.Println(" Self Closing:",tt)
+
+        // A CommentToken looks like <!--x-->
+        case html.CommentToken:
+            t := tokens.Token()
+            for i:=0; i<len(t.Attr); i++ {
+                fmt.Print(" Attr:", t.Attr[i])
+            }
+            fmt.Println(" Comment:",t.Data)
+
+        // A DoctypeToken looks like <!DOCTYPE x>
+        case html.DoctypeToken:
+            t := tokens.Token()
+            for i:=0; i<len(t.Attr); i++ {
+                fmt.Print(" Attr:", t.Attr[i])
+            }
+            fmt.Println(" DocType:",t.Data)
+        }
+    }
+
+    fmt.Println("==>Test succeeded!\n\n")
+    return nil
+}
+
+func main() {
+    var err error
+
+    err = ValidateFile("./data/app01sq_list_html2.txt")
+    if err != nil {
+        fmt.Print(err.Error())
+        os.Exit(4)
+    }
+
+    err = ValidateFile("./data/app01sq_list_html3.txt")
+    if err == nil {
+        fmt.Print("Error - Test for html3 file should have failed!\n")
+        os.Exit(4)
+    }
+
 }
 

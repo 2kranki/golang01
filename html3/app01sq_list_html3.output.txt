@@ -1,0 +1,166 @@
+ Document: 
+    Comment:  vi:nu:et:sts=4 ts=4 sw=4 
+    DocType: html
+    Attr:{ lang en} Element: html
+       Element: head
+         Text:
+     Text: 
+    
+          Attr:{ charset UTF-8} Element: meta
+         Text:
+     Text: 
+    
+          Element: title
+            Text:App01sq/customer List Text: App01sq/customer List
+         Text:
+     Text: 
+    
+          Element: style
+            Text:
+        html, body, p {
+            padding: 0;
+            border: 0;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: left;
+            height: 100vh;
+        }
+     Text: 
+        html, body, p {
+            padding: 0;
+            border: 0;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: left;
+            height: 100vh;
+        }
+    
+         Text:
+ Text: 
+
+      Text:
+ Text: 
+
+       Element: body
+         Text:
+     Text: 
+    
+          Attr:{ id listForm} Attr:{ method get} Attr:{ action /Customer} Element: form
+            Text:
+     Text: 
+    
+             Element: table
+               Text:
+         Text: 
+        
+                Comment:  The Data List 
+               Text:
+         Text: 
+        
+                Attr:{ name keys} Element: tbody
+                  Text:
+             Text: 
+            
+                   Element: tr
+                     Text:
+                 Text: 
+                
+                      Element: td
+                         Attr:{ href /Customer/find?key0%3d0} Element: a
+                           Text:0 Text: 0
+                     Text:
+                 Text: 
+                
+                      Attr:{ name key0} Element: td
+                        Text:A Text: A
+                     Text:
+             Text: 
+            
+                  Text:
+             Text: 
+            
+                   Element: tr
+                     Text:
+                 Text: 
+                
+                      Element: td
+                         Attr:{ href /Customer/find?key0%3d1} Element: a
+                           Text:1 Text: 1
+                     Text:
+                 Text: 
+                
+                      Attr:{ name key1} Element: td
+                        Text:B Text: B
+                     Text:
+             Text: 
+            
+                  Text:
+         Text: 
+        
+               Text:
+     Text: 
+    
+            Text:
+         Text: 
+        
+             Attr:{ type hidden} Attr:{ name offset} Attr:{ id offset} Attr:{ value 0} Element: input
+            Text:
+         Text: 
+        
+             Element: p
+               Text:
+         Text: 
+        
+             Element: p
+               Text:
+         Text: 
+        
+             Element: p
+               Text:
+         Text: 
+        
+                Attr:{ type submit} Attr:{ onclick onListFirst()} Attr:{ value First} Element: input
+               Text:
+     Text: 
+    
+         Text:
+     Text: 
+    
+          Element: p
+            Text:
+     Text: 
+    
+          Element: p
+         Text:
+     Text: 
+    
+          Element: script
+            Text:
+        function onListFirst() {
+            document.getElementById("listForm").action = "/Customer/list/first";
+            document.getElementById("listForm").method = "get";
+        }
+     Text: 
+        function onListFirst() {
+            document.getElementById("listForm").action = "/Customer/list/first";
+            document.getElementById("listForm").method = "get";
+        }
+    
+         Text:
+
+
+
+ Text: 
+
+
+
+
+We are done!
