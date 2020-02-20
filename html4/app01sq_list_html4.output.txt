@@ -21,11 +21,14 @@ Static Check:
  Attr:{ name keys} Element: tbody
  Text: 
             
- Element: tr
- Element: td
- Attr:{ href /Customer/find?key0%3d0} Element: a
- Text: 0
-UNEXPECTED NODE3:  Text: 0
+    Element: tr
+       Element: td
+          Attr:{ href /Customer/find?key0%3d0} Element: a
+             Text: 0
+    Element: tr
+       Element: td
+          Attr:{ href /Customer/find?key0%3d1} Element: a
+             Text: 1
 ...Static Check Succeeded!
 End of Static Check
 

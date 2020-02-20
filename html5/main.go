@@ -1,6 +1,11 @@
 // vi:nu:et:sts=4 ts=4 sw=4
 // How to parse html in Golang using the HTML Parser which
-// returns a tree instead of a stream of tokens.
+// returns a tree instead of a stream of tokens which can
+// be scanned multiple times and several different ways.
+//
+// In this example, we use a state machine to check for 
+// TBody/tr/Element_a/Text <number> where we are looking 
+// for consecutive numbers starting with 0.
 //
 // For documentation on this, see:
 // https://godoc.org/golang.org/x/net/html#NodeType

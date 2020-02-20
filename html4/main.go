@@ -24,7 +24,7 @@ import "strings"
 import "golang.org/x/net/html"
 
 var nodeStack   []*html.Node
-var chk string
+var chk int
 
 // Element: TBODY
 //      Text
@@ -115,13 +115,16 @@ func check1(node *html.Node) (int) {
                 printNode(node1, 9)
                 node1 = node1.FirstChild       // Text
                 printNode(node1, 12)
-                if node1.Type == html.TextNode && node1.Data == chk {
-                    num, err := strconv.Atoi(chk)
+                if node1.Type == html.TextNode {
+                    num, err := strconv.Atoi(node1.Data)
                     if err != nil {
-                        fmt.Errorf("%s\n", err.Error())
+                        log.Fatalf("%s\n", err.Error())
                     }
-                    num++
-                    chk = strconv.Itoa(num)
+                    if num != chk {
+                        fmt.Errorf("Error: check failed for Text %d looking for %d\n", num, chk)
+                        return 0
+                    }
+                    chk++
                     continue
                 } else {
                     fmt.Print("UNEXPECTED NODE3: ")
@@ -224,13 +227,36 @@ func main() {
         log.Fatal(err)
     }
 
-    fmt.Println("Static Check:")
+    fmt.Println("Static Check of HTML2...")
+    chk = 0
     indent = check1(nodeRoot)
-    chk = "0"
     if indent > 0 {
         fmt.Println("...Static Check Succeeded!")
     }
-    fmt.Println("End of Static Check")
+    fmt.Println("End of Static Check for HTML2!")
+    fmt.Println("")
+    fmt.Println("")
+    fmt.Println("")
+
+    b, err = ioutil.ReadFile("./data/app01sq_list_html3.txt")
+    if err != nil {
+        log.Fatal(err)
+    }
+    str = string(b)
+    rdr = strings.NewReader(str)
+
+    nodeRoot, err = html.Parse(rdr)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Println("Static Check of HTML3...")
+    chk = 0
+    indent = check1(nodeRoot)
+    if indent == 0 {
+        fmt.Println("...Static Check Failed, but it should have failed!")
+    }
+    fmt.Println("End of Static Check for HTML3!")
     fmt.Println("")
     fmt.Println("")
     fmt.Println("")
