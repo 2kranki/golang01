@@ -20,15 +20,17 @@ package main
 
 import "fmt"
 import "io/ioutil"
+import "log"
 import "os"
+import "strconv"
 import "strings"
 import "golang.org/x/net/html"
 
 func ValidateFile(path string) error {
     var in_td       bool = false
     var num_td      int
+    var num_entry   int
     var nameEven    string
-    var nameOdd     string
 
     b, err := ioutil.ReadFile(path)
     if err != nil {
@@ -60,12 +62,16 @@ loop:
             fmt.Println(" Text:",t.Data)
             if in_td && len(t.Data) == 1 {
                 if (num_td & 1) == 1 {
-                    if nameOdd != "" && (nameOdd[0] + 1) != t.Data[0] {
-                        fmt.Println("==>Test failed!\n\n")
-                        return fmt.Errorf("Invalid name: %s %s\n",nameOdd,t.Data)
+                    num, err := strconv.Atoi(t.Data)
+                    if err != nil {
+                        log.Fatalf("%s\n", err.Error())
                     }
-                    nameOdd = t.Data
-                    fmt.Println("\t\t\tNameOdd:",nameOdd)
+                    if num != num_entry {
+                        fmt.Println("==>Test failed!\n\n")
+                        return fmt.Errorf("Invalid integer: %d %s\n",num_entry,t.Data)
+                    }
+                    fmt.Println("\t\t\tNumEntry:",num_entry)
+                    num_entry++
                 } else {
                     if nameEven != "" && (nameEven[0] + 1) != t.Data[0] {
                         fmt.Println("==>Test failed!\n\n")
