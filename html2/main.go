@@ -9,7 +9,9 @@
 
 // 1/9/2020 - I modified this to validate the array data. I needed this
 //          validation for unit testing in genapp and was the reason that
-//          I did this experimentation.
+//          I did this experimentation. The test is a simple check on the
+//          first TD's Element a's Text to see that it is a number and
+//          progresses from 0;
 //          See: https://github.com/2kranki/genapp
 
 
@@ -132,13 +134,17 @@ loop:
 func main() {
     var err error
 
+    fmt.Println("Testing HTML2...\n")
     err = ValidateFile("./data/app01sq_list_html2.txt")
+    fmt.Println("...End of HTML2 Tests...\n")
     if err != nil {
         fmt.Print(err.Error())
         os.Exit(4)
     }
 
+    fmt.Println("Testing HTML3...\n")
     err = ValidateFile("./data/app01sq_list_html3.txt")
+    fmt.Println("...End of HTML3 Tests...\n")
     if err == nil {
         fmt.Print("Error - Test for html3 file should have failed!\n")
         os.Exit(4)

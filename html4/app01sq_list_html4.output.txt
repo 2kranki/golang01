@@ -1,0 +1,34 @@
+Static Check:
+ Document: 
+ Comment:  vi:nu:et:sts=4 ts=4 sw=4 
+ DocType: html
+ Attr:{ lang en} Element: html
+ Element: head
+ Text: 
+
+ Element: body
+ Text: 
+    
+ Attr:{ id listForm} Attr:{ method get} Attr:{ action /Customer} Element: form
+ Text: 
+    
+ Element: table
+ Text: 
+        
+ Comment:  The Data List 
+ Text: 
+        
+ Attr:{ name keys} Element: tbody
+ Text: 
+            
+ Element: tr
+ Element: td
+ Attr:{ href /Customer/find?key0%3d0} Element: a
+ Text: 0
+UNEXPECTED NODE3:  Text: 0
+...Static Check Succeeded!
+End of Static Check
+
+
+
+We are done!

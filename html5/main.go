@@ -1,15 +1,6 @@
 // vi:nu:et:sts=4 ts=4 sw=4
 // How to parse html in Golang using the HTML Parser which
-// returns a tree instead of a stream of tokens which can
-// be scanned multiple times and several different ways.
-//
-// In this example, we hard code the check for TBody/tr/
-// Element_a/Text <number> where we are looking for 
-// consecutive numbers starting with 0.
-//
-// Initially, it was very time consuming constructing the
-// scan to get to the tr's, but this method does work and
-// allows for some simple checking of the generated html.
+// returns a tree instead of a stream of tokens.
 //
 // For documentation on this, see:
 // https://godoc.org/golang.org/x/net/html#NodeType
@@ -25,6 +16,7 @@ import "golang.org/x/net/html"
 
 var nodeStack   []*html.Node
 var chk string
+var state int
 
 // Element: TBODY
 //      Text
@@ -38,6 +30,25 @@ var chk string
 //              Text        (letter)
 //          Text
 //
+const (
+    scanning state = iota           // Not in TBody
+    st_any
+    st_el_a         // Element a in First TD
+    st_el_td_0      // First Element TD in TR
+    st_el_td_1      // Second Element TD in TR
+    st_el_tr        // Element TR (Possibly Multiple TRs)
+    st_text_0       // TEXT in TBody
+    st_text_1       // TEXT in TR
+    st_text_2       // TEXT in First TD/Element a
+    st_text_2       // TEXT in Second TD
+)
+const (
+    ev_any event = iota
+    ev_FirstChild
+    ev_NextSibling
+    ev_Return
+)
+
 
 func isEmpty() (bool) {
     if len(nodeStack) > 0 {
@@ -97,24 +108,24 @@ func check1(node *html.Node) (int) {
     printNode(node, 0)                  // Text:
     for node != nil {
         var node1 *html.Node
-        node = node.NextSibling         // Scan the sibling chain of tbody.
+        node = node.NextSibling
         if node == nil {
             break
         }
         if node.Type == html.TextNode {
             continue
         }
-        printNode(node, 3)                  // Element: tr
+        printNode(node, 0)                  // Element: tr
         if node.Type == html.ElementNode && node.Data == "tr" {
             node1 = node.FirstChild         // Text
             node1 = node1.NextSibling       // td
             // Now we should have an Element with a following Text.
-            printNode(node1, 6)             // Element: td
+            printNode(node1, 0)             // Element: td
             if node1.Type == html.ElementNode && node1.Data == "td" {
                 node1 = node1.FirstChild    // Element: a
-                printNode(node1, 9)
+                printNode(node1, 0)
                 node1 = node1.FirstChild       // Text
-                printNode(node1, 12)
+                printNode(node1, 0)
                 if node1.Type == html.TextNode && node1.Data == chk {
                     num, err := strconv.Atoi(chk)
                     if err != nil {
@@ -122,7 +133,6 @@ func check1(node *html.Node) (int) {
                     }
                     num++
                     chk = strconv.Itoa(num)
-                    continue
                 } else {
                     fmt.Print("UNEXPECTED NODE3: ")
                     printNode(node1, 0)                  // Element: td
@@ -208,6 +218,51 @@ func printNode(node *html.Node, indent int) {
 
 }
 
+func visitPreorder(node *html.Node, indent int) {
+
+    printNode(node, indent)
+
+    switch state {
+        case scanning:
+            if node.Type == html.ElementNode && node.Data == "tr" {
+                state = in_el_tr
+            }
+            break
+        case in_el_a:
+            if node.Type == html.TextNode {
+                if node.Data == chk {
+                    num, err := strconv.Atoi(chk)
+                    if err != nil {
+                        fmt.Errorf("%s\n", err.Error())
+                    }
+                    num++
+                    chk = strconv.Itoa(num)
+                }
+            }
+            state = in_el_tr
+            break
+        case in_el_td:
+            if node.Type == html.ElementNode && node.Data == "a" {
+                state = in_el_a
+            }
+            break
+        case in_el_tr:
+            if node.Type == html.ElementNode && node.Data == "td" {
+                state = in_el_td
+            }
+            break
+    }
+    if node.FirstChild != nil {
+        fmt.Println("FirstChild:")
+        visitPreorder(node.FirstChild, indent+3)
+    }
+    if node.NextSibling != nil {
+        fmt.Println("NextSibling:")
+        visitPreorder(node.NextSibling, indent)
+    }
+    fmt.Println("Return")
+}
+
 func main() {
     var nodeRoot *html.Node
     var indent int
@@ -231,6 +286,15 @@ func main() {
         fmt.Println("...Static Check Succeeded!")
     }
     fmt.Println("End of Static Check")
+    fmt.Println("")
+    fmt.Println("")
+    fmt.Println("")
+
+    fmt.Println("Recursive Check:")
+    indent = 0
+    chk = "0"
+    visitPreorder(nodeRoot, indent)
+    fmt.Println("End of Recursive Check")
     fmt.Println("")
     fmt.Println("")
     fmt.Println("")
