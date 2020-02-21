@@ -1,4 +1,4 @@
-Static Check:
+Static Check1 of HTML2...
  Document: 
  Comment:  vi:nu:et:sts=4 ts=4 sw=4 
  DocType: html
@@ -30,7 +30,108 @@ Static Check:
           Attr:{ href /Customer/find?key0%3d1} Element: a
              Text: 1
 ...Static Check Succeeded!
-End of Static Check
+End of Static Check1 for HTML2!
+
+
+
+Static Check2 of HTML2...
+ Document: 
+ Comment:  vi:nu:et:sts=4 ts=4 sw=4 
+ DocType: html
+ Attr:{ lang en} Element: html
+ Element: head
+ Text: 
+
+ Element: body
+ Text: 
+    
+ Attr:{ id listForm} Attr:{ method get} Attr:{ action /Customer} Element: form
+ Text: 
+    
+ Element: table
+ Text: 
+        
+ Comment:  The Data List 
+ Text: 
+        
+ Attr:{ name keys} Element: tbody
+ Text: 
+            
+    Element: tr
+       Element: td
+          Attr:{ href /Customer/find?key0%3d0} Element: a
+             Text: 0
+    Element: tr
+       Element: td
+          Attr:{ href /Customer/find?key0%3d1} Element: a
+             Text: 1
+...Static Check Succeeded!
+End of Static Check2 for HTML2!
+
+
+
+Static Check1 of HTML3...
+ Document: 
+ Comment:  vi:nu:et:sts=4 ts=4 sw=4 
+ DocType: html
+ Attr:{ lang en} Element: html
+ Element: head
+ Text: 
+
+ Element: body
+ Text: 
+    
+ Attr:{ id listForm} Attr:{ method get} Attr:{ action /Customer} Element: form
+ Text: 
+    
+ Element: table
+ Text: 
+        
+ Comment:  The Data List 
+ Text: 
+        
+ Attr:{ name keys} Element: tbody
+ Text: 
+            
+    Element: tr
+       Element: td
+          Attr:{ href /Customer/find?key0%3d0} Element: a
+             Text: 3
+...Static Check Failed, but it should have failed!
+End of Static Check1 for HTML3!
+
+
+
+Static Check2 of HTML3...
+ Document: 
+ Comment:  vi:nu:et:sts=4 ts=4 sw=4 
+ DocType: html
+ Attr:{ lang en} Element: html
+ Element: head
+ Text: 
+
+ Element: body
+ Text: 
+    
+ Attr:{ id listForm} Attr:{ method get} Attr:{ action /Customer} Element: form
+ Text: 
+    
+ Element: table
+ Text: 
+        
+ Comment:  The Data List 
+ Text: 
+        
+ Attr:{ name keys} Element: tbody
+ Text: 
+            
+    Element: tr
+       Element: td
+          Attr:{ href /Customer/find?key0%3d0} Element: a
+             Text: 3
+...Static Check Failed, but it should have failed!
+
+End of Static Check2 for HTML3!
 
 
 

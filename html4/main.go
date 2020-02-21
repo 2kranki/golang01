@@ -11,6 +11,17 @@
 // scan to get to the tr's, but this method does work and
 // allows for some simple checking of the generated html.
 //
+// The second implementation of the checking was done using
+// the recursive search and was much faster to implement
+// since we had the recursive search from html3 already.
+//
+// The book, "The Go Programming Language" starting on 
+// page 121, has yet another way to scan the tree.
+// However, it combines the FirstChild with NextSibling
+// which I did not want for this process.  It is a
+// wonderful book if you have not read it and covers
+// many aspects of Go.
+//
 // For documentation on this, see:
 // https://godoc.org/golang.org/x/net/html#NodeType
 
@@ -23,7 +34,6 @@ import "strconv"
 import "strings"
 import "golang.org/x/net/html"
 
-var nodeStack   []*html.Node
 var chk int
 
 // Element: TBODY
@@ -39,25 +49,8 @@ var chk int
 //          Text
 //
 
-func isEmpty() (bool) {
-    if len(nodeStack) > 0 {
-        return true
-    }
-    return false
-}
-
-func popNode() (*html.Node) {
-    node := nodeStack[len(nodeStack)-1]
-    nodeStack = nodeStack[:len(nodeStack)-1]
-    return node
-}
-
-func pushNode(node *html.Node) {
-    nodeStack = append(nodeStack, node)
-}
-
 //******************************************************************
-//                  S t a t i c  C h e c k
+//                  S t a t i c  C h e c k 1
 // As you can see, this became much more painful that I thought that
 // it would be to find the starting point.  However, it is one way
 // of doing some checking on the html.
@@ -146,6 +139,88 @@ func check1(node *html.Node) (int) {
     return 1
 }
 
+var stopRecurse bool
+var nodeTR *html.Node
+
+func visit_Preorder_TR(node *html.Node, indent int) {
+
+    if stopRecurse {
+        return
+    }
+    if node.Type == html.ElementNode && node.Data == "tr" {
+        nodeTR = node
+        stopRecurse = true
+    }
+    printNode(node, indent)
+    if node.FirstChild != nil {
+        visit_Preorder_TR(node.FirstChild, indent+3)
+    }
+    if node.NextSibling != nil {
+        visit_Preorder_TR(node.NextSibling, indent)
+    }
+}
+
+//******************************************************************
+//                  S t a t i c  C h e c k 2
+// For this check, we use the recursive search to find TR node which
+// was much easier to implement.  
+//******************************************************************
+func check2(node *html.Node) (int) {
+
+    visit_Preorder_TR(node, 0)
+    if nodeTR == nil {
+        log.Fatalf("ERROR: check2 never found the TR node!")
+    }
+
+    // Scan TD's
+    node = node.FirstChild
+    for node != nil {
+        var node1 *html.Node
+
+        if node.Type == html.TextNode {
+            node = node.NextSibling
+            continue
+        }
+        printNode(node, 3)                  // Element: td
+        if node.Type == html.ElementNode && node.Data == "td" {
+            if node.FirstChild.Type == html.ElementNode && node.FirstChild.Data == "a" {
+                node1 = node.FirstChild
+                printNode(node1, 9)
+                node1 = node1.FirstChild       // Text
+                printNode(node1, 12)
+                if node1.Type == html.TextNode {
+                    num, err := strconv.Atoi(node1.Data)
+                    if err != nil {
+                        log.Fatalf("%s\n", err.Error())
+                    }
+                    if num != chk {
+                        fmt.Errorf("Error: check failed for Text %d looking for %d\n", num, chk)
+                        return 0
+                    }
+                    chk++
+                    continue
+                } else {
+                    fmt.Print("UNEXPECTED NODE3: ")
+                    printNode(node1, 0)                  // Element: td
+                    break
+                }
+            } else {
+                fmt.Print("UNEXPECTED NODE2: ")
+                printNode(node1, 0)                  // Element: td
+                break
+            }
+        } else {
+            fmt.Print("UNEXPECTED NODE1: ")
+            printNode(node1, 0)                  // Element: td
+            break
+        }
+
+        node = node.NextSibling         // Scan the sibling chain of tbody.
+    }
+
+    return 1
+}
+
 func printNode(node *html.Node, indent int) {
     fmt.Print(strings.Repeat(" ",indent))
 
@@ -227,13 +302,24 @@ func main() {
         log.Fatal(err)
     }
 
-    fmt.Println("Static Check of HTML2...")
+    fmt.Println("Static Check1 of HTML2...")
     chk = 0
     indent = check1(nodeRoot)
     if indent > 0 {
         fmt.Println("...Static Check Succeeded!")
     }
-    fmt.Println("End of Static Check for HTML2!")
+    fmt.Println("End of Static Check1 for HTML2!")
+    fmt.Println("")
+    fmt.Println("")
+    fmt.Println("")
+
+    fmt.Println("Static Check2 of HTML2...")
+    chk = 0
+    indent = check1(nodeRoot)
+    if indent > 0 {
+        fmt.Println("...Static Check Succeeded!")
+    }
+    fmt.Println("End of Static Check2 for HTML2!")
     fmt.Println("")
     fmt.Println("")
     fmt.Println("")
@@ -250,17 +336,32 @@ func main() {
         log.Fatal(err)
     }
 
-    fmt.Println("Static Check of HTML3...")
+    fmt.Println("Static Check1 of HTML3...")
     chk = 0
     indent = check1(nodeRoot)
     if indent == 0 {
         fmt.Println("...Static Check Failed, but it should have failed!")
+    } else {
+        log.Fatalf("ERROR: Static Check succeeded and it should not have!\n")
     }
-    fmt.Println("End of Static Check for HTML3!")
+    fmt.Println("End of Static Check1 for HTML3!")
     fmt.Println("")
     fmt.Println("")
     fmt.Println("")
 
-    fmt.Println("We are done!")
+    fmt.Println("Static Check2 of HTML3...")
+    chk = 0
+    indent = check1(nodeRoot)
+    if indent == 0 {
+        fmt.Println("...Static Check Failed, but it should have failed!\n")
+    } else {
+        log.Fatalf("ERROR: Static Check succeeded and it should not have!\n")
+    }
+    fmt.Println("End of Static Check2 for HTML3!")
+    fmt.Println("")
+    fmt.Println("")
+    fmt.Println("")
+
+     fmt.Println("We are done!")
 }
 
