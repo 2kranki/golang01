@@ -3,14 +3,11 @@
 I am currently learning Golang and its associated libraries in
 conjunction with Docker.  So, I decided to create this repository
 with code that I create.  Everything in this directory is public
-domain unless stated otherwise within the file.  
+domain unless stated otherwise within the file.
 
-Most of the projects here are operational.  Some are in-progress
-and not gauranteed to work correctly.  Those are:
-    console04
-    console05
-    gen
-
+My primary reference for learning Go is "The Go Programming Language"
+by Alan Donovan and Brian Kernighan, Addison Wesley, 2016.  It is
+an excellent book and covers most aspects of Go. 
 
 The 'html1' and 'html2' directories give an example of parsing HTML 
 with Go using its experimental library. I wrote it to get an example,
@@ -29,7 +26,6 @@ tree if needed. 'html3' parses the html and then prints the tree in
 'preorder' or depth-first search mode. 'html4' does the same, but with
 the addition of some validation needed for genapp.
 
-WARNING: 'html4' is a work in progress and definitely is not complete.
 
 
 
